@@ -20,6 +20,11 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 25
     env:
+      # 云端 runner 是英文系统（cp1252），而仓库里的源码/夹具都是 UTF-8。
+      # 不强制 UTF-8 的话，测试读文件会把 ‰ — （） 读成乱码，出现一批假失败
+      # （2026-11-15 首次跑 CI 就是这个问题：18 failed / 16 errors）。
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
       # 工作区指向仓库自身：没有 data/panel 时，依赖真实数据的用例会在
       # app/conftest.py 里自动打上 needs_data 并跳过（不是失败）。
       PANEL_V2_WS: ${{ github.workspace }}
