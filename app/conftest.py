@@ -30,8 +30,9 @@ _ROOT = Path(__file__).resolve().parents[1]                 # panel-v2
 _WS = Path(os.environ.get("PANEL_V2_WS") or _ROOT.parents[1])
 _HAS_PROD_DATA = (_WS / "data" / "panel").is_dir()
 
-# 需要本机生产数据 / 旧引擎文件的用例（nodeid 相对 panel-v2）。
-# 2026-11-15 实测：无数据环境下正好这 41 条失败，其余 1744 条照常通过。
+# 需要本机生产数据 / 旧引擎文件 / Hana 宿主 skill 资源的用例（nodeid 相对 panel-v2）。
+# 2026-11-15 实测：无数据环境下初测 41 条失败；首次跑 CI 又多出 1 条
+# （test_paper_css_cache_key_covers_shim 依赖 ~/.hanako/skills/report-builder/report.css）。
 _NEEDS_DATA_CASES = frozenset({
     "app/tests/test_contract.py::test_lib_accepts_real_amv_contrib",
     "app/tests/test_fe_shell_bridge.py::test_undefined_tokens_not_used",
@@ -74,6 +75,7 @@ _NEEDS_DATA_CASES = frozenset({
     "app/plugins/review/tests/test_review_api.py::test_build_review_md_paper_date_404",
     "app/plugins/review/tests/test_review_api.py::test_review_chart_real",
     "app/plugins/review/tests/test_review_frontend.py::test_scoped_css_rule_headers_match_legacy",
+    "app/plugins/review/tests/test_paper_semantic_blocks.py::test_paper_css_cache_key_covers_shim",
 })
 
 

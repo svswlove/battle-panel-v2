@@ -119,6 +119,8 @@ python -m pytest app/tests app/plugins app/lib -q     # 1785 passed, 3 skipped
 - K 线弹窗复用一套旧页 K 线模块（`engine/web/` 下的 js），这些资源不随本仓库分发，缺它们时弹窗不完整。
 - L2 筹码（主力动向）来自通达信协议客户端，需要本地 `.cah` 缓存与 7709 行情通道，公开环境不可用。
 - 盘中实时字段依赖 `eltdx`；不可用时如实留空，不做近似替代。
+- 纸面复盘的样式表来自 Hana 宿主的 skill 资源（`~/.hanako/skills/report-builder/report.css`），
+  没有这个文件时纸面渲染会降级（如实报错不伪造页面）。
 
 ## 许可
 
