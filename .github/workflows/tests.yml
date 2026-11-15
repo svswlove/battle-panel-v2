@@ -1,0 +1,46 @@
+name: tests
+
+# 每次推送 / PR 自动在干净的云端机器上跑一遍测试。
+# 重点不是"证明代码好"，而是**及早发现"在我这儿能跑、在别人那儿跑不起来"**——
+# 云端没有本机的生产数据、没有装过的包，缺依赖会立刻暴露。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    env:
+      # 工作区指向仓库自身：没有 data/panel 时，依赖真实数据的用例会在
+      # app/conftest.py 里自动打上 needs_data 并跳过（不是失败）。
+      PANEL_V2_WS: ${{ github.workspace }}
+      PANEL_V2_OUT_DIR: ${{ github.workspace }}/data/panel_v2
+      PANEL_V2_PAPER_DIR: ${{ github.workspace }}/data/panel_v2/paper
+      PANEL_V2_NOTIFY_DISABLE: "1"
+      PANEL_V2_PREWARM: "0"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 跑测试
+        run: python -m pytest app/tests app/plugins app/lib -q

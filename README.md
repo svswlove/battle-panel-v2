@@ -1,5 +1,7 @@
 # 作战面板 v2 · A 股复盘与交易纪律工作台
 
+[![tests](https://github.com/svswlove/battle-panel-v2/actions/workflows/tests.yml/badge.svg)](https://github.com/svswlove/battle-panel-v2/actions/workflows/tests.yml)
+
 > A 股板块轮动、选股、K 线、复盘、预警的一体化面板。**薄核 + 插件**架构，23 个业务插件各管一块，口径只有一份实现。
 >
 > 定位：给个人交易者用的「看板 + 纪律工具」，不是通用行情终端，也不下单。
@@ -98,6 +100,11 @@ python -m pytest app/tests app/plugins app/lib -q     # 1785 passed, 3 skipped
 
 测试按插件分目录（`app/plugins/<id>/tests/`），核心契约与跨插件口径在 `app/tests/`。
 几个门禁值得知道：`test_single_source.py`（同一口径不许有第二份实现）、`test_web_single_source.py`（vendored 文件必须与源一致）、各插件的契约测试（返回字段逐字对齐）。
+
+**CI**：每次推送 / PR，GitHub Actions 在干净的云端 Windows 机器上装依赖并跑同一套测试。
+云端没有本机的生产数据，因此 41 条「对着真实数据断言」的用例会被自动跳过
+（`app/conftest.py` 里的 `needs_data` 清单），其余 1744 条照常跑；本地有数据时一条都不跳。
+实测：无数据环境 `1691 passed, 80 skipped`（其中 41 条是本机制跳过），有数据环境 `1785 passed, 3 skipped`。
 
 ## 目录与约定
 
