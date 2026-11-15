@@ -47,13 +47,11 @@ LIBS = {
 # 口径库的本地补丁（同 SHELL_PATCHES）：源文件写死本机绝对路径，副本要能独立跑。
 # 同步后自动重施，所以 `do_sync` 不会把这些改动覆盖掉。
 #
-# **冻结项（LIBS_FROZEN）**：副本已与源分叉，不能再从源覆盖——否则会静默丢掉副本上的修复。
-#   amv_regime：2026-11-09 副本加了「缺失值不当 0、不删位」的 None 语义（守门测试
-#   `app/lib/tests/test_amv_regime_null_semantics.py`），源文件仍是旧逻辑。
-#   合并需人工把修复回写源，再解冻。—— 2026-11-15 记
-LIBS_FROZEN: dict[str, str] = {
-    "amv_regime": "2026-11-09 None 语义修复只在副本上，源未合入",
-}
+# **冻结项（LIBS_FROZEN）**：副本已与源分叉、且暂时不允许从源覆盖的库。
+#   2026-11-15：amv_regime 已解冻——副本里 2026-11-09 的「缺失值不当 0、不删位」修复
+#   已经回写主体（主人裁定「以最新为准」），两边现在只差路径写法（下面 LIB_PATCHES 重施）。
+#   以后再出现分叉：先想办法合回主体，不要在副本上长期改口径。
+LIBS_FROZEN: dict[str, str] = {}
 
 LIB_PATCHES: dict[str, tuple[tuple[str, str], ...]] = {
     "amv_regime": ((

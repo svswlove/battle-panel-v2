@@ -8,10 +8,9 @@
     },
     "amv_regime": {
       "source": "夏天-activity/工具/amv_regime.py",
-      "source_sha256": "a8157f27a790d58d88b7223115fc4fc0e4c0545451503cb3ac4fb5be7a96539f",
-      "bytes": 16392,
-      "local_sha256": "5e074994d3e5a7329c094d112c8897ed33503fe23a5ab75581ca25c2d93763f2",
-      "frozen": "2026-11-09 None 语义修复只在副本上，源未合入；不同步"
+      "source_sha256": "1f51a2c965e4d1419f131b02362510d399a659af7418220f7e62d185f4568f2f",
+      "bytes": 17388,
+      "local_sha256": "751c3ca4d7bb1e36507da696c3e411fe1947f58132747de6e9ae42f786378d39"
     },
     "amv_state_tree": {
       "source": "夏天-activity/工具/amv_state_tree.py",

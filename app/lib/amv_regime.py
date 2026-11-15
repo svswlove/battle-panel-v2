@@ -47,8 +47,6 @@ TH_DN = -0.023     # 空头动量阈值 −2.3%
 
 # 2026-11-15 公开化：路径不再写死本机。PANEL_V2_WS 优先，否则按本文件位置推导
 # （app/lib/amv_regime.py → 上溯三层 = 项目根）。生产环境仍指向 OH-WorkSpace 根。
-# 注意：本副本自 2026-11-09 起含「缺失值不参与计算」修复，**已与源分叉**，
-#       tools/sync_vendor.py 把它列为冻结项（不再从源覆盖）；合并需人工比对。
 WS = os.environ.get("PANEL_V2_WS") or os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 AMV_DB = os.path.join(WS, 'data', 'amv_board.db')
@@ -80,8 +78,9 @@ def stock_state(vals):
     """
     if not vals:
         return None
-    # 2026-11-09：与 stock_state_series 同口径——缺失值不参与计算（不当 0、不删位）。
-    # 原实现 `sum(vals[-10:])` 遇 None 直接 TypeError；回退到有效值序列后语义与 series 完全一致。
+    # 2026-11-09（2026-11-15 从 panel-v2 副本回写主体，主人裁定「以最新为准」）：
+    # 缺失值不参与计算（不当 0、不删位）。原实现 `sum(vals[-10:])` 遇 None 直接 TypeError；
+    # 回退到有效值序列后语义与 stock_state_series 完全一致。
     seq = [v for v in vals if v is not None]
     if len(seq) < 12:
         return None
@@ -122,7 +121,7 @@ def stock_state_series(vals):
     out = [None] * n
     if n == 0:
         return out
-    # 2026-11-09：缺失值语义（口径守门 test_amv_regime_null_semantics）——
+    # 2026-11-09（2026-11-15 从 panel-v2 副本回写主体，主人裁定「以最新为准」）：
     #   缺失日 = 不下判定（保留位置、不删元素、不置零）。
     #   做法：在「有效值序列」上算 EMA / MA10，再按原下标映射回去。
     #   效果：首日缺失 == 从第 1 天开始的序列（种子取首个有效值，不从 0 收敛）；
