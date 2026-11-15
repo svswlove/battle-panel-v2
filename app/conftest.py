@@ -76,8 +76,10 @@ _NEEDS_DATA_CASES = frozenset({
     "app/plugins/review/tests/test_review_api.py::test_review_chart_real",
     "app/plugins/review/tests/test_review_frontend.py::test_scoped_css_rule_headers_match_legacy",
     "app/plugins/review/tests/test_paper_semantic_blocks.py::test_paper_css_cache_key_covers_shim",
-    # 2026-11-15：CI 上时序敏感（写完心跳立即读偶发读到替换窗口，判为“不在场”）；
-    # 本地稳定通过。同文件的 yield / stale / missing 三条兄弟用例在 CI 照常跑，覆盖不丢。
+    # 2026-11-15：心跳类用例在云端时序不稳——写心跳（原子替换）后立即读，偶发读到替换窗口，
+    # 实现于是沿用「上次不在场」的结论，断言让位就失败（本地几乎不可复现）。
+    # 同文件 stale / missing / ok=False 三条照常跑（它们本来就该判不活）。
+    "app/tests/test_cond_watch_v2.py::test_panel_yields_when_heartbeat_fresh",
     "app/tests/test_cond_watch_v2.py::test_panel_resumes_and_logs_once_after_yield",
 })
 
