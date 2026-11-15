@@ -1,0 +1,125 @@
+<!-- 原样提取自 engine/web/index.html:2722-2822（#klineModal 完整弹窗，含 .kbox / #kQuotePanel / #kF10Panel）。
+     不手改：旧四个模块（kline_lc/quote5/f10/order）按 ID 与类名取节点，任何改名都会静默失效。 -->
+<div id="klineModal">
+  <!-- v2:extra -->
+  <!-- 列表卡片（2026-10-28 主人）：当前列表上下文的全部标的，可收起/展开；点击切票，↑↓ 同步高亮。
+       只增节点、不改旧模块按 ID/类名取的任何元素。 -->
+  <aside id="kListPanel" class="k-list-panel" aria-hidden="true">
+    <div class="klp-head"><span class="klp-title">列表</span><span class="klp-count"></span></div>
+    <div class="klp-body"></div>
+  </aside>
+  <!-- /v2:extra -->
+  <div class="kbox">
+    <div class="khead">
+      <span class="ktitle" id="klineTitle">K线</span>
+      <!-- 周期+分钟合并为分段控件（2026-10-19 主人 + 知夏方案）：
+           四格共用一条外框；左键切档，**分钟格右键 = 选 60/30/15/5/1**（不再占一个 ▾ 半边）。
+           分钟格文字显示当前档（15分），点它=切到该档（无锚定 → 最新窗口）。 -->
+      <span id="kMinWrap" class="k-drop kgroup-wrap">
+        <span class="kgroup" id="kPerGroup">
+          <button data-period="d" class="on" onclick="KLineApp.setPeriod('d')">日线</button>
+          <button data-period="t" onclick="KLineApp.setPeriod('t')">分时</button>
+          <button data-period="w" onclick="KLineApp.setPeriod('w')">周线</button>
+          <button class="k-r" id="kMinPill" title="左键：切到当前分钟档 · 右键：选分钟周期"><span id="kMinMain">15分</span></button>
+        </span>
+        <div class="k-panel" id="kMinPanel" style="width:auto">
+          <button class="mini k-mini" data-min="m60">60分</button>
+          <button class="mini k-mini" data-min="m30">30分</button>
+          <button class="mini k-mini" data-min="m15">15分</button>
+          <button class="mini k-mini" data-min="m5">5分</button>
+          <button class="mini k-mini" data-min="m1">1分</button>
+        </div>
+      </span>
+      <!-- 指标模板①②：堆叠式（上下两层）——同义并列的俩按钮天生该堆，不再左右并排。
+           左键 = 切模板，右键 = 开该模板的指标设置面板（面板为单例，右键哪个就编哪个）。 -->
+      <span id="kTplWrap" class="k-drop">
+        <span class="k-stack k-r" id="kTplStack" title="左键：切换指标模板 · 右键：设置指标">
+          <button class="k-l1" data-tpl="0" title="指标模板①（左键切换 · 右键设置）">指标①</button>
+          <button class="k-l2" data-tpl="1" title="指标模板②（左键切换 · 右键设置）">指标②</button>
+        </span>
+        <div class="k-panel" id="kIndPanel">
+          <div class="k-tabs"><button class="k-tab on" data-t="main">主图</button><button class="k-tab" data-t="sub">副图</button></div>
+          <div id="kIndMain"></div>
+          <div id="kIndSub" style="display:none"></div>
+        </div>
+      </span>
+      <span id="kToolWrap" class="k-drop">
+        <button class="mini k-r" id="kToolToggle" title="左键/右键：浮层 · 划线 · 成本线 · 买卖点">工具</button>
+        <div class="k-panel" id="kToolPanel">
+          <!-- v2:toolpanel -->
+          <!-- 2026-10-30 主人：筹码分布/复权事件/成本线/止盈止损/买卖点 全部移到右键菜单「主图设置」，
+               工具面板只留画线工具。
+               注意：下面这几个隐藏 input 是旧模块的读写口（DEFAULTS.tools 与面板联动仍要它们），
+               删掉会让 kline_lc.js 的 syncToolUI / onchange 失效 —— 保留但不可见。 -->
+          <span hidden>
+            <input type="checkbox" id="kToolChips">
+            <input type="checkbox" id="kToolAdjust" checked>
+            <input type="checkbox" id="kToolCost">
+            <input type="checkbox" id="kToolTPSL">
+            <select id="kToolTPSLOp"><option value="0.2">淡</option><option value="0.35" selected>中</option><option value="0.55">浓</option></select>
+            <input type="checkbox" id="kToolBS" checked>
+          </span>
+          <!-- /v2:toolpanel -->
+          <div class="k-sec">划线 / 测量</div>
+          <!-- 2026-10-19 主人：统一拖拽式（左键按下起点 → 拖动预览 → 松开完成）
+               · 水平线 → 水平线段（两点等高，拖多长就多长，不再无限延伸）
+               · 斐波那契 → 百分比线（同名分层工具，按百分比刻度标注）
+               · 新增：射线 / 对称角度线 / 文字 -->
+          <button class="mini k-draw" data-d="trend-line">线段</button>
+          <button class="mini k-draw" data-d="hsegment">水平线段</button>
+          <button class="mini k-draw" data-d="ray">射线</button>
+          <button class="mini k-draw" data-d="rectangle">矩形</button>
+          <button class="mini k-draw" data-d="pct-line">百分比线</button>
+          <button class="mini k-draw" data-d="trend-angle">对称角度线</button>
+          <button class="mini k-draw" data-d="text">文字</button>
+          <!-- 2026-11-08 主人：工具改名「区间成交量」（原「固定范围量分布」）；库内置 fixed-range-volume-profile，2 点 bbox，不自己实现分档 -->
+          <button class="mini k-draw" data-d="fixed-range-volume-profile">区间成交量</button>
+          <!-- 2026-10-19 主人：价格范围改为**右键拖拽**测距（无需先点按钮），旧按钮下线；
+               说明文字按主人要求删除（操作已在右键圆点提示里体现） -->
+          <button class="mini" id="kDrawClear">清除划线</button>
+        </div>
+      </span>
+      <span id="kBgWrap" class="k-drop">
+        <button class="mini k-r" id="kBgToggle" title="左键：开/关多空图层 · 右键：选多空层级">多空</button>
+        <div class="k-panel" id="kBgPanel">
+          <div class="k-sec">多空层级（可多选）</div>
+          <label><input type="checkbox" name="kBgLevel" value="l2"> 二级行业</label>
+          <label><input type="checkbox" name="kBgLevel" value="l3"> 三级行业</label>
+          <label><input type="checkbox" name="kBgLevel" value="stock"> 个股</label>
+          <div class="k-desc" id="kBgDesc"></div>
+        </div>
+      </span>
+      <button class="mini" id="btnWatch" onclick="KLineApp.toggleWatch()" title="加入/移出自选池">☆ 自选</button>
+        <!-- 2026-10-19 主人：只在「选股」页打开 K 线时出现，一键把当前票放进当日选股池 -->
+        <button class="mini" id="btnSelPool" onclick="KLineApp.toggleSelPool()" style="display:none" title="把当前票加入当日选股池">＋选股池</button>
+      <button class="mini" id="btnRefreshK" onclick="KLineApp.refreshData()" title="强制重新获取一次数据（绕过缓存；数据偶尔不对时点它）">↻ 刷新</button>
+      <!-- v2:extra -->
+      <button class="mini" id="btnListToggle" title="列表卡片：开/关">列表</button>
+      <button class="mini" id="btnF10Toggle" title="F10 基础信息卡：开/关">F10</button>
+      <!-- /v2:extra -->
+      <span class="kstatus" id="klineStatus"></span>
+    </div>
+    <div id="klineChart"></div>
+    <!-- 分时改 HQChart（2026-10-13）：分时 t 由 HQChart 渲染（分钟走势图 + 集合竞价段），
+         与 #klineChart 同占位互斥；默认隐藏，period=t 时由 kline_lc.js 显示。
+         日/周/分钟档仍走 LC（#klineChart），二者切换见 kline_lc.js hqShow/hqHide。 -->
+    <div id="hq_minute"></div>
+    <div id="kTopLeft" class="k-topleft"></div>
+    <div id="kTip" class="k-tip"></div>
+    <div id="kAdjInfo" class="k-adjinfo"></div>
+    <div id="kXLabel" class="k-xlabel"></div>
+    <canvas id="kchipCanvas"></canvas>
+    <!-- 集合竞价三要素面板（2026-10-12）：分时图左侧独立区，三纵区=价格白点/未匹配量/匹配量
+         （通达信竞价图形态；竞价时段等距刻度，与主时间轴解耦） -->
+    <canvas id="kauctionCanvas"></canvas>
+    <div id="kRangeBox"></div>
+    <div id="kRangeInfo"></div>
+    <button id="kVpLock" title="锁定为向右射线" aria-label="锁定为向右射线">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+    </button>
+  </div>
+  <!-- 盘口外挂卡（2026-10-19 · 01）：与 .kbox 并排、挂在弹窗卡片外面；仅分时显示，渲染在 kline_quote5.js -->
+  <aside id="kQuotePanel" class="k-quote-panel" aria-hidden="true"></aside>
+  <!-- F10 基础信息外挂卡（2026-10-20 · 01）：所有周期档显示；渲染在 kline_f10.js -->
+  <aside id="kF10Panel" class="k-f10-panel" aria-hidden="true"></aside>
+</div>

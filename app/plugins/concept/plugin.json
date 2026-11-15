@@ -1,0 +1,33 @@
+{
+  "manifest_version": 1,
+  "id": "concept",
+  "name": "概念追踪",
+  "version": "0.2.0",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {"id": "concept.main", "title": "概念追踪", "slot": "main", "order": 55}
+    ]
+  },
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "mount": "root",
+    "timeout_ms": 10000,
+    "permissions": ["read:text", "read:db", "read:json"]
+  },
+  "data": {
+    "read": ["ths_board.db"],
+    "panel": [],
+    "json": ["stock_names"],
+    "lib": [],
+    "text": ["concept_tracking"],
+    "quotes": false,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

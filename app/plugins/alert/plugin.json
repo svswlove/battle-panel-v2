@@ -1,0 +1,28 @@
+{
+  "manifest_version": 1,
+  "id": "alert",
+  "name": "预警（只提醒不下单）",
+  "version": "0.2.7",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {"id": "alert.main", "title": "预警", "slot": "main", "order": 40}
+    ]
+  },
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 15000,
+    "mount": "plugin",
+    "permissions": []
+  },
+  "data": {
+    "panel": [],
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

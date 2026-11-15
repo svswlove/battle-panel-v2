@@ -1,0 +1,8 @@
+# 运行必需
+fastapi>=0.100
+uvicorn>=0.20
+markdown>=3.4          # 复盘/概念 Markdown 渲染
+
+# 测试
+pytest>=7
+httpx>=0.24            # fastapi TestClient

@@ -1,0 +1,49 @@
+{
+  "libs": {
+    "amv_contrib": {
+      "source": "夏天-activity/工具/amv_contrib.py",
+      "source_sha256": "d6ba9c22f736f6e7388ebd18447c8db27402bc4006f43e962d360f845a183343",
+      "bytes": 9192,
+      "local_sha256": "c80d1febd37e8c463ff63c487daac460957856e72792633f07bbf6937a9af828"
+    },
+    "amv_regime": {
+      "source": "夏天-activity/工具/amv_regime.py",
+      "source_sha256": "a8157f27a790d58d88b7223115fc4fc0e4c0545451503cb3ac4fb5be7a96539f",
+      "bytes": 16392,
+      "local_sha256": "5e074994d3e5a7329c094d112c8897ed33503fe23a5ab75581ca25c2d93763f2",
+      "frozen": "2026-11-09 None 语义修复只在副本上，源未合入；不同步"
+    },
+    "amv_state_tree": {
+      "source": "夏天-activity/工具/amv_state_tree.py",
+      "source_sha256": "9dd78ac5294647df38aa40f179415660ddeab850420580c8a2c90b16b9cdde89",
+      "bytes": 25112,
+      "local_sha256": "9dd78ac5294647df38aa40f179415660ddeab850420580c8a2c90b16b9cdde89"
+    },
+    "amv_struct_tag": {
+      "source": "夏天-activity/工具/amv_struct_tag.py",
+      "source_sha256": "1ac88bfd0526996aa5907b05f1db565e916c61cb1898006bb3dd2ced3bccaeab",
+      "bytes": 6688,
+      "local_sha256": "1ac88bfd0526996aa5907b05f1db565e916c61cb1898006bb3dd2ced3bccaeab"
+    },
+    "panel_scores": {
+      "source": "夏天-activity/工具/panel_scores.py",
+      "source_sha256": "cec99f795bb80f80e85cd50e850bbc52097fd2412b9b284b5a8914c290878f9a",
+      "bytes": 8284,
+      "local_sha256": "cec99f795bb80f80e85cd50e850bbc52097fd2412b9b284b5a8914c290878f9a"
+    },
+    "indicators": {
+      "source": "engine/common/indicators.py",
+      "source_sha256": "dc42e495a471bbc31763f97e9200a0020abddf64731b56529c565769795aa50e",
+      "bytes": 3560,
+      "local_sha256": "dc42e495a471bbc31763f97e9200a0020abddf64731b56529c565769795aa50e"
+    }
+  },
+  "web": {
+    "shell.html": {
+      "source": "engine/web/shell.html",
+      "source_sha256": "0121b552ad9f0ef6fdce9ad66eed942f8fc69c9912ad57279cf2fe635c47c28f",
+      "bytes": 25296,
+      "local_sha256": "2b671fe286da40f77ac8a46c8efdbd079eb1bc7c75ee775d89962890e012e83d"
+    }
+  }
+}

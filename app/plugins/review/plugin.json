@@ -1,0 +1,42 @@
+{
+  "manifest_version": 1,
+  "id": "review",
+  "name": "每日复盘",
+  "version": "0.3.3",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {
+        "id": "review.main",
+        "title": "每日复盘",
+        "slot": "main",
+        "order": 60
+      }
+    ]
+  },
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "mount": "root",
+    "timeout_ms": 15000,
+    "permissions": [
+      "read:text"
+    ]
+  },
+  "data": {
+    "read": [],
+    "panel": [],
+    "json": [],
+    "lib": [],
+    "text": [
+      "daily_review"
+    ],
+    "quotes": false,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

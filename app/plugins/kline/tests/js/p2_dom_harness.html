@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><title>P2 DOM harness</title>
+<style>
+:root{--bg:#0b1220;--card:#131b2b;--card2:#1a2334;--line:#26324a;--line-soft:#1f2a3d;--fg:#e6edf7;
+--dim:#8b98ad;--accent:#4da3ff;--accent-on:#04121f;--up-solid:#ff5c5c;--down-solid:#26c281;
+--up-ink:#ff5c5c;--down-ink:#26c281;--up-bg:#3a1a1a;--down-bg:#12301f;--warn-solid:#ffd166;
+--warn:#ffd166;--warn-ink:#ffd166;--warn-bg:#3a3218;--danger-ink:#ff6b6b;--radius-sm:6px;--radius-lg:10px;
+--radius-pill:999px;--shadow-pop:0 18px 40px rgba(0,0,0,.5);--font-mono:ui-monospace,monospace;--font-ui:system-ui}
+body{margin:0;background:#0b1220;color:#e6edf7;font:13px system-ui}
+</style></head>
+<body>
+<script type="module">
+// 隔离 DOM harness：所有网络走桩，POST 只记在 window.__posts，不发真实请求。
+import { openKline } from '/frontend/overlay.js';
+
+const bars = [];
+for (let i = 0; i < 40; i++) {
+  const c = 10 + Math.sin(i / 6) * 1.5;
+  bars.push({ t: '20260' + String(400 + i).slice(1), o: c - 0.5, h: c + 1, l: c - 1, c: c, v: 1e6, amount: 1e8,
+    yellow: null, white: c, amv: 500 + i, amvMa: 480 + i, amvWhite: 495 + i });
+}
+const q5 = { ok: true, last: 10, pre_close: 9.9, bids: [{ price: 9.99, vol: 100 }], asks: [{ price: 10.01, vol: 100 }],
+  stats: {}, quote_time: '10:00:00', limit_up: 11, limit_down: 9 };
+window.__posts = [];
+window.fetch = async (u, init) => {
+  const url = String(u);
+  const mk = (o) => ({ ok: true, status: 200, json: async () => o });
+  if (init && init.method === 'POST') {
+    window.__posts.push({ url: url, body: JSON.parse(init.body || '{}') });
+    if (url.indexOf('/order/place') >= 0) return mk({ order: { status: 'FILLED', filled_qty: 100, filled_price: 10.01 } });
+    if (url.indexOf('/condition/add') >= 0) return mk({ cond_id: 'CO-NEW-1' });
+    return mk({ ok: true });
+  }
+  if (url.indexOf('/api/kline/') >= 0) return mk({ code: '600519.SH', period: 'd', adj: 'front', source: 'eltdx', bars, prev_close: 10, mf: null });
+  if (url.indexOf('/api/p/kline/bg/') >= 0) return mk({ states: null });
+  if (url.indexOf('/api/trades/') >= 0) return mk({ points: [], cost: { paper: 9.5, live: 1 } });
+  if (url.indexOf('/api/order/list') >= 0) return mk({
+    account: { available_cash: 100000, total_asset: 100000,
+      positions: { '600519.SH': { qty: 300, available_qty: 200, cost_price: 9.5, today_bought: 100 } } },
+    orders: [
+      { paper_order_id: 'PP-A', ts_code: '600519.SH', status: 'REPORTED', side: 'BUY', qty: 100, limit_price: 9.9 },
+      { paper_order_id: 'PP-B', ts_code: '000001.SZ', status: 'PARTIAL', side: 'SELL', qty: 200, limit_price: 11 },
+    ],
+    conditions: [
+      { cond_id: 'CO-1', code: '600519.SH', status: 'ACTIVE', type: 'stop_loss', label: '止损卖出', qty: 100 },
+      { cond_id: 'CO-2', code: '000001.SZ', status: 'ACTIVE', type: 'take_profit', label: '止盈卖出', qty: 100 },
+    ] });
+  if (url.indexOf('/api/watchlist.json') >= 0) return mk({ items: [] });
+  return { ok: false, status: 404, json: async () => ({}) };
+};
+const api = { get: async (p) => {
+  if (p.indexOf('/quote5/') >= 0) return q5;
+  if (p.indexOf('/intraday/') >= 0) return { ok: true, points: [], session: { slots: [] }, pre_close: 9.9, last: 10, pct: 1, count: 0 };
+  if (p.indexOf('/volume_profile/') >= 0) return { buckets: [], pre_close: 9.9, total_v: 0, max_v: 0 };
+  throw new Error('no route ' + p);
+} };
+window.__handle = openKline({ api: api, code: '600519.SH', name: '贵州茅台', period: 'daily' });
+</script></body></html>

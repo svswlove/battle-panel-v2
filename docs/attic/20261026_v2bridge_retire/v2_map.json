@@ -1,0 +1,11 @@
+{
+  "dashboard": "v2",
+  "battle_plan": "v2",
+  "intraday": "v2",
+  "sector": "v2:sector.board",
+  "concept": "v2",
+  "review": "v2",
+  "watchlist": "v2",
+  "selection": "v2",
+  "ops": "v2"
+}

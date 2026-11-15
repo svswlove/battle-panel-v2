@@ -1,0 +1,31 @@
+{
+  "manifest_version": 1,
+  "id": "score",
+  "name": "个股打分",
+  "version": "0.2.0",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 8000,
+    "permissions": []
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {"id": "score.main", "title": "个股打分", "slot": "main", "order": 72}
+    ]
+  },
+  "data": {
+    "read": [],
+    "panel": [],
+    "json": [],
+    "lib": [],
+    "quotes": false,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

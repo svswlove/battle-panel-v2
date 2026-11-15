@@ -1,0 +1,35 @@
+{
+  "manifest_version": 1,
+  "id": "dashboard",
+  "name": "仪表盘",
+  "version": "0.1.0",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 3000,
+    "permissions": []
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {
+        "id": "dashboard.main",
+        "title": "仪表盘",
+        "slot": "main",
+        "order": 5
+      }
+    ]
+  },
+  "data": {
+    "read": [],
+    "panel": [],
+    "json": [],
+    "lib": [],
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

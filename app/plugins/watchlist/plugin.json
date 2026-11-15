@@ -1,0 +1,39 @@
+{
+  "manifest_version": 1,
+  "id": "watchlist",
+  "name": "自选池",
+  "version": "0.3.2",
+  "min_core_version": "0.1.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 3000,
+    "permissions": [
+      "read:panel"
+    ]
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {
+        "id": "watchlist.main",
+        "title": "自选池",
+        "slot": "main",
+        "order": 50
+      }
+    ]
+  },
+  "data": {
+    "read": [],
+    "panel": [
+      "watchlist",
+      "watchlist_quotes",
+      "focus_levels"
+    ],
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

@@ -1,0 +1,60 @@
+{
+  "manifest_version": 1,
+  "id": "ops",
+  "name": "运维与备注",
+  "version": "0.3.4",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "mount": "root",
+    "timeout_ms": 30000,
+    "permissions": [
+      "read:panel",
+      "read:json",
+      "write:misc",
+      "read:quotes",
+      "trigger:ops"
+    ]
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {
+        "id": "ops.main",
+        "title": "后台",
+        "slot": "main",
+        "order": 70
+      }
+    ]
+  },
+  "data": {
+    "read": [],
+    "panel": [
+      "ops",
+      "alert_plan_persistent",
+      "panic_breadth"
+    ],
+    "json": [
+      "kline_indicator_settings"
+    ],
+    "lib": [],
+    "quotes": true,
+    "text": [],
+    "ops_run": true,
+    "write": [
+      "alert_plan"
+    ],
+    "state": [
+      "ui_notes",
+      "engine_state"
+    ],
+    "misc": [
+      "kline_indicator_settings"
+    ]
+  },
+  "config": {},
+  "depends": []
+}

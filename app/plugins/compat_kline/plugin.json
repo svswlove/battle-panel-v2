@@ -1,0 +1,36 @@
+{
+  "manifest_version": 1,
+  "id": "compat_kline",
+  "name": "旧前端 K 线兼容层",
+  "version": "0.2.0",
+  "min_core_version": "0.2.0",
+  "enabled": true,
+  "kind": "compat",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 20000,
+    "mount": "root",
+    "permissions": [
+      "read:amv_board",
+      "read:ths_board",
+      "read:ths_index"
+    ]
+  },
+  "data": {
+    "read": [
+      "amv_board.db",
+      "ths_board.db",
+      "ths_index.db"
+    ],
+    "lib": [
+      "amv_regime",
+      "indicators",
+      "l2_mf"
+    ],
+    "write": [],
+    "quotes": true
+  },
+  "config": {},
+  "depends": []
+}

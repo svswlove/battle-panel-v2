@@ -1,0 +1,31 @@
+{
+  "manifest_version": 1,
+  "id": "emotion",
+  "name": "情绪打分",
+  "version": "0.1.0",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 8000,
+    "permissions": []
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {"id": "emotion.main", "title": "情绪打分", "slot": "main", "order": 73}
+    ]
+  },
+  "data": {
+    "read": ["track_pool.db"],
+    "panel": [],
+    "json": [],
+    "lib": [],
+    "quotes": false,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

@@ -1,0 +1,144 @@
+{
+  "_note": "旧端 8800 各端点键集基线（未 curl，来源逐端点见 src 字段）。值不在此文件，只列键路径；tools/compare_legacy.py 用它做结构基线。",
+  "generated_at": "2026-10-23",
+  "generated_by": "compat_misc 子代理（无 shell，未运行验证）",
+  "endpoints": {
+    "/api/ops.json": {
+      "src": "engine/ops/ops_status.py::_aggregate return 字面量；实读 data/panel/ops_status.json（2026-10-23 17:33，595 行）交叉核对",
+      "top": ["meta", "summary", "tasks", "daemons", "freshness"],
+      "meta": ["updated_at", "today", "trade_date", "is_trading_day", "in_session",
+               "registry_ok", "registry_error", "task_query_error", "proc_query_error",
+               "source", "counts", "coverage", "manual"],
+      "meta.counts": ["tasks", "daemons"],
+      "meta.coverage": ["tasks_unknown", "daemons_unknown", "daemons_unregistered"],
+      "meta.manual": ["enabled", "note"],
+      "summary": ["tasks_total", "tasks_fail", "tasks_notrun", "tasks_disabled",
+                  "tasks_unknown", "daemons_total", "daemons_down", "daemons_unknown",
+                  "fresh_total", "fresh_stale"],
+      "tasks[]": ["id", "name", "group", "redline", "desc", "status", "state",
+                  "last_run", "last_result", "next_run"],
+      "daemons[]": ["id", "name", "group", "redline", "desc", "status", "pid",
+                    "started_at", "signal", "proc_count", "probe", "watchdog"],
+      "freshness[]": ["key", "label", "latest", "source", "state"]
+    },
+    "/api/order/list": {
+      "src": "engine/server.py::api_order_list（body 字面量）+ core/manual_orders._account_view",
+      "top": ["ok", "mode", "date", "orders", "conditions", "account", "metrics"],
+      "account": ["available_cash", "total_asset", "frozen_cash", "positions", "updated_at"],
+      "note": "mode=live 时旧端另加 qmt_reports（骨架无，不猜 mode）"
+    },
+    "/api/trades/{ts_code}": {
+      "src": "engine/server.py::build_trades_payload return（9896-9903）",
+      "top": ["version", "code", "days", "points", "count", "cost"],
+      "cost": ["paper", "live"],
+      "points[]": ["mode", "side", "date", "t", "price", "qty", "amount", "name", "id"]
+    },
+    "/api/condition/list": {
+      "src": "engine/server.py::api_condition_list",
+      "top": ["ok", "conditions"]
+    },
+    "/api/paper_account": {
+      "src": "engine/server.py::api_paper_account（3821-3833）+ 实读 engine/state/paper_account.json 顶层",
+      "top": ["initial_cash", "cash", "positions", "realized_pnl", "equity_curve",
+              "stats", "updated_at", "trade_date", "account", "positions_list"],
+      "account": ["total_asset", "available_cash", "market_value", "frozen_cash",
+                  "unrealized_pnl", "single_order_cap", "cash_reserve_pct", "updated_at"],
+      "stats": ["win_rate", "closed_trades", "wins"],
+      "positions_list[]": ["ts_code", "name", "qty", "available_qty", "cost_price",
+                           "last_price", "price_source", "quote_asof", "pnl_amount",
+                           "pnl_pct", "day_pnl_amount", "day_pnl_pct", "market_value",
+                           "weight_pct", "opened_at"]
+    },
+    "/api/ledger": {
+      "src": "engine/server.py::api_ledger（paper 4290-4301 / live 4359-4370）",
+      "top": ["ok", "mode", "asof", "account", "positions", "trades",
+              "conds_expiring", "book"],
+      "account": ["total_asset", "cash", "available_cash", "frozen_cash", "market_value",
+                  "position_pnl", "position_pnl_pct", "day_pnl", "day_pnl_pct", "cash_ratio"],
+      "positions[]": ["code", "name", "qty", "available_qty", "frozen_qty", "cost_price",
+                      "price", "price_source", "pnl", "pnl_pct", "day_pnl",
+                      "day_pnl_pct", "market_value", "weight_pct", "bought_today",
+                      "sold_today", "mode"],
+      "trades[]": ["time", "code", "name", "side", "price", "qty", "amount", "fee", "mode"],
+      "book": ["active", "history", "hist_max", "hist_total"]
+    },
+    "/api/selection": {
+      "src": "engine/server.py::_selection_snapshot_payload 缺快照分支（6419-6429）",
+      "top": ["meta", "date", "error", "asof", "filters", "filter_options", "group_sigs",
+              "group_filters", "board_map", "hot_concepts", "stats", "warnings",
+              "score_warn", "freshness", "pool", "groups"],
+      "meta": ["schema_version", "document_type", "generated_at", "source"],
+      "stats": ["hits", "groups", "scored"],
+      "freshness": ["state", "snapshot_date", "expected_date", "produce_by", "today_pending"],
+      "normal_branch_extra": "正常分支 meta 另有 trade_date / signal_date / producer / note（实读 selection_latest.json），且顶层多 date 以外的快照键 —— 骨架只照『缺快照分支』，所以旧端正常时会被 compare 判 extra，属预期",
+      "note": "pool = /selection_pool 的同构对象"
+    },
+    "/api/selection_board_options": {
+      "src": "engine/server.py::api_selection_board_options（6733-6734）",
+      "top": ["favorites", "catalog", "counts"],
+      "favorites[]": ["code", "name", "level"],
+      "catalog[]": ["code", "name", "level"],
+      "counts": ["favorites", "catalog"]
+    },
+    "/api/selection_pool": {
+      "src": "engine/server.py::_selection_pool_payload（6618-6620）",
+      "top": ["date", "count", "is_current", "names", "items", "slots", "keep"],
+      "items[]": ["code", "name", "group", "sig", "added_at", "order"],
+      "slots[]": ["date", "count", "saved_at"]
+    },
+    "/api/selection_prefs": {
+      "src": "engine/server.py::api_selection_prefs（6660-6661：不可读 → {}）+ 实读 data/panel/selection_filter.json",
+      "top": ["meta", "pools", "ma", "pin", "inds", "cons", "boards", "sigs",
+              "boardOn", "hot"],
+      "note": "旧端不可读时返回 {}（空键集）；骨架也是 {} → 结构比对恒过"
+    },
+    "/api/stock_amv/{ts_code}": {
+      "src": "夏天-activity/工具/tdx_sector_api.py::stock_amv（365-369）",
+      "top": ["code", "ts_code", "dates", "alive", "sh", "note"]
+    },
+    "/api/sector_amv/{code}": {
+      "src": "tdx_sector_api.py::_board_amv（338-343，THS 分支）/ sector_amv L2 回落（307-311）",
+      "board_branch": ["code", "name", "index_code", "ma_n", "level", "dates",
+                       "amv", "ma", "share", "rank"],
+      "l2_fallback_branch": ["code", "name", "index_code", "ma_n", "dates",
+                             "amv", "ma", "share", "rank"]
+    },
+    "/api/sector_kline/{code}": {
+      "src": "tdx_sector_api.py::sector_kline / _board_kline / _ths_index_bars（130-132 / 166-168 / 198-201）",
+      "top": ["code", "index_code", "bars", "n", "last", "source", "indicators"],
+      "bars[]": ["t", "o", "h", "l", "c", "v", "amt", "yellow", "white"],
+      "note": "source 值必然不同（eltdx:daily_bars vs vipdoc:sh881xxx.day）= 值差非结构差"
+    },
+    "/api/ui_notes/list": {
+      "src": "engine/server.py::api_ui_notes_list（830-831）",
+      "top": ["ok", "notes", "open"],
+      "notes[]": ["id", "selector", "elem", "html", "style", "text", "page", "x", "y",
+                  "status", "created_at", "resolve_note", "resolved_at", "edited_at"]
+    },
+    "/api/review.md": {
+      "src": "engine/server.py::api_review_md 文档串（1626）+ _review_renderer（1600-1607）",
+      "top": ["date", "file", "title", "html", "mtime_ns", "cache", "degraded",
+              "error", "theme", "charts"],
+      "charts": ["swimlane", "track"],
+      "note": "paper=1 时旧端另加 paper / masthead / css / footer 四键"
+    },
+    "/api/review_chart.json": {
+      "src": "engine/common/review_chart_data.py::assemble return（1184-1195）+ build（1225-1227）",
+      "top": ["ok", "meta", "head", "levels", "index", "amv", "breadth", "temp",
+              "turnover", "sector", "ladder", "anomaly", "sentiment", "news", "positions",
+              "gate", "tomorrow", "scenarios", "gaps", "md_quotes", "file", "mtime_ns",
+              "cache"],
+      "meta": ["trade_date", "idx_date", "generated_by", "md_source", "miss",
+               "freshness", "note"],
+      "head": ["date", "weekday", "title", "one", "three", "next", "temp", "caliber",
+               "exec_note"],
+      "news": ["asof_pre", "asof_inc", "pre", "inc", "driver"],
+      "md_quotes": ["who", "s0", "s1", "s2", "s3"],
+      "index": ["rows", "source"],
+      "gate": ["rows", "gates", "verdict", "source"],
+      "tomorrow": ["date", "rows", "src", "miss"],
+      "scenarios": ["missing_branch || (trade_date, plan_version, source, rows, open_default, miss)"],
+      "note": "levels 旧端缺上证数据时为 null；有数据时 {sse:{close,ma5,ma10,ma20,res,sup}}"
+    }
+  }
+}

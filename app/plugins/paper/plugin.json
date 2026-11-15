@@ -1,0 +1,47 @@
+{
+  "manifest_version": 1,
+  "id": "paper",
+  "name": "模拟交易",
+  "version": "0.2.2",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {
+        "id": "paper.main",
+        "title": "模拟交易",
+        "slot": "main",
+        "order": 45
+      }
+    ]
+  },
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "mount": "root",
+    "timeout_ms": 10000,
+    "permissions": [
+      "paper:trade",
+      "feed:read",
+      "quotes:read"
+    ]
+  },
+  "data": {
+    "read": [],
+    "panel": [
+      "real_positions"
+    ],
+    "json": [
+      "stock_names"
+    ],
+    "lib": [],
+    "quotes": true,
+    "feed": true,
+    "paper": true,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

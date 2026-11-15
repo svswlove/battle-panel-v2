@@ -1,0 +1,800 @@
+{
+ "_fixture": {
+  "what": "GET /api/panic 的 2026-10-29 收盘口径回放（mode=close，四项含量能）",
+  "why": "页面是收盘后日度工具；零点之后 /api/panic 按设计回落到库内最后一行（mode=closed），为了让测试与截图稳定复现 10-29 收盘读数，用本夹具替换该请求，其余接口仍然真实。",
+  "recorded_at": "2026-10-29 23:3x（活实例真实响应）",
+  "series_source": "库内既有序列（至 20261023）+ 10-29 记录点"
+ },
+ "ok": true,
+ "asof": "2026-10-29 23:35:00",
+ "trade_date": "20261029",
+ "mode": "close",
+ "live": false,
+ "source": "eltdx:880005+880006+880009",
+ "window": 250,
+ "value": 23.1,
+ "state": "冰点",
+ "items": [
+  {
+   "key": "limit_down",
+   "label": "跌停占比",
+   "unit": "%",
+   "value": 0.7624,
+   "count": 42,
+   "percentile": 85.2
+  },
+  {
+   "key": "up_ratio",
+   "label": "上涨占比",
+   "unit": "%",
+   "value": 14.1768,
+   "count": 781,
+   "percentile": 6
+  },
+  {
+   "key": "median",
+   "label": "全A中位涨跌",
+   "unit": "%",
+   "value": -2.5969,
+   "count": null,
+   "percentile": 5.2
+  },
+  {
+   "key": "amount",
+   "label": "量能（成交额/昨日）",
+   "unit": "×",
+   "value": 0.9558,
+   "count": null,
+   "percentile": 33.6,
+   "kind": "actual",
+   "active": true,
+   "state": "in",
+   "amount": 1556524171264,
+   "prev_amount": 1628487560384,
+   "ratio_same_time": 0.9558
+  }
+ ],
+ "series": [
+  {
+   "date": "20260427",
+   "value": 46.93,
+   "q_limit_down_count": 96,
+   "up": 3284
+  },
+  {
+   "date": "20260428",
+   "value": 14.4,
+   "q_limit_down_count": 96,
+   "up": 1698
+  },
+  {
+   "date": "20260429",
+   "value": 58.93,
+   "q_limit_down_count": 93.8,
+   "up": 3973
+  },
+  {
+   "date": "20260430",
+   "value": 39.07,
+   "q_limit_down_count": 95.4,
+   "up": 2878
+  },
+  {
+   "date": "20260506",
+   "value": 56.53,
+   "q_limit_down_count": 97.6,
+   "up": 3889
+  },
+  {
+   "date": "20260507",
+   "value": 50.93,
+   "q_limit_down_count": 95.4,
+   "up": 3520
+  },
+  {
+   "date": "20260508",
+   "value": 53.73,
+   "q_limit_down_count": 88.6,
+   "up": 3637
+  },
+  {
+   "date": "20260511",
+   "value": 46.4,
+   "q_limit_down_count": 86.2,
+   "up": 3121
+  },
+  {
+   "date": "20260512",
+   "value": 12.8,
+   "q_limit_down_count": 88.8,
+   "up": 1379
+  },
+  {
+   "date": "20260513",
+   "value": 51.2,
+   "q_limit_down_count": 72.2,
+   "up": 3215
+  },
+  {
+   "date": "20260514",
+   "value": 6,
+   "q_limit_down_count": 94,
+   "up": 1047
+  },
+  {
+   "date": "20260515",
+   "value": 18,
+   "q_limit_down_count": 94.2,
+   "up": 1816
+  },
+  {
+   "date": "20260518",
+   "value": 28,
+   "q_limit_down_count": 95.6,
+   "up": 2375
+  },
+  {
+   "date": "20260519",
+   "value": 55.87,
+   "q_limit_down_count": 85.8,
+   "up": 3608
+  },
+  {
+   "date": "20260520",
+   "value": 14.67,
+   "q_limit_down_count": 92,
+   "up": 1638
+  },
+  {
+   "date": "20260521",
+   "value": 2,
+   "q_limit_down_count": 98,
+   "up": 695
+  },
+  {
+   "date": "20260522",
+   "value": 65.87,
+   "q_limit_down_count": 72.8,
+   "up": 3869
+  },
+  {
+   "date": "20260525",
+   "value": 29.73,
+   "q_limit_down_count": 81.6,
+   "up": 2181
+  },
+  {
+   "date": "20260526",
+   "value": 11.73,
+   "q_limit_down_count": 89.4,
+   "up": 1354
+  },
+  {
+   "date": "20260527",
+   "value": 7.47,
+   "q_limit_down_count": 87.8,
+   "up": 974
+  },
+  {
+   "date": "20260528",
+   "value": 56,
+   "q_limit_down_count": 54.4,
+   "up": 3018
+  },
+  {
+   "date": "20260529",
+   "value": 9.33,
+   "q_limit_down_count": 96.8,
+   "up": 1542
+  },
+  {
+   "date": "20260601",
+   "value": 63.87,
+   "q_limit_down_count": 78.6,
+   "up": 3776
+  },
+  {
+   "date": "20260602",
+   "value": 21.73,
+   "q_limit_down_count": 70.6,
+   "up": 1543
+  },
+  {
+   "date": "20260603",
+   "value": 20,
+   "q_limit_down_count": 84.6,
+   "up": 1713
+  },
+  {
+   "date": "20260604",
+   "value": 12.4,
+   "q_limit_down_count": 87.2,
+   "up": 1344
+  },
+  {
+   "date": "20260605",
+   "value": 55.07,
+   "q_limit_down_count": 68.2,
+   "up": 3277
+  },
+  {
+   "date": "20260608",
+   "value": 4.67,
+   "q_limit_down_count": 93.6,
+   "up": 899
+  },
+  {
+   "date": "20260609",
+   "value": 57.6,
+   "q_limit_down_count": 65.8,
+   "up": 3322
+  },
+  {
+   "date": "20260610",
+   "value": 12,
+   "q_limit_down_count": 97.8,
+   "up": 1556
+  },
+  {
+   "date": "20260611",
+   "value": 12.13,
+   "q_limit_down_count": 92.8,
+   "up": 1370
+  },
+  {
+   "date": "20260612",
+   "value": 66.53,
+   "q_limit_down_count": 76.4,
+   "up": 3923
+  },
+  {
+   "date": "20260615",
+   "value": 78.27,
+   "q_limit_down_count": 43.8,
+   "up": 3906
+  },
+  {
+   "date": "20260616",
+   "value": 51.6,
+   "q_limit_down_count": 48,
+   "up": 2730
+  },
+  {
+   "date": "20260617",
+   "value": 25.47,
+   "q_limit_down_count": 68.8,
+   "up": 1723
+  },
+  {
+   "date": "20260618",
+   "value": 24.67,
+   "q_limit_down_count": 87.6,
+   "up": 2023
+  },
+  {
+   "date": "20260622",
+   "value": 46.27,
+   "q_limit_down_count": 84.4,
+   "up": 2916
+  },
+  {
+   "date": "20260623",
+   "value": 37,
+   "q_limit_down_count": 92.6,
+   "up": 2764
+  },
+  {
+   "date": "20260624",
+   "value": 9.6,
+   "q_limit_down_count": 96,
+   "up": 1434
+  },
+  {
+   "date": "20260625",
+   "value": 7.2,
+   "q_limit_down_count": 98.4,
+   "up": 1231
+  },
+  {
+   "date": "20260626",
+   "value": 5.6,
+   "q_limit_down_count": 90.4,
+   "up": 790
+  },
+  {
+   "date": "20260629",
+   "value": 31.73,
+   "q_limit_down_count": 97.6,
+   "up": 2469
+  },
+  {
+   "date": "20260630",
+   "value": 53.73,
+   "q_limit_down_count": 69.2,
+   "up": 3054
+  },
+  {
+   "date": "20260701",
+   "value": 81.73,
+   "q_limit_down_count": 45.4,
+   "up": 4329
+  },
+  {
+   "date": "20260702",
+   "value": 28.53,
+   "q_limit_down_count": 89,
+   "up": 2219
+  },
+  {
+   "date": "20260703",
+   "value": 65.07,
+   "q_limit_down_count": 75,
+   "up": 3804
+  },
+  {
+   "date": "20260706",
+   "value": 19.2,
+   "q_limit_down_count": 90.6,
+   "up": 1876
+  },
+  {
+   "date": "20260707",
+   "value": 4.93,
+   "q_limit_down_count": 90,
+   "up": 693
+  },
+  {
+   "date": "20260708",
+   "value": 16.27,
+   "q_limit_down_count": 89,
+   "up": 1593
+  },
+  {
+   "date": "20260709",
+   "value": 46.67,
+   "q_limit_down_count": 54.6,
+   "up": 2486
+  },
+  {
+   "date": "20260710",
+   "value": 86.67,
+   "q_limit_down_count": 10.2,
+   "up": 3772
+  },
+  {
+   "date": "20260713",
+   "value": 1.87,
+   "q_limit_down_count": 100,
+   "up": 801
+  },
+  {
+   "date": "20260714",
+   "value": 70.8,
+   "q_limit_down_count": 75.2,
+   "up": 4211
+  },
+  {
+   "date": "20260715",
+   "value": 55.33,
+   "q_limit_down_count": 82.4,
+   "up": 3351
+  },
+  {
+   "date": "20260716",
+   "value": 35.6,
+   "q_limit_down_count": 85.8,
+   "up": 2499
+  },
+  {
+   "date": "20260717",
+   "value": 0.53,
+   "q_limit_down_count": 100,
+   "up": 482
+  },
+  {
+   "date": "20260720",
+   "value": 12.13,
+   "q_limit_down_count": 100,
+   "up": 1740
+  },
+  {
+   "date": "20260721",
+   "value": 54.27,
+   "q_limit_down_count": 76.4,
+   "up": 3107
+  },
+  {
+   "date": "20260722",
+   "value": 36.8,
+   "q_limit_down_count": 31.2,
+   "up": 1530
+  },
+  {
+   "date": "20260723",
+   "value": 95.47,
+   "q_limit_down_count": 3.2,
+   "up": 4260
+  },
+  {
+   "date": "20260724",
+   "value": 11.2,
+   "q_limit_down_count": 73,
+   "up": 555
+  },
+  {
+   "date": "20260727",
+   "value": 95.6,
+   "q_limit_down_count": 14.8,
+   "up": 5195
+  },
+  {
+   "date": "20260728",
+   "value": 36.8,
+   "q_limit_down_count": 90,
+   "up": 2603
+  },
+  {
+   "date": "20260729",
+   "value": 85.33,
+   "q_limit_down_count": 31.8,
+   "up": 4253
+  },
+  {
+   "date": "20260730",
+   "value": 18.4,
+   "q_limit_down_count": 96.8,
+   "up": 1768
+  },
+  {
+   "date": "20260731",
+   "value": 98.47,
+   "q_limit_down_count": 0.2,
+   "up": 4691
+  },
+  {
+   "date": "20260803",
+   "value": 82,
+   "q_limit_down_count": 31.2,
+   "up": 4005
+  },
+  {
+   "date": "20260804",
+   "value": 85.47,
+   "q_limit_down_count": 1.4,
+   "up": 3642
+  },
+  {
+   "date": "20260805",
+   "value": 85.67,
+   "q_limit_down_count": 1.6,
+   "up": 3725
+  },
+  {
+   "date": "20260806",
+   "value": 69.53,
+   "q_limit_down_count": 1.6,
+   "up": 2789
+  },
+  {
+   "date": "20260807",
+   "value": 69.2,
+   "q_limit_down_count": 8,
+   "up": 2856
+  },
+  {
+   "date": "20260810",
+   "value": 88.67,
+   "q_limit_down_count": 11.2,
+   "up": 4068
+  },
+  {
+   "date": "20260811",
+   "value": 50.8,
+   "q_limit_down_count": 4.6,
+   "up": 1615
+  },
+  {
+   "date": "20260812",
+   "value": 88.53,
+   "q_limit_down_count": 0.4,
+   "up": 4128
+  },
+  {
+   "date": "20260813",
+   "value": 39.47,
+   "q_limit_down_count": 9,
+   "up": 1143
+  },
+  {
+   "date": "20260814",
+   "value": 52.67,
+   "q_limit_down_count": 38.2,
+   "up": 2400
+  },
+  {
+   "date": "20260817",
+   "value": 95.33,
+   "q_limit_down_count": 2.2,
+   "up": 4335
+  },
+  {
+   "date": "20260818",
+   "value": 55.2,
+   "q_limit_down_count": 12.6,
+   "up": 2121
+  },
+  {
+   "date": "20260819",
+   "value": 1.33,
+   "q_limit_down_count": 98,
+   "up": 449
+  },
+  {
+   "date": "20260820",
+   "value": 75.07,
+   "q_limit_down_count": 48.6,
+   "up": 4096
+  },
+  {
+   "date": "20260821",
+   "value": 49.33,
+   "q_limit_down_count": 51.4,
+   "up": 2505
+  },
+  {
+   "date": "20260824",
+   "value": 32.27,
+   "q_limit_down_count": 42,
+   "up": 1460
+  },
+  {
+   "date": "20260825",
+   "value": 91.87,
+   "q_limit_down_count": 8.4,
+   "up": 4234
+  },
+  {
+   "date": "20260826",
+   "value": 71.67,
+   "q_limit_down_count": 5.2,
+   "up": 2946
+  },
+  {
+   "date": "20260827",
+   "value": 76.4,
+   "q_limit_down_count": 9,
+   "up": 3394
+  },
+  {
+   "date": "20260828",
+   "value": 72.67,
+   "q_limit_down_count": 5.4,
+   "up": 3013
+  },
+  {
+   "date": "20260831",
+   "value": 60.93,
+   "q_limit_down_count": 48.4,
+   "up": 3181
+  },
+  {
+   "date": "20260901",
+   "value": 79.67,
+   "q_limit_down_count": 0.6,
+   "up": 3387
+  },
+  {
+   "date": "20260902",
+   "value": 40.53,
+   "q_limit_down_count": 27.6,
+   "up": 1541
+  },
+  {
+   "date": "20260903",
+   "value": 36.13,
+   "q_limit_down_count": 56.8,
+   "up": 1846
+  },
+  {
+   "date": "20260904",
+   "value": 54.53,
+   "q_limit_down_count": 32,
+   "up": 2444
+  },
+  {
+   "date": "20260907",
+   "value": 74.53,
+   "q_limit_down_count": 5.6,
+   "up": 3167
+  },
+  {
+   "date": "20260908",
+   "value": 79.33,
+   "q_limit_down_count": 0.8,
+   "up": 3417
+  },
+  {
+   "date": "20260909",
+   "value": 48.13,
+   "q_limit_down_count": 22.4,
+   "up": 1794
+  },
+  {
+   "date": "20260910",
+   "value": 24.4,
+   "q_limit_down_count": 49,
+   "up": 955
+  },
+  {
+   "date": "20260911",
+   "value": 15.47,
+   "q_limit_down_count": 64.2,
+   "up": 643
+  },
+  {
+   "date": "20260914",
+   "value": 54.93,
+   "q_limit_down_count": 60.4,
+   "up": 3126
+  },
+  {
+   "date": "20260915",
+   "value": 15.6,
+   "q_limit_down_count": 79.8,
+   "up": 1120
+  },
+  {
+   "date": "20260916",
+   "value": 87.33,
+   "q_limit_down_count": 9.8,
+   "up": 4170
+  },
+  {
+   "date": "20260917",
+   "value": 64.93,
+   "q_limit_down_count": 6.2,
+   "up": 2576
+  },
+  {
+   "date": "20260918",
+   "value": 91.33,
+   "q_limit_down_count": 3.2,
+   "up": 4234
+  },
+  {
+   "date": "20260921",
+   "value": 95.6,
+   "q_limit_down_count": 6.8,
+   "up": 4536
+  },
+  {
+   "date": "20260922",
+   "value": 58.67,
+   "q_limit_down_count": 14.8,
+   "up": 2374
+  },
+  {
+   "date": "20260923",
+   "value": 39.33,
+   "q_limit_down_count": 51.8,
+   "up": 1891
+  },
+  {
+   "date": "20260924",
+   "value": 25.2,
+   "q_limit_down_count": 54.6,
+   "up": 1120
+  },
+  {
+   "date": "20260928",
+   "value": 8.27,
+   "q_limit_down_count": 92.6,
+   "up": 898
+  },
+  {
+   "date": "20260929",
+   "value": 65.47,
+   "q_limit_down_count": 41.6,
+   "up": 3471
+  },
+  {
+   "date": "20260930",
+   "value": 53.2,
+   "q_limit_down_count": 44.6,
+   "up": 2567
+  },
+  {
+   "date": "20261008",
+   "value": 32.8,
+   "q_limit_down_count": 54,
+   "up": 1698
+  },
+  {
+   "date": "20261009",
+   "value": 68.93,
+   "q_limit_down_count": 35.8,
+   "up": 3297
+  },
+  {
+   "date": "20261012",
+   "value": 19.47,
+   "q_limit_down_count": 66.2,
+   "up": 1167
+  },
+  {
+   "date": "20261013",
+   "value": 60.8,
+   "q_limit_down_count": 36,
+   "up": 2909
+  },
+  {
+   "date": "20261014",
+   "value": 25.93,
+   "q_limit_down_count": 41.4,
+   "up": 979
+  },
+  {
+   "date": "20261015",
+   "value": 10.27,
+   "q_limit_down_count": 73.4,
+   "up": 430
+  },
+  {
+   "date": "20261016",
+   "value": 64.67,
+   "q_limit_down_count": 41.2,
+   "up": 3301
+  },
+  {
+   "date": "20261019",
+   "value": 37.07,
+   "q_limit_down_count": 71.6,
+   "up": 2275
+  },
+  {
+   "date": "20261020",
+   "value": 80.4,
+   "q_limit_down_count": 22,
+   "up": 3778
+  },
+  {
+   "date": "20261021",
+   "value": 53.47,
+   "q_limit_down_count": 14.4,
+   "up": 1981
+  },
+  {
+   "date": "20261022",
+   "value": 5.6,
+   "q_limit_down_count": 91.6,
+   "up": 535
+  },
+  {
+   "date": "20261023",
+   "value": 90.6,
+   "q_limit_down_count": 22.6,
+   "up": 4526
+  },
+  {
+   "date": "20261029",
+   "value": 23.1,
+   "q_limit_down_count": null,
+   "up": 781
+  }
+ ],
+ "stage": {
+  "date": "20261029",
+  "label": "退潮"
+ },
+ "volume": {
+  "amount": 1556524171264,
+  "kind": "actual",
+  "prev_day_amount": 1628487560384,
+  "ratio": 0.9558,
+  "ratio_same_time": 0.9558,
+  "percentile": 33.6,
+  "state": "in",
+  "source": "intraday:total_amount|prev=intraday:prev_same_time_amount"
+ },
+ "note": "回放夹具：恐慌广度=四项（跌停占比/上涨占比/全A中位/量能）250 日滚动分位反向均值"
+}

@@ -1,0 +1,4597 @@
+{
+  "meta": {
+    "schema_version": "1.0.0",
+    "document_type": "intraday",
+    "trade_date": "2026-10-23",
+    "generated_at": "2026-10-23 15:30:00",
+    "producer": "engine",
+    "md_source": null,
+    "note": "tick_feed 常驻刷新（QMT 订阅回调驱动，秒级）；信号流水等既有段由引擎/巡检另行落盘，本进程原样合并",
+    "source": "qmt:tick-feed"
+  },
+  "session": {
+    "date": "2026-10-23",
+    "phase": "CLOSED",
+    "state": "MONITORING",
+    "frozen_reason": null,
+    "last_reset_at": null
+  },
+  "signals": [
+    {
+      "signal_id": "SIG-20261023-033",
+      "channel": "A",
+      "created_at": "2026-10-23 17:22:43",
+      "ts_code": "002733.SZ",
+      "name": "雄韬股份",
+      "kind": "BUY",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 15.61,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-23 17:22:43"
+      },
+      "execution": {
+        "paper_order_id": "PP20261023-0033",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261023-032",
+      "channel": "A",
+      "created_at": "2026-10-23 09:30:06",
+      "ts_code": "002812.SZ",
+      "name": "恩捷股份",
+      "kind": "SELL",
+      "source": "conditional",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 42.01,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-23 09:30:06"
+      },
+      "execution": {
+        "paper_order_id": "PP20261023-0032",
+        "status": "FILLED",
+        "filled_qty": 100,
+        "filled_price": 42.01,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "条件单 CO202610220002 触发"
+    },
+    {
+      "signal_id": "SIG-20261023-031",
+      "channel": "A",
+      "created_at": "2026-10-23 09:30:06",
+      "ts_code": "002733.SZ",
+      "name": "雄韬股份",
+      "kind": "SELL",
+      "source": "conditional",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 14.75,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-23 09:30:06"
+      },
+      "execution": {
+        "paper_order_id": "PP20261023-0031",
+        "status": "FILLED",
+        "filled_qty": 200,
+        "filled_price": 14.75,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "条件单 CO202610220001 触发"
+    },
+    {
+      "signal_id": "SIG-20261022-030",
+      "channel": "A",
+      "created_at": "2026-10-22 15:43:39",
+      "ts_code": "002733.SZ",
+      "name": "雄韬股份",
+      "kind": "SELL",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 15.13,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-22 15:43:39"
+      },
+      "execution": {
+        "paper_order_id": "PP20261022-0030",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261022-029",
+      "channel": "A",
+      "created_at": "2026-10-22 14:55:00",
+      "ts_code": "002074.SZ",
+      "name": "国轩高科",
+      "kind": "SELL",
+      "source": "conditional",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 25.36,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-22 14:55:00"
+      },
+      "execution": {
+        "paper_order_id": "PP20261022-0029",
+        "status": "FILLED",
+        "filled_qty": 100,
+        "filled_price": 25.36,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "条件单 CO202610210018 触发"
+    },
+    {
+      "signal_id": "SIG-20261021-028",
+      "channel": "A",
+      "created_at": "2026-10-21 18:50:13",
+      "ts_code": "002099.SZ",
+      "name": "海翔药业",
+      "kind": "BUY",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 5.89,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-21 18:50:13"
+      },
+      "execution": {
+        "paper_order_id": "PP20261021-0028",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261021-027",
+      "channel": "A",
+      "created_at": "2026-10-21 14:58:25",
+      "ts_code": "002074.SZ",
+      "name": "国轩高科",
+      "kind": "BUY",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 25.04,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-21 14:58:25"
+      },
+      "execution": {
+        "paper_order_id": "PP20261021-0027",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261021-026",
+      "channel": "A",
+      "created_at": "2026-10-21 14:56:50",
+      "ts_code": "002074.SZ",
+      "name": "国轩高科",
+      "kind": "BUY",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 25.9,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-21 14:56:50"
+      },
+      "execution": {
+        "paper_order_id": "PP20261021-0026",
+        "status": "FILLED",
+        "filled_qty": 100,
+        "filled_price": 25.9,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261021-002",
+      "channel": "A",
+      "created_at": "2026-10-21 14:06:59",
+      "ts_code": "600000.SH",
+      "name": "浦发银行",
+      "kind": "BUY",
+      "source": "",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 10.0,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-21 14:06:59"
+      },
+      "execution": {
+        "paper_order_id": "PP20261021-0002",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20261021-025",
+      "channel": "A",
+      "created_at": "2026-10-21 11:17:14",
+      "ts_code": "603236.SH",
+      "name": "移远通信",
+      "kind": "BUY",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 75.95,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-21 11:17:14"
+      },
+      "execution": {
+        "paper_order_id": "PP20261021-0025",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261021-024",
+      "channel": "A",
+      "created_at": "2026-10-21 11:13:08",
+      "ts_code": "600487.SH",
+      "name": "亨通光电",
+      "kind": "BUY",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 50.0,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-21 11:13:08"
+      },
+      "execution": {
+        "paper_order_id": "PP20261021-0024",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261021-023",
+      "channel": "A",
+      "created_at": "2026-10-21 03:26:32",
+      "ts_code": "002812.SZ",
+      "name": "恩捷股份",
+      "kind": "BUY",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 46.55,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-21 03:26:32"
+      },
+      "execution": {
+        "paper_order_id": "PP20261021-0023",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261021-021",
+      "channel": "A",
+      "created_at": "2026-10-21 02:46:06",
+      "ts_code": "002733.SZ",
+      "name": "雄韬股份",
+      "kind": "BUY",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 16.05,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-21 02:46:06"
+      },
+      "execution": {
+        "paper_order_id": "PP20261021-0021",
+        "status": "FILLED",
+        "filled_qty": 100,
+        "filled_price": 16.05,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261021-020",
+      "channel": "A",
+      "created_at": "2026-10-21 02:45:56",
+      "ts_code": "002733.SZ",
+      "name": "雄韬股份",
+      "kind": "BUY",
+      "source": "manual",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 16.08,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-21 02:45:56"
+      },
+      "execution": {
+        "paper_order_id": "PP20261021-0020",
+        "status": "FILLED",
+        "filled_qty": 100,
+        "filled_price": 16.05,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "panel"
+    },
+    {
+      "signal_id": "SIG-20261013-001",
+      "channel": "A",
+      "created_at": "2026-10-13 21:51:25",
+      "ts_code": "603538.SH",
+      "name": "美诺华",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 24.19,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-13 21:51:25"
+      },
+      "execution": {
+        "paper_order_id": "PS20261013-0012",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20261008-018",
+      "channel": "A",
+      "created_at": "2026-10-08 09:53:55",
+      "ts_code": "603538.SH",
+      "name": "美诺华",
+      "kind": "BUY",
+      "source": "SW-20261008-02",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 28.81,
+        "condition": "择机槽 SW-20261008-02 命中 BREAKOUT：放量突破前20根高点 28.860（量比 1.65）；盘口[压力比1.60(balanced_down)]",
+        "met": true,
+        "met_at": "2026-10-08 09:53:55"
+      },
+      "execution": {
+        "paper_order_id": "PP20261008-0018",
+        "status": "FILLED",
+        "filled_qty": 1000,
+        "filled_price": 28.79,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）",
+      "batch_seq": 2
+    },
+    {
+      "signal_id": "SIG-20261008-017",
+      "channel": "A",
+      "created_at": "2026-10-08 09:30:02",
+      "ts_code": "603538.SH",
+      "name": "美诺华",
+      "kind": "BUY",
+      "source": "SW-20261008-02",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 29.06,
+        "condition": "盘口[压力比0.23(bid_heavy_up)]",
+        "met": true,
+        "met_at": "2026-10-08 09:30:02"
+      },
+      "execution": {
+        "paper_order_id": "PP20261008-0017",
+        "status": "FILLED",
+        "filled_qty": 1200,
+        "filled_price": 29.0,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20261008-001",
+      "channel": "A",
+      "created_at": "2026-10-08 09:25:01",
+      "ts_code": "002297.SZ",
+      "name": "博云新材",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 19.92,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-10-08 09:25:01"
+      },
+      "execution": {
+        "paper_order_id": "PS20261008-0011",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "P4-④ 补账自动挂止损 @19.92（key_levels 锚点）"
+    },
+    {
+      "signal_id": "SIG-20260928-016",
+      "channel": "A",
+      "created_at": "2026-09-28 14:05:28",
+      "ts_code": "002297.SZ",
+      "name": "博云新材",
+      "kind": "BUY",
+      "source": "SW-20260928-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 20.56,
+        "condition": "择机槽 SW-20260928-01 命中 BREAKOUT：放量突破前20根高点 20.540（量比 2.09）；盘口[压力比1.03(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-28 14:05:28"
+      },
+      "execution": {
+        "paper_order_id": "PP20260928-0016",
+        "status": "FILLED",
+        "filled_qty": 600,
+        "filled_price": 20.54,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）",
+      "batch_seq": 3
+    },
+    {
+      "signal_id": "SIG-20260928-015",
+      "channel": "A",
+      "created_at": "2026-09-28 14:01:45",
+      "ts_code": "002297.SZ",
+      "name": "博云新材",
+      "kind": "BUY",
+      "source": "SW-20260928-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 20.42,
+        "condition": "择机槽 SW-20260928-01 命中 BREAKOUT：放量突破前20根高点 20.260（量比 2.44）；盘口[压力比1.55(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-28 14:01:45"
+      },
+      "execution": {
+        "paper_order_id": "PP20260928-0015",
+        "status": "FILLED",
+        "filled_qty": 900,
+        "filled_price": 20.24,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）",
+      "batch_seq": 2
+    },
+    {
+      "signal_id": "SIG-20260928-014",
+      "channel": "A",
+      "created_at": "2026-09-28 10:57:00",
+      "ts_code": "002297.SZ",
+      "name": "博云新材",
+      "kind": "BUY",
+      "source": "SW-20260928-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 20.63,
+        "condition": "择机槽 SW-20260928-01 命中 PULLBACK：突破(2026-09-28 10:54:00 收盘站上前高)后回踩 20.710 于 [20.493,20.907] 不破（锚=突破颈线）→ 三段确认，触及后 2 根收盘站稳下沿（企稳确认 ✓）；盘口[压力比1.99(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-28 10:57:00"
+      },
+      "execution": {
+        "paper_order_id": "PP20260928-0014",
+        "status": "FILLED",
+        "filled_qty": 1600,
+        "filled_price": 20.63,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）",
+      "batch_seq": 1
+    },
+    {
+      "signal_id": "SIG-20260928-001",
+      "channel": "A",
+      "created_at": "2026-09-28 09:54:13",
+      "ts_code": "600330.SH",
+      "name": "天通股份",
+      "kind": "STOP",
+      "source": "exit_executor",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 27.7,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-28 09:54:13"
+      },
+      "execution": {
+        "paper_order_id": "PS20260928-0010",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "盈亏点保本（浮盈垫 2.770 ≥1.5×ATR 1.806，现价 27.700 跌回成本 27.700，无条件平仓，§8.6 用法2）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260928-001",
+      "channel": "A",
+      "created_at": "2026-09-28 09:25:02",
+      "ts_code": "603009.SH",
+      "name": "北特科技",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 47.3,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-28 09:25:02"
+      },
+      "execution": {
+        "paper_order_id": "PS20260928-0009",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "P4-④ 补账自动挂止损 @47.3（key_levels 锚点）"
+    },
+    {
+      "signal_id": "SIG-20260928-001",
+      "channel": "A",
+      "created_at": "2026-09-28 09:25:01",
+      "ts_code": "600150.SH",
+      "name": "中国船舶",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 38.25,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-28 09:25:01"
+      },
+      "execution": {
+        "paper_order_id": "PS20260928-0008",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "P4-④ 补账自动挂止损 @38.25（key_levels 锚点）"
+    },
+    {
+      "signal_id": "SIG-20260918-013",
+      "channel": "A",
+      "created_at": "2026-09-18 10:16:43",
+      "ts_code": "600150.SH",
+      "name": "中国船舶",
+      "kind": "BUY",
+      "source": "SW-20260918-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 39.42,
+        "condition": "择机槽 SW-20260918-01 命中 PULLBACK：突破(2026-09-18 10:10:00 收盘站上前高)后回踩 39.370 于 [39.055,39.844] 不破（锚=突破颈线）→ 三段确认，触及后 2 根收盘站稳下沿（企稳确认 ✓）；盘口[压力比1.37(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-18 10:16:43"
+      },
+      "execution": {
+        "paper_order_id": "PP20260918-0013",
+        "status": "FILLED",
+        "filled_qty": 900,
+        "filled_price": 39.33,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）",
+      "batch_seq": 1
+    },
+    {
+      "signal_id": "SIG-20260918-012",
+      "channel": "A",
+      "created_at": "2026-09-18 09:30:09",
+      "ts_code": "603009.SH",
+      "name": "北特科技",
+      "kind": "BUY",
+      "source": "SW-20260918-02",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 48.18,
+        "condition": "盘口[压力比0.11(bid_heavy_up)]",
+        "met": true,
+        "met_at": "2026-09-18 09:30:09"
+      },
+      "execution": {
+        "paper_order_id": "PP20260918-0012",
+        "status": "FILLED",
+        "filled_qty": 700,
+        "filled_price": 48.16,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260918-011",
+      "channel": "A",
+      "created_at": "2026-09-18 09:30:09",
+      "ts_code": "603009.SH",
+      "name": "北特科技",
+      "kind": "BUY",
+      "source": "SW-20260918-02",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 48.18,
+        "condition": "盘口[压力比0.11(bid_heavy_up)]",
+        "met": true,
+        "met_at": "2026-09-18 09:30:09"
+      },
+      "execution": {
+        "paper_order_id": "PP20260918-0011",
+        "status": "FILLED",
+        "filled_qty": 700,
+        "filled_price": 48.16,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260916-001",
+      "channel": "A",
+      "created_at": "2026-09-16 10:31:08",
+      "ts_code": "600330.SH",
+      "name": "600330.SH",
+      "kind": "TAKE_PROFIT",
+      "source": "exit_executor",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 30.47,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-16 10:31:08"
+      },
+      "execution": {
+        "paper_order_id": "PT20260916-0001",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "3221 t1（现价 30.470 ≥ 成本×1.10 30.470）减 30%"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260911-001",
+      "channel": "A",
+      "created_at": "2026-09-11 09:25:01",
+      "ts_code": "002837.SZ",
+      "name": "英维克",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 62.5,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-11 09:25:01"
+      },
+      "execution": {
+        "paper_order_id": "PS20260911-0007",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "P4-④ 补账自动挂止损 @62.5（key_levels 锚点）"
+    },
+    {
+      "signal_id": "SIG-20260910-001",
+      "channel": "A",
+      "created_at": "2026-09-10 21:10:47",
+      "ts_code": "603259.SH",
+      "name": "药明康德",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 150.9,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-10 21:10:47"
+      },
+      "execution": {
+        "paper_order_id": "PS20260910-0006",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "P4-④ 补账自动挂止损 @150.9（key_levels 锚点）"
+    },
+    {
+      "signal_id": "SIG-20260910-001",
+      "channel": "A",
+      "created_at": "2026-09-10 21:02:19",
+      "ts_code": "600330.SH",
+      "name": "天通股份",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 25.35,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-10 21:02:19"
+      },
+      "execution": {
+        "paper_order_id": "PS20260910-0005",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "P4-④ 补账自动挂止损 @25.35（key_levels 锚点）"
+    },
+    {
+      "signal_id": "SIG-20260910-001",
+      "channel": "A",
+      "created_at": "2026-09-10 21:02:19",
+      "ts_code": "002837.SZ",
+      "name": "英维克",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 62.5,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-10 21:02:19"
+      },
+      "execution": {
+        "paper_order_id": "PS20260910-0004",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "P4-④ 补账自动挂止损 @62.5（key_levels 锚点）"
+    },
+    {
+      "signal_id": "SIG-20260910-001",
+      "channel": "A",
+      "created_at": "2026-09-10 21:02:18",
+      "ts_code": "000426.SZ",
+      "name": "兴业银锡",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 36.4,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-10 21:02:18"
+      },
+      "execution": {
+        "paper_order_id": "PS20260910-0003",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "P4-④ 补账自动挂止损 @36.4（key_levels 锚点）"
+    },
+    {
+      "signal_id": "SIG-20260910-001",
+      "channel": "A",
+      "created_at": "2026-09-10 20:48:52",
+      "ts_code": "603444.SH",
+      "name": "吉比特",
+      "kind": "STOP",
+      "source": "auto_backfill",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 380.84,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-10 20:48:52"
+      },
+      "execution": {
+        "paper_order_id": "PS20260910-0002",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "P4-④ 补账自动挂止损 @380.84（key_levels 锚点）"
+    },
+    {
+      "signal_id": "SIG-20260910-010",
+      "channel": "A",
+      "created_at": "2026-09-10 10:47:15",
+      "ts_code": "000426.SZ",
+      "name": "兴业银锡",
+      "kind": "BUY",
+      "source": "SW-20260910-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 38.71,
+        "condition": "择机槽 SW-20260910-01 命中 PULLBACK：突破(2026-09-10 10:44:00 收盘站上前高)后回踩 38.690 于 [38.313,39.087] 不破（锚=突破颈线）→ 三段确认，触及后 2 根收盘站稳下沿（企稳确认 ✓）；盘口[压力比1.43(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-10 10:47:15"
+      },
+      "execution": {
+        "paper_order_id": "PP20260910-0010",
+        "status": "FILLED",
+        "filled_qty": 400,
+        "filled_price": 38.71,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260910-009",
+      "channel": "A",
+      "created_at": "2026-09-10 10:44:33",
+      "ts_code": "000426.SZ",
+      "name": "兴业银锡",
+      "kind": "BUY",
+      "source": "SW-20260910-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 38.73,
+        "condition": "择机槽 SW-20260910-01 命中 BREAKOUT：放量突破前20根高点 38.700（量比 2.97）；盘口[背离vol_up_price_flat；压力比0.98(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-10 10:44:33"
+      },
+      "execution": {
+        "paper_order_id": "PP20260910-0009",
+        "status": "FILLED",
+        "filled_qty": 600,
+        "filled_price": 38.68,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260910-008",
+      "channel": "A",
+      "created_at": "2026-09-10 10:34:03",
+      "ts_code": "000426.SZ",
+      "name": "兴业银锡",
+      "kind": "BUY",
+      "source": "SW-20260910-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 38.47,
+        "condition": "择机槽 SW-20260910-01 命中 PULLBACK：突破(2026-09-10 10:31:00 收盘站上前高)后回踩 38.610 于 [38.224,38.996] 不破（锚=突破颈线）→ 三段确认，触及后 2 根收盘站稳下沿（企稳确认 ✓）；盘口[压力比1.86(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-10 10:34:03"
+      },
+      "execution": {
+        "paper_order_id": "PP20260910-0008",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260910-008",
+      "channel": "A",
+      "created_at": "2026-09-10 10:34:03",
+      "ts_code": "000426.SZ",
+      "name": "兴业银锡",
+      "kind": "BUY",
+      "source": "SW-20260910-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 38.47,
+        "condition": "择机槽 SW-20260910-01 命中 PULLBACK：突破(2026-09-10 10:31:00 收盘站上前高)后回踩 38.610 于 [38.224,38.996] 不破（锚=突破颈线）→ 三段确认，触及后 2 根收盘站稳下沿（企稳确认 ✓）；盘口[压力比1.86(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-10 10:34:03"
+      },
+      "execution": {
+        "paper_order_id": "PP20260910-0008",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260910-007",
+      "channel": "A",
+      "created_at": "2026-09-10 10:22:30",
+      "ts_code": "603129.SH",
+      "name": "春风动力",
+      "kind": "BUY",
+      "source": "SW-20260910-02",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 287.49,
+        "condition": "择机槽 SW-20260910-02 命中 BREAKOUT：放量突破前20根高点 288.210（量比 2.22）；盘口[压力比1.17(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-10 10:22:30"
+      },
+      "execution": {
+        "paper_order_id": "PP20260910-0007",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260910-007",
+      "channel": "A",
+      "created_at": "2026-09-10 10:22:30",
+      "ts_code": "603129.SH",
+      "name": "春风动力",
+      "kind": "BUY",
+      "source": "SW-20260910-02",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 287.49,
+        "condition": "择机槽 SW-20260910-02 命中 BREAKOUT：放量突破前20根高点 288.210（量比 2.22）；盘口[压力比1.17(balanced_flat)]",
+        "met": true,
+        "met_at": "2026-09-10 10:22:30"
+      },
+      "execution": {
+        "paper_order_id": "PP20260910-0007",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260908-006",
+      "channel": "A",
+      "created_at": "2026-09-08 13:14:54",
+      "ts_code": "603444.SH",
+      "name": "吉比特",
+      "kind": "BUY",
+      "source": "SW-20260908-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 404.34,
+        "condition": "择机槽 SW-20260908-01 命中 PULLBACK：突破(2026-09-08 10:05:00 收盘站上前高)后回踩 408.730 于 [404.395,412.565] 不破（锚=突破颈线）→ 三段确认；盘口[压力比2.25(ask_heavy_flat)]",
+        "met": true,
+        "met_at": "2026-09-08 13:14:54"
+      },
+      "execution": {
+        "paper_order_id": "PP20260908-0006",
+        "status": "FILLED",
+        "filled_qty": 100,
+        "filled_price": 403.99,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260907-001",
+      "channel": "A",
+      "created_at": "2026-09-07 10:59:19",
+      "ts_code": "600703.SH",
+      "name": "600703.SH",
+      "kind": "STOP",
+      "source": "exit_executor",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 12.98,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-07 10:59:19"
+      },
+      "execution": {
+        "paper_order_id": "PS20260907-0001",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "硬止损（intraday，交易员填 13.000，现价 12.980 ≤ 13.000，破了立刻走）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260904-005",
+      "channel": "A",
+      "created_at": "2026-09-04 10:12:17",
+      "ts_code": "600330.SH",
+      "name": "天通股份",
+      "kind": "BUY",
+      "source": "SW-20260904-01",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 27.7,
+        "condition": "择机槽 SW-20260904-01 命中 VWAP_RECLAIM：收复均价线 27.494（上穿4次，量比 0.09）",
+        "met": true,
+        "met_at": "2026-09-04 10:12:17"
+      },
+      "execution": {
+        "paper_order_id": "PP20260904-0005",
+        "status": "FILLED",
+        "filled_qty": 1400,
+        "filled_price": 27.7,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260904-004",
+      "channel": "A",
+      "created_at": "2026-09-04 09:34:47",
+      "ts_code": "600703.SH",
+      "name": "三安光电",
+      "kind": "BUY",
+      "source": "SW-20260904-02",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 13.71,
+        "condition": "择机槽 SW-20260904-02 命中 VWAP_RECLAIM：收复均价线 13.657（上穿1次，量比 0.45）",
+        "met": true,
+        "met_at": "2026-09-04 09:34:47"
+      },
+      "execution": {
+        "paper_order_id": "PP20260904-0004",
+        "status": "FILLED",
+        "filled_qty": 2700,
+        "filled_price": 13.66,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260824-003",
+      "channel": "A",
+      "created_at": "2026-09-01 14:15:30",
+      "ts_code": "002837.SZ",
+      "name": "英维克",
+      "kind": "BUY",
+      "source": "SW-20260901-06",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 65.93,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-09-01 14:15:30"
+      },
+      "pre_hung_order": {
+        "order_id": "PH-PP20260901-0003",
+        "direction": "BUY",
+        "price": 65.93,
+        "qty": 380,
+        "amount": 25053.4,
+        "status": "FIRED"
+      },
+      "execution": {
+        "paper_order_id": "PP20260901-0003",
+        "status": "FILLED",
+        "filled_qty": 380,
+        "filled_price": 65.91,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）"
+    },
+    {
+      "signal_id": "SIG-20260824-003",
+      "channel": "A",
+      "created_at": "2026-08-28 04:26:45",
+      "ts_code": "002428.SZ",
+      "name": "云南锗业",
+      "kind": "STOP",
+      "source": "manual_protect",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 94.67,
+        "condition": "保本线止损（主人 2026-08-28 裁决）",
+        "met": true,
+        "met_at": "2026-08-28 04:26:45"
+      },
+      "pre_hung_order": {
+        "order_id": "PH-PP20260828-0002",
+        "direction": "SELL",
+        "price": 94.67,
+        "qty": 200,
+        "amount": 18934.0,
+        "status": "FIRED"
+      },
+      "execution": {
+        "paper_order_id": "PP20260828-0002",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "止损重挂（此前被同号止盈单 upsert 覆盖，seq_start 修正）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "保本线止损 200 股 @94.67；t1 止盈成交后撤本单改挂 100 股 @80.47 摊薄保本线"
+    },
+    {
+      "signal_id": "SIG-20260824-002",
+      "channel": "A",
+      "created_at": "2026-08-28 04:22:50",
+      "ts_code": "002428.SZ",
+      "name": "云南锗业",
+      "kind": "STOP",
+      "source": "manual_protect",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 94.67,
+        "condition": "保本线止损（主人 2026-08-28 裁决：成本 94.67，浮盈回吐至保本线无条件平仓）",
+        "met": true,
+        "met_at": "2026-08-28 04:22:50"
+      },
+      "pre_hung_order": {
+        "order_id": "PH-PP20260828-0001",
+        "direction": "SELL",
+        "price": 94.67,
+        "qty": 200,
+        "amount": 18934.0,
+        "status": "FIRED"
+      },
+      "execution": {
+        "paper_order_id": "PP20260828-0001",
+        "status": "REPORTED",
+        "filled_qty": 0,
+        "filled_price": null,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "止损补挂（成交自动挂止损 bug 修复前的人工保护单）"
+      },
+      "status": "TRIGGERED",
+      "t1_alert": false,
+      "note": "保本线止损 200 股 @94.67（主人裁决挂保本线）"
+    },
+    {
+      "signal_id": "SIG-20260824-003",
+      "channel": "A",
+      "created_at": "2026-08-27 09:33:09",
+      "ts_code": "002428.SZ",
+      "name": "云南锗业",
+      "kind": "BUY",
+      "source": "BP-20260827-03AM",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 94.79,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-08-27 09:33:09"
+      },
+      "pre_hung_order": {
+        "order_id": "PH-PP20260827-0002",
+        "direction": "BUY",
+        "price": 94.79,
+        "qty": 100,
+        "amount": 9479.0,
+        "status": "FIRED"
+      },
+      "execution": {
+        "paper_order_id": "PP20260827-0002",
+        "status": "FILLED",
+        "filled_qty": 100,
+        "filled_price": 94.79,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）",
+      "batch_seq": 2
+    },
+    {
+      "signal_id": "SIG-20260824-002",
+      "channel": "A",
+      "created_at": "2026-08-27 09:31:19",
+      "ts_code": "002428.SZ",
+      "name": "云南锗业",
+      "kind": "BUY",
+      "source": "BP-20260827-03AM",
+      "trigger": {
+        "type": "CUSTOM",
+        "price": 94.55,
+        "condition": "",
+        "met": true,
+        "met_at": "2026-08-27 09:31:19"
+      },
+      "pre_hung_order": {
+        "order_id": "PH-PP20260827-0001",
+        "direction": "BUY",
+        "price": 94.55,
+        "qty": 100,
+        "amount": 9455.0,
+        "status": "FIRED"
+      },
+      "execution": {
+        "paper_order_id": "PP20260827-0001",
+        "status": "FILLED",
+        "filled_qty": 100,
+        "filled_price": 94.55,
+        "reject_reason": null,
+        "aligned_at": null
+      },
+      "decision": {
+        "made_by": "ENGINE",
+        "reason": "纸面下单（dry-run）"
+      },
+      "status": "EXECUTED",
+      "t1_alert": false,
+      "note": "dry-run 纸面记录（§8）",
+      "batch_seq": 1
+    }
+  ],
+  "strength_snapshots": [],
+  "env_adjustments": [],
+  "events": [],
+  "commands_b": [],
+  "day_summary": {
+    "signal_count": 49,
+    "triggered_count": 49,
+    "executed_count": 22,
+    "blocked_count": 0,
+    "latest_at": "2026-10-23 17:22:43"
+  },
+  "market_quotes": [
+    {
+      "code": "880008.SH",
+      "name": "全A",
+      "price": 1348.11,
+      "change_pct": 1.8379,
+      "amount": 1972854849536.0,
+      "volume": 0.0,
+      "quote_time": "2026-10-23 15:29:43",
+      "source": "eltdx:snap"
+    },
+    {
+      "code": "000001.SH",
+      "name": "上证指数",
+      "price": 3690.475,
+      "change_pct": 0.8871,
+      "amount": 898666874900.0,
+      "volume": 552842912.0,
+      "quote_time": "2026-10-23 15:00:03",
+      "source": "qmt:tick"
+    },
+    {
+      "code": "399001.SZ",
+      "name": "深证成指",
+      "price": 11673.826,
+      "change_pct": 2.7868,
+      "amount": 1057616973500.0,
+      "volume": 690752095.0,
+      "quote_time": "2026-10-23 15:00:03",
+      "source": "qmt:tick"
+    },
+    {
+      "code": "399006.SZ",
+      "name": "创业板指",
+      "price": 2684.097,
+      "change_pct": 4.1599,
+      "amount": 536851086200.0,
+      "volume": 228509724.0,
+      "quote_time": "2026-10-23 15:00:03",
+      "source": "qmt:tick"
+    },
+    {
+      "code": "000688.SH",
+      "name": "科创50",
+      "price": 1345.515,
+      "change_pct": 3.0357,
+      "amount": 96902723400.0,
+      "volume": 10444456.0,
+      "quote_time": "2026-10-23 15:00:03",
+      "source": "qmt:tick"
+    },
+    {
+      "code": "000016.SH",
+      "name": "上证50",
+      "price": 2757.683,
+      "change_pct": 1.2066,
+      "amount": 170485920900.0,
+      "volume": 66836465.0,
+      "quote_time": "2026-10-23 15:00:03",
+      "source": "qmt:tick"
+    },
+    {
+      "code": "000300.SH",
+      "name": "沪深300",
+      "price": 4105.329,
+      "change_pct": 1.7103,
+      "amount": 558204983100.0,
+      "volume": 231325213.0,
+      "quote_time": "2026-10-23 15:00:06",
+      "source": "qmt:tick"
+    },
+    {
+      "code": "000905.SH",
+      "name": "中证500",
+      "price": 6814.443,
+      "change_pct": 2.392,
+      "amount": 336940932900.0,
+      "volume": 170824050.0,
+      "quote_time": "2026-10-23 15:00:06",
+      "source": "qmt:tick"
+    },
+    {
+      "code": "000852.SH",
+      "name": "中证1000",
+      "price": 6734.547,
+      "change_pct": 2.3756,
+      "amount": 377688701900.0,
+      "volume": 252676285.0,
+      "quote_time": "2026-10-23 15:00:06",
+      "source": "qmt:tick"
+    },
+    {
+      "code": "399303.SZ",
+      "name": "国证2000",
+      "price": 8919.008,
+      "change_pct": 2.2889,
+      "amount": 558993697400.0,
+      "volume": 394737024.0,
+      "quote_time": "2026-10-23 15:00:06",
+      "source": "qmt:tick"
+    }
+  ],
+  "market_turnover": {
+    "total_amount": 1956257843600.0,
+    "progress": 1.0,
+    "estimated": true,
+    "source": "qmt:tick",
+    "asof": "2026-10-23 15:30:00",
+    "estimate_method": "profile",
+    "estimate_note": "预估=今日累计÷w(t)（量能剖面近20日）；昨日同刻=昨日1m真值",
+    "series_today": [
+      {
+        "t": "09:30",
+        "a": 15911060500.0
+      },
+      {
+        "t": "09:30",
+        "a": 56578081100.0
+      },
+      {
+        "t": "09:31",
+        "a": 76089527000.0
+      },
+      {
+        "t": "09:31",
+        "a": 94791444100.0
+      },
+      {
+        "t": "09:32",
+        "a": 110202859100.0
+      },
+      {
+        "t": "09:32",
+        "a": 123383296400.0
+      },
+      {
+        "t": "09:33",
+        "a": 136918724800.0
+      },
+      {
+        "t": "09:33",
+        "a": 149721056300.0
+      },
+      {
+        "t": "09:34",
+        "a": 161628504400.0
+      },
+      {
+        "t": "09:34",
+        "a": 171587214400.0
+      },
+      {
+        "t": "09:35",
+        "a": 181828699300.0
+      },
+      {
+        "t": "09:35",
+        "a": 194246128000.0
+      },
+      {
+        "t": "09:36",
+        "a": 207634791800.0
+      },
+      {
+        "t": "09:36",
+        "a": 216542047000.0
+      },
+      {
+        "t": "09:37",
+        "a": 226708402400.0
+      },
+      {
+        "t": "09:37",
+        "a": 235278099500.0
+      },
+      {
+        "t": "09:38",
+        "a": 245888020100.0
+      },
+      {
+        "t": "09:38",
+        "a": 255444012600.0
+      },
+      {
+        "t": "09:39",
+        "a": 266563111300.0
+      },
+      {
+        "t": "09:40",
+        "a": 273931629000.0
+      },
+      {
+        "t": "09:40",
+        "a": 282183382900.0
+      },
+      {
+        "t": "09:41",
+        "a": 288926285700.0
+      },
+      {
+        "t": "09:41",
+        "a": 299222828500.0
+      },
+      {
+        "t": "09:42",
+        "a": 305165378000.0
+      },
+      {
+        "t": "09:42",
+        "a": 314679070300.0
+      },
+      {
+        "t": "09:43",
+        "a": 323998041900.0
+      },
+      {
+        "t": "09:43",
+        "a": 332440847600.0
+      },
+      {
+        "t": "09:44",
+        "a": 339659592000.0
+      },
+      {
+        "t": "09:44",
+        "a": 346109503600.0
+      },
+      {
+        "t": "09:45",
+        "a": 352242432200.0
+      },
+      {
+        "t": "09:45",
+        "a": 359199510400.0
+      },
+      {
+        "t": "09:46",
+        "a": 366850853100.0
+      },
+      {
+        "t": "09:46",
+        "a": 373124763200.0
+      },
+      {
+        "t": "09:47",
+        "a": 379506548000.0
+      },
+      {
+        "t": "09:47",
+        "a": 385433858500.0
+      },
+      {
+        "t": "09:48",
+        "a": 391600400000.0
+      },
+      {
+        "t": "09:49",
+        "a": 397592400000.0
+      },
+      {
+        "t": "09:49",
+        "a": 404653251700.0
+      },
+      {
+        "t": "09:50",
+        "a": 412703155000.0
+      },
+      {
+        "t": "09:50",
+        "a": 419815226000.0
+      },
+      {
+        "t": "09:51",
+        "a": 426284890100.0
+      },
+      {
+        "t": "09:51",
+        "a": 433487302400.0
+      },
+      {
+        "t": "09:52",
+        "a": 439047820300.0
+      },
+      {
+        "t": "09:52",
+        "a": 446036189900.0
+      },
+      {
+        "t": "09:53",
+        "a": 453029784700.0
+      },
+      {
+        "t": "09:53",
+        "a": 459233548400.0
+      },
+      {
+        "t": "09:54",
+        "a": 465240917600.0
+      },
+      {
+        "t": "09:54",
+        "a": 470601459800.0
+      },
+      {
+        "t": "09:55",
+        "a": 475751213900.0
+      },
+      {
+        "t": "09:55",
+        "a": 481628565300.0
+      },
+      {
+        "t": "09:56",
+        "a": 487474373600.0
+      },
+      {
+        "t": "09:56",
+        "a": 492076831200.0
+      },
+      {
+        "t": "09:57",
+        "a": 497215329700.0
+      },
+      {
+        "t": "09:57",
+        "a": 502624831100.0
+      },
+      {
+        "t": "09:58",
+        "a": 508382129300.0
+      },
+      {
+        "t": "09:59",
+        "a": 515364845900.0
+      },
+      {
+        "t": "09:59",
+        "a": 522262964500.0
+      },
+      {
+        "t": "10:00",
+        "a": 527895335700.0
+      },
+      {
+        "t": "10:00",
+        "a": 533228769200.0
+      },
+      {
+        "t": "10:01",
+        "a": 539513261600.0
+      },
+      {
+        "t": "10:01",
+        "a": 543999807900.0
+      },
+      {
+        "t": "10:02",
+        "a": 548705917100.0
+      },
+      {
+        "t": "10:02",
+        "a": 552382618900.0
+      },
+      {
+        "t": "10:03",
+        "a": 556816401000.0
+      },
+      {
+        "t": "10:03",
+        "a": 561618074900.0
+      },
+      {
+        "t": "10:04",
+        "a": 566215498800.0
+      },
+      {
+        "t": "10:04",
+        "a": 571019713500.0
+      },
+      {
+        "t": "10:05",
+        "a": 575861016400.0
+      },
+      {
+        "t": "10:05",
+        "a": 580108697600.0
+      },
+      {
+        "t": "10:06",
+        "a": 584471331600.0
+      },
+      {
+        "t": "10:06",
+        "a": 588975690000.0
+      },
+      {
+        "t": "10:07",
+        "a": 593536560000.0
+      },
+      {
+        "t": "10:07",
+        "a": 597416236900.0
+      },
+      {
+        "t": "10:08",
+        "a": 603105969600.0
+      },
+      {
+        "t": "10:08",
+        "a": 606881975300.0
+      },
+      {
+        "t": "10:09",
+        "a": 610571701000.0
+      },
+      {
+        "t": "10:10",
+        "a": 614102814900.0
+      },
+      {
+        "t": "10:10",
+        "a": 619779380700.0
+      },
+      {
+        "t": "10:11",
+        "a": 623912482200.0
+      },
+      {
+        "t": "10:11",
+        "a": 627919981100.0
+      },
+      {
+        "t": "10:12",
+        "a": 630942945300.0
+      },
+      {
+        "t": "10:12",
+        "a": 634316786100.0
+      },
+      {
+        "t": "10:13",
+        "a": 638488225200.0
+      },
+      {
+        "t": "10:13",
+        "a": 642893345600.0
+      },
+      {
+        "t": "10:14",
+        "a": 648032823700.0
+      },
+      {
+        "t": "10:14",
+        "a": 652540303500.0
+      },
+      {
+        "t": "10:15",
+        "a": 657029621800.0
+      },
+      {
+        "t": "10:15",
+        "a": 661730989700.0
+      },
+      {
+        "t": "10:16",
+        "a": 665906458400.0
+      },
+      {
+        "t": "10:16",
+        "a": 669977980100.0
+      },
+      {
+        "t": "10:17",
+        "a": 673543948700.0
+      },
+      {
+        "t": "10:17",
+        "a": 677717629200.0
+      },
+      {
+        "t": "10:18",
+        "a": 680940495700.0
+      },
+      {
+        "t": "10:19",
+        "a": 684845900700.0
+      },
+      {
+        "t": "10:19",
+        "a": 688356361800.0
+      },
+      {
+        "t": "10:20",
+        "a": 692950827800.0
+      },
+      {
+        "t": "10:20",
+        "a": 697828631700.0
+      },
+      {
+        "t": "10:21",
+        "a": 702956634400.0
+      },
+      {
+        "t": "10:21",
+        "a": 708015598400.0
+      },
+      {
+        "t": "10:22",
+        "a": 713435052400.0
+      },
+      {
+        "t": "10:22",
+        "a": 720024311000.0
+      },
+      {
+        "t": "10:23",
+        "a": 724593651100.0
+      },
+      {
+        "t": "10:23",
+        "a": 729799612700.0
+      },
+      {
+        "t": "10:24",
+        "a": 733773266900.0
+      },
+      {
+        "t": "10:24",
+        "a": 738383985300.0
+      },
+      {
+        "t": "10:25",
+        "a": 742980225500.0
+      },
+      {
+        "t": "10:25",
+        "a": 747546075600.0
+      },
+      {
+        "t": "10:26",
+        "a": 751337602700.0
+      },
+      {
+        "t": "10:26",
+        "a": 755114635100.0
+      },
+      {
+        "t": "10:27",
+        "a": 759633268300.0
+      },
+      {
+        "t": "10:27",
+        "a": 762715555700.0
+      },
+      {
+        "t": "10:28",
+        "a": 766892080300.0
+      },
+      {
+        "t": "10:28",
+        "a": 770530972200.0
+      },
+      {
+        "t": "10:29",
+        "a": 774907875900.0
+      },
+      {
+        "t": "10:30",
+        "a": 778637608300.0
+      },
+      {
+        "t": "10:30",
+        "a": 783717286200.0
+      },
+      {
+        "t": "10:31",
+        "a": 789213048400.0
+      },
+      {
+        "t": "10:31",
+        "a": 794283412100.0
+      },
+      {
+        "t": "10:32",
+        "a": 799283367900.0
+      },
+      {
+        "t": "10:32",
+        "a": 804005256500.0
+      },
+      {
+        "t": "10:33",
+        "a": 808430093500.0
+      },
+      {
+        "t": "10:33",
+        "a": 813203357900.0
+      },
+      {
+        "t": "10:34",
+        "a": 817447210300.0
+      },
+      {
+        "t": "10:34",
+        "a": 821712950300.0
+      },
+      {
+        "t": "10:35",
+        "a": 826986616000.0
+      },
+      {
+        "t": "10:35",
+        "a": 830747088300.0
+      },
+      {
+        "t": "10:36",
+        "a": 834628421900.0
+      },
+      {
+        "t": "10:36",
+        "a": 837991701900.0
+      },
+      {
+        "t": "10:37",
+        "a": 841181411400.0
+      },
+      {
+        "t": "10:38",
+        "a": 844974878100.0
+      },
+      {
+        "t": "10:38",
+        "a": 848020454200.0
+      },
+      {
+        "t": "10:39",
+        "a": 850010573200.0
+      },
+      {
+        "t": "10:39",
+        "a": 852364179700.0
+      },
+      {
+        "t": "10:40",
+        "a": 855911115900.0
+      },
+      {
+        "t": "10:40",
+        "a": 859091191900.0
+      },
+      {
+        "t": "10:41",
+        "a": 862558085400.0
+      },
+      {
+        "t": "10:41",
+        "a": 865735275300.0
+      },
+      {
+        "t": "10:42",
+        "a": 868512905000.0
+      },
+      {
+        "t": "10:42",
+        "a": 871343847600.0
+      },
+      {
+        "t": "10:43",
+        "a": 875452625400.0
+      },
+      {
+        "t": "10:43",
+        "a": 878102591000.0
+      },
+      {
+        "t": "10:44",
+        "a": 881129001900.0
+      },
+      {
+        "t": "10:44",
+        "a": 883751311400.0
+      },
+      {
+        "t": "10:45",
+        "a": 887644521400.0
+      },
+      {
+        "t": "10:45",
+        "a": 890547122500.0
+      },
+      {
+        "t": "10:46",
+        "a": 893972421800.0
+      },
+      {
+        "t": "10:46",
+        "a": 896344763700.0
+      },
+      {
+        "t": "10:47",
+        "a": 899456830700.0
+      },
+      {
+        "t": "10:48",
+        "a": 902088941000.0
+      },
+      {
+        "t": "10:48",
+        "a": 904632908700.0
+      },
+      {
+        "t": "10:49",
+        "a": 907043300800.0
+      },
+      {
+        "t": "10:49",
+        "a": 909279784100.0
+      },
+      {
+        "t": "10:50",
+        "a": 911762565300.0
+      },
+      {
+        "t": "10:50",
+        "a": 914402349300.0
+      },
+      {
+        "t": "10:51",
+        "a": 917594878500.0
+      },
+      {
+        "t": "10:51",
+        "a": 921378090200.0
+      },
+      {
+        "t": "10:52",
+        "a": 924960345700.0
+      },
+      {
+        "t": "10:52",
+        "a": 928301547900.0
+      },
+      {
+        "t": "10:53",
+        "a": 932089192400.0
+      },
+      {
+        "t": "10:53",
+        "a": 935627100800.0
+      },
+      {
+        "t": "10:54",
+        "a": 938752209500.0
+      },
+      {
+        "t": "10:54",
+        "a": 942217813200.0
+      },
+      {
+        "t": "10:55",
+        "a": 944863824900.0
+      },
+      {
+        "t": "10:55",
+        "a": 947577554800.0
+      },
+      {
+        "t": "10:56",
+        "a": 949391181600.0
+      },
+      {
+        "t": "10:56",
+        "a": 951249399300.0
+      },
+      {
+        "t": "10:57",
+        "a": 953239022300.0
+      },
+      {
+        "t": "10:58",
+        "a": 954957297600.0
+      },
+      {
+        "t": "10:58",
+        "a": 957783760200.0
+      },
+      {
+        "t": "10:59",
+        "a": 959944917400.0
+      },
+      {
+        "t": "10:59",
+        "a": 962355521900.0
+      },
+      {
+        "t": "11:00",
+        "a": 965066956500.0
+      },
+      {
+        "t": "11:00",
+        "a": 967118532700.0
+      },
+      {
+        "t": "11:01",
+        "a": 969548714300.0
+      },
+      {
+        "t": "11:01",
+        "a": 971512891300.0
+      },
+      {
+        "t": "11:02",
+        "a": 973681443000.0
+      },
+      {
+        "t": "11:02",
+        "a": 975807450400.0
+      },
+      {
+        "t": "11:03",
+        "a": 978254390500.0
+      },
+      {
+        "t": "11:03",
+        "a": 981000352200.0
+      },
+      {
+        "t": "11:04",
+        "a": 982682790700.0
+      },
+      {
+        "t": "11:04",
+        "a": 984787894300.0
+      },
+      {
+        "t": "11:05",
+        "a": 987082949100.0
+      },
+      {
+        "t": "11:05",
+        "a": 988956193400.0
+      },
+      {
+        "t": "11:06",
+        "a": 991006069500.0
+      },
+      {
+        "t": "11:06",
+        "a": 992529666100.0
+      },
+      {
+        "t": "11:07",
+        "a": 994685088800.0
+      },
+      {
+        "t": "11:08",
+        "a": 996055640800.0
+      },
+      {
+        "t": "11:08",
+        "a": 997741815300.0
+      },
+      {
+        "t": "11:09",
+        "a": 999671423000.0
+      },
+      {
+        "t": "11:09",
+        "a": 1001324602000.0
+      },
+      {
+        "t": "11:10",
+        "a": 1003544119300.0
+      },
+      {
+        "t": "11:10",
+        "a": 1005706808600.0
+      },
+      {
+        "t": "11:11",
+        "a": 1007314519600.0
+      },
+      {
+        "t": "11:11",
+        "a": 1008821323600.0
+      },
+      {
+        "t": "11:12",
+        "a": 1010823655500.0
+      },
+      {
+        "t": "11:12",
+        "a": 1012631287900.0
+      },
+      {
+        "t": "11:13",
+        "a": 1014069029100.0
+      },
+      {
+        "t": "11:13",
+        "a": 1015466844200.0
+      },
+      {
+        "t": "11:14",
+        "a": 1016946350900.0
+      },
+      {
+        "t": "11:14",
+        "a": 1018534408100.0
+      },
+      {
+        "t": "11:15",
+        "a": 1020543189600.0
+      },
+      {
+        "t": "11:16",
+        "a": 1022078111600.0
+      },
+      {
+        "t": "11:16",
+        "a": 1024145011200.0
+      },
+      {
+        "t": "11:17",
+        "a": 1025730443400.0
+      },
+      {
+        "t": "11:17",
+        "a": 1027551208400.0
+      },
+      {
+        "t": "11:18",
+        "a": 1029311816200.0
+      },
+      {
+        "t": "11:18",
+        "a": 1030901533300.0
+      },
+      {
+        "t": "11:19",
+        "a": 1032381356600.0
+      },
+      {
+        "t": "11:19",
+        "a": 1034041661600.0
+      },
+      {
+        "t": "11:20",
+        "a": 1035753669600.0
+      },
+      {
+        "t": "11:20",
+        "a": 1036989491500.0
+      },
+      {
+        "t": "11:21",
+        "a": 1038433185700.0
+      },
+      {
+        "t": "11:21",
+        "a": 1040696802100.0
+      },
+      {
+        "t": "11:22",
+        "a": 1041979522400.0
+      },
+      {
+        "t": "11:22",
+        "a": 1043121312500.0
+      },
+      {
+        "t": "11:23",
+        "a": 1044878788000.0
+      },
+      {
+        "t": "11:24",
+        "a": 1046274862800.0
+      },
+      {
+        "t": "11:24",
+        "a": 1049700796500.0
+      },
+      {
+        "t": "11:25",
+        "a": 1051697954700.0
+      },
+      {
+        "t": "11:25",
+        "a": 1053299202000.0
+      },
+      {
+        "t": "11:26",
+        "a": 1054910597800.0
+      },
+      {
+        "t": "11:26",
+        "a": 1056161984900.0
+      },
+      {
+        "t": "11:27",
+        "a": 1057479174700.0
+      },
+      {
+        "t": "11:27",
+        "a": 1058789302800.0
+      },
+      {
+        "t": "11:28",
+        "a": 1060595195100.0
+      },
+      {
+        "t": "11:28",
+        "a": 1062997517400.0
+      },
+      {
+        "t": "11:29",
+        "a": 1065830165200.0
+      },
+      {
+        "t": "11:29",
+        "a": 1067527922600.0
+      },
+      {
+        "t": "11:30",
+        "a": 1067993760300.0
+      },
+      {
+        "t": "13:00",
+        "a": 1067993760300.0
+      },
+      {
+        "t": "13:00",
+        "a": 1081371496300.0
+      },
+      {
+        "t": "13:01",
+        "a": 1085866170500.0
+      },
+      {
+        "t": "13:01",
+        "a": 1092003062600.0
+      },
+      {
+        "t": "13:02",
+        "a": 1096580157000.0
+      },
+      {
+        "t": "13:02",
+        "a": 1102050136600.0
+      },
+      {
+        "t": "13:03",
+        "a": 1106788839700.0
+      },
+      {
+        "t": "13:03",
+        "a": 1111449672600.0
+      },
+      {
+        "t": "13:04",
+        "a": 1116018268700.0
+      },
+      {
+        "t": "13:04",
+        "a": 1119817460900.0
+      },
+      {
+        "t": "13:05",
+        "a": 1122942126700.0
+      },
+      {
+        "t": "13:05",
+        "a": 1126908397100.0
+      },
+      {
+        "t": "13:06",
+        "a": 1131784682100.0
+      },
+      {
+        "t": "13:06",
+        "a": 1137739435300.0
+      },
+      {
+        "t": "13:07",
+        "a": 1143408434200.0
+      },
+      {
+        "t": "13:07",
+        "a": 1148459579800.0
+      },
+      {
+        "t": "13:08",
+        "a": 1153497123000.0
+      },
+      {
+        "t": "13:08",
+        "a": 1157827989300.0
+      },
+      {
+        "t": "13:09",
+        "a": 1166297436900.0
+      },
+      {
+        "t": "13:09",
+        "a": 1170217754000.0
+      },
+      {
+        "t": "13:10",
+        "a": 1174892580900.0
+      },
+      {
+        "t": "13:10",
+        "a": 1178699653900.0
+      },
+      {
+        "t": "13:11",
+        "a": 1182829825900.0
+      },
+      {
+        "t": "13:11",
+        "a": 1186613774200.0
+      },
+      {
+        "t": "13:12",
+        "a": 1190832344700.0
+      },
+      {
+        "t": "13:12",
+        "a": 1194371037600.0
+      },
+      {
+        "t": "13:13",
+        "a": 1198324218300.0
+      },
+      {
+        "t": "13:13",
+        "a": 1203832625800.0
+      },
+      {
+        "t": "13:14",
+        "a": 1209936768200.0
+      },
+      {
+        "t": "13:15",
+        "a": 1214549464000.0
+      },
+      {
+        "t": "13:15",
+        "a": 1218968457500.0
+      },
+      {
+        "t": "13:16",
+        "a": 1223145870500.0
+      },
+      {
+        "t": "13:16",
+        "a": 1228332475700.0
+      },
+      {
+        "t": "13:17",
+        "a": 1233870026000.0
+      },
+      {
+        "t": "13:17",
+        "a": 1238458789400.0
+      },
+      {
+        "t": "13:18",
+        "a": 1242808337800.0
+      },
+      {
+        "t": "13:18",
+        "a": 1246487013900.0
+      },
+      {
+        "t": "13:19",
+        "a": 1250068180800.0
+      },
+      {
+        "t": "13:19",
+        "a": 1253532732300.0
+      },
+      {
+        "t": "13:20",
+        "a": 1257924790200.0
+      },
+      {
+        "t": "13:21",
+        "a": 1262705357000.0
+      },
+      {
+        "t": "13:21",
+        "a": 1266671776600.0
+      },
+      {
+        "t": "13:22",
+        "a": 1270718555100.0
+      },
+      {
+        "t": "13:22",
+        "a": 1275757717200.0
+      },
+      {
+        "t": "13:23",
+        "a": 1280362817900.0
+      },
+      {
+        "t": "13:23",
+        "a": 1286186531700.0
+      },
+      {
+        "t": "13:24",
+        "a": 1291827453400.0
+      },
+      {
+        "t": "13:24",
+        "a": 1297097177100.0
+      },
+      {
+        "t": "13:25",
+        "a": 1302874224400.0
+      },
+      {
+        "t": "13:25",
+        "a": 1307387684300.0
+      },
+      {
+        "t": "13:26",
+        "a": 1311122590900.0
+      },
+      {
+        "t": "13:26",
+        "a": 1314597804300.0
+      },
+      {
+        "t": "13:27",
+        "a": 1317814723400.0
+      },
+      {
+        "t": "13:27",
+        "a": 1321093929100.0
+      },
+      {
+        "t": "13:28",
+        "a": 1324126563600.0
+      },
+      {
+        "t": "13:28",
+        "a": 1326792017300.0
+      },
+      {
+        "t": "13:29",
+        "a": 1330132968700.0
+      },
+      {
+        "t": "13:30",
+        "a": 1333192558400.0
+      },
+      {
+        "t": "13:30",
+        "a": 1336448366300.0
+      },
+      {
+        "t": "13:31",
+        "a": 1340102437400.0
+      },
+      {
+        "t": "13:31",
+        "a": 1343313167000.0
+      },
+      {
+        "t": "13:32",
+        "a": 1345732087400.0
+      },
+      {
+        "t": "13:32",
+        "a": 1348943475500.0
+      },
+      {
+        "t": "13:33",
+        "a": 1352430878400.0
+      },
+      {
+        "t": "13:33",
+        "a": 1356085808000.0
+      },
+      {
+        "t": "13:34",
+        "a": 1359342416500.0
+      },
+      {
+        "t": "13:34",
+        "a": 1361757699100.0
+      },
+      {
+        "t": "13:35",
+        "a": 1364434892800.0
+      },
+      {
+        "t": "13:35",
+        "a": 1366940610000.0
+      },
+      {
+        "t": "13:36",
+        "a": 1369755448900.0
+      },
+      {
+        "t": "13:36",
+        "a": 1372508256600.0
+      },
+      {
+        "t": "13:37",
+        "a": 1375152480400.0
+      },
+      {
+        "t": "13:37",
+        "a": 1378182944500.0
+      },
+      {
+        "t": "13:38",
+        "a": 1381051483800.0
+      },
+      {
+        "t": "13:38",
+        "a": 1383611151600.0
+      },
+      {
+        "t": "13:39",
+        "a": 1386938635300.0
+      },
+      {
+        "t": "13:39",
+        "a": 1390165197800.0
+      },
+      {
+        "t": "13:40",
+        "a": 1393129551100.0
+      },
+      {
+        "t": "13:40",
+        "a": 1396598200400.0
+      },
+      {
+        "t": "13:41",
+        "a": 1400124998200.0
+      },
+      {
+        "t": "13:41",
+        "a": 1404805572600.0
+      },
+      {
+        "t": "13:42",
+        "a": 1409471506300.0
+      },
+      {
+        "t": "13:43",
+        "a": 1413253686100.0
+      },
+      {
+        "t": "13:43",
+        "a": 1417898378800.0
+      },
+      {
+        "t": "13:44",
+        "a": 1421133667600.0
+      },
+      {
+        "t": "13:44",
+        "a": 1424460618700.0
+      },
+      {
+        "t": "13:45",
+        "a": 1428122918000.0
+      },
+      {
+        "t": "13:45",
+        "a": 1430895804500.0
+      },
+      {
+        "t": "13:46",
+        "a": 1434650851500.0
+      },
+      {
+        "t": "13:46",
+        "a": 1437188323200.0
+      },
+      {
+        "t": "13:47",
+        "a": 1440030009800.0
+      },
+      {
+        "t": "13:47",
+        "a": 1442597989900.0
+      },
+      {
+        "t": "13:48",
+        "a": 1446322853400.0
+      },
+      {
+        "t": "13:48",
+        "a": 1449270176900.0
+      },
+      {
+        "t": "13:49",
+        "a": 1451920444500.0
+      },
+      {
+        "t": "13:49",
+        "a": 1454671737100.0
+      },
+      {
+        "t": "13:50",
+        "a": 1457499598800.0
+      },
+      {
+        "t": "13:50",
+        "a": 1459743030800.0
+      },
+      {
+        "t": "13:51",
+        "a": 1461893109400.0
+      },
+      {
+        "t": "13:52",
+        "a": 1464095853500.0
+      },
+      {
+        "t": "13:52",
+        "a": 1466112561300.0
+      },
+      {
+        "t": "13:53",
+        "a": 1468218399600.0
+      },
+      {
+        "t": "13:53",
+        "a": 1471168080300.0
+      },
+      {
+        "t": "13:54",
+        "a": 1473933742400.0
+      },
+      {
+        "t": "13:54",
+        "a": 1476270726500.0
+      },
+      {
+        "t": "13:55",
+        "a": 1478551340900.0
+      },
+      {
+        "t": "13:55",
+        "a": 1480696395700.0
+      },
+      {
+        "t": "13:56",
+        "a": 1483355942300.0
+      },
+      {
+        "t": "13:56",
+        "a": 1485276036700.0
+      },
+      {
+        "t": "13:57",
+        "a": 1487396512100.0
+      },
+      {
+        "t": "13:57",
+        "a": 1489071253700.0
+      },
+      {
+        "t": "13:58",
+        "a": 1491576801100.0
+      },
+      {
+        "t": "13:58",
+        "a": 1493601394100.0
+      },
+      {
+        "t": "13:59",
+        "a": 1495795133300.0
+      },
+      {
+        "t": "13:59",
+        "a": 1498166756800.0
+      },
+      {
+        "t": "14:00",
+        "a": 1500623879900.0
+      },
+      {
+        "t": "14:01",
+        "a": 1502939537900.0
+      },
+      {
+        "t": "14:01",
+        "a": 1505845722900.0
+      },
+      {
+        "t": "14:02",
+        "a": 1507892434700.0
+      },
+      {
+        "t": "14:02",
+        "a": 1509816143900.0
+      },
+      {
+        "t": "14:03",
+        "a": 1511963412300.0
+      },
+      {
+        "t": "14:03",
+        "a": 1514463785600.0
+      },
+      {
+        "t": "14:04",
+        "a": 1517005133700.0
+      },
+      {
+        "t": "14:04",
+        "a": 1518641032100.0
+      },
+      {
+        "t": "14:05",
+        "a": 1521582905200.0
+      },
+      {
+        "t": "14:05",
+        "a": 1523799785500.0
+      },
+      {
+        "t": "14:06",
+        "a": 1527626146200.0
+      },
+      {
+        "t": "14:06",
+        "a": 1531344366100.0
+      },
+      {
+        "t": "14:07",
+        "a": 1536884432400.0
+      },
+      {
+        "t": "14:07",
+        "a": 1542354612400.0
+      },
+      {
+        "t": "14:08",
+        "a": 1548002587200.0
+      },
+      {
+        "t": "14:08",
+        "a": 1552461696000.0
+      },
+      {
+        "t": "14:09",
+        "a": 1556673289300.0
+      },
+      {
+        "t": "14:10",
+        "a": 1560461294500.0
+      },
+      {
+        "t": "14:10",
+        "a": 1566032261500.0
+      },
+      {
+        "t": "14:11",
+        "a": 1570089649900.0
+      },
+      {
+        "t": "14:11",
+        "a": 1573865066100.0
+      },
+      {
+        "t": "14:12",
+        "a": 1577417142600.0
+      },
+      {
+        "t": "14:12",
+        "a": 1581368174000.0
+      },
+      {
+        "t": "14:13",
+        "a": 1584978490200.0
+      },
+      {
+        "t": "14:13",
+        "a": 1589445147800.0
+      },
+      {
+        "t": "14:14",
+        "a": 1594677824800.0
+      },
+      {
+        "t": "14:14",
+        "a": 1599670684200.0
+      },
+      {
+        "t": "14:15",
+        "a": 1604110398100.0
+      },
+      {
+        "t": "14:15",
+        "a": 1608502356700.0
+      },
+      {
+        "t": "14:16",
+        "a": 1612459739600.0
+      },
+      {
+        "t": "14:16",
+        "a": 1617766973000.0
+      },
+      {
+        "t": "14:17",
+        "a": 1623265641600.0
+      },
+      {
+        "t": "14:17",
+        "a": 1627755168300.0
+      },
+      {
+        "t": "14:18",
+        "a": 1631852501500.0
+      },
+      {
+        "t": "14:18",
+        "a": 1637288402200.0
+      },
+      {
+        "t": "14:19",
+        "a": 1644146253500.0
+      },
+      {
+        "t": "14:19",
+        "a": 1647827219500.0
+      },
+      {
+        "t": "14:20",
+        "a": 1652170251300.0
+      },
+      {
+        "t": "14:21",
+        "a": 1655259049100.0
+      },
+      {
+        "t": "14:21",
+        "a": 1660036563100.0
+      },
+      {
+        "t": "14:22",
+        "a": 1664164648400.0
+      },
+      {
+        "t": "14:22",
+        "a": 1669298869800.0
+      },
+      {
+        "t": "14:23",
+        "a": 1672760169500.0
+      },
+      {
+        "t": "14:23",
+        "a": 1676633218500.0
+      },
+      {
+        "t": "14:24",
+        "a": 1679975869800.0
+      },
+      {
+        "t": "14:24",
+        "a": 1683606225000.0
+      },
+      {
+        "t": "14:25",
+        "a": 1688113894000.0
+      },
+      {
+        "t": "14:25",
+        "a": 1691997860800.0
+      },
+      {
+        "t": "14:26",
+        "a": 1696053811200.0
+      },
+      {
+        "t": "14:26",
+        "a": 1699014886600.0
+      },
+      {
+        "t": "14:27",
+        "a": 1702144418000.0
+      },
+      {
+        "t": "14:27",
+        "a": 1704707568900.0
+      },
+      {
+        "t": "14:28",
+        "a": 1707234563100.0
+      },
+      {
+        "t": "14:28",
+        "a": 1709760521800.0
+      },
+      {
+        "t": "14:29",
+        "a": 1712714396700.0
+      },
+      {
+        "t": "14:30",
+        "a": 1715300844600.0
+      },
+      {
+        "t": "14:30",
+        "a": 1719961636300.0
+      },
+      {
+        "t": "14:31",
+        "a": 1724135165000.0
+      },
+      {
+        "t": "14:31",
+        "a": 1728030596300.0
+      },
+      {
+        "t": "14:32",
+        "a": 1731848514900.0
+      },
+      {
+        "t": "14:32",
+        "a": 1735051885900.0
+      },
+      {
+        "t": "14:33",
+        "a": 1738917804800.0
+      },
+      {
+        "t": "14:33",
+        "a": 1741805862800.0
+      },
+      {
+        "t": "14:34",
+        "a": 1745141812500.0
+      },
+      {
+        "t": "14:34",
+        "a": 1748152328300.0
+      },
+      {
+        "t": "14:35",
+        "a": 1751449804800.0
+      },
+      {
+        "t": "14:35",
+        "a": 1754542344500.0
+      },
+      {
+        "t": "14:36",
+        "a": 1758309487600.0
+      },
+      {
+        "t": "14:36",
+        "a": 1761559771000.0
+      },
+      {
+        "t": "14:37",
+        "a": 1765182050600.0
+      },
+      {
+        "t": "14:37",
+        "a": 1768609823900.0
+      },
+      {
+        "t": "14:38",
+        "a": 1772670322100.0
+      },
+      {
+        "t": "14:39",
+        "a": 1775857176400.0
+      },
+      {
+        "t": "14:39",
+        "a": 1779902737800.0
+      },
+      {
+        "t": "14:40",
+        "a": 1784025835800.0
+      },
+      {
+        "t": "14:40",
+        "a": 1788497945300.0
+      },
+      {
+        "t": "14:41",
+        "a": 1792606602900.0
+      },
+      {
+        "t": "14:41",
+        "a": 1797287940900.0
+      },
+      {
+        "t": "14:42",
+        "a": 1801971541300.0
+      },
+      {
+        "t": "14:42",
+        "a": 1807477747300.0
+      },
+      {
+        "t": "14:43",
+        "a": 1812247230200.0
+      },
+      {
+        "t": "14:43",
+        "a": 1816269312100.0
+      },
+      {
+        "t": "14:44",
+        "a": 1820671282300.0
+      },
+      {
+        "t": "14:44",
+        "a": 1824888940200.0
+      },
+      {
+        "t": "14:45",
+        "a": 1829453301700.0
+      },
+      {
+        "t": "14:45",
+        "a": 1833523673600.0
+      },
+      {
+        "t": "14:46",
+        "a": 1838580192800.0
+      },
+      {
+        "t": "14:47",
+        "a": 1842304023900.0
+      },
+      {
+        "t": "14:47",
+        "a": 1847112076600.0
+      },
+      {
+        "t": "14:48",
+        "a": 1850880755900.0
+      },
+      {
+        "t": "14:48",
+        "a": 1855887369400.0
+      },
+      {
+        "t": "14:49",
+        "a": 1860592484100.0
+      },
+      {
+        "t": "14:49",
+        "a": 1865413419000.0
+      },
+      {
+        "t": "14:50",
+        "a": 1870463936400.0
+      },
+      {
+        "t": "14:50",
+        "a": 1874892133000.0
+      },
+      {
+        "t": "14:51",
+        "a": 1879881179200.0
+      },
+      {
+        "t": "14:51",
+        "a": 1884845850300.0
+      },
+      {
+        "t": "14:52",
+        "a": 1889800017400.0
+      },
+      {
+        "t": "14:52",
+        "a": 1894900001400.0
+      },
+      {
+        "t": "14:53",
+        "a": 1899664058500.0
+      },
+      {
+        "t": "14:53",
+        "a": 1903751656300.0
+      },
+      {
+        "t": "14:54",
+        "a": 1908653976000.0
+      },
+      {
+        "t": "14:54",
+        "a": 1913638860100.0
+      },
+      {
+        "t": "14:55",
+        "a": 1919568849100.0
+      },
+      {
+        "t": "14:56",
+        "a": 1925281306800.0
+      },
+      {
+        "t": "14:56",
+        "a": 1932330714500.0
+      },
+      {
+        "t": "14:57",
+        "a": 1937123663600.0
+      },
+      {
+        "t": "14:57",
+        "a": 1937123663600.0
+      },
+      {
+        "t": "14:58",
+        "a": 1937123663600.0
+      },
+      {
+        "t": "14:58",
+        "a": 1937123663600.0
+      },
+      {
+        "t": "14:59",
+        "a": 1937123663600.0
+      },
+      {
+        "t": "14:59",
+        "a": 1937123663600.0
+      },
+      {
+        "t": "15:00",
+        "a": 1956257843600.0
+      },
+      {
+        "t": "15:00",
+        "a": 1956257843600.0
+      }
+    ],
+    "series_prev": [
+      {
+        "t": "09:30",
+        "a": 12441882128.0
+      },
+      {
+        "t": "09:31",
+        "a": 58592120136.0
+      },
+      {
+        "t": "09:32",
+        "a": 84492599913.0
+      },
+      {
+        "t": "09:33",
+        "a": 107884301027.0
+      },
+      {
+        "t": "09:34",
+        "a": 129728097204.0
+      },
+      {
+        "t": "09:35",
+        "a": 148898049612.0
+      },
+      {
+        "t": "09:36",
+        "a": 166986895395.0
+      },
+      {
+        "t": "09:37",
+        "a": 183763324287.0
+      },
+      {
+        "t": "09:38",
+        "a": 200328934445.0
+      },
+      {
+        "t": "09:39",
+        "a": 215550230307.0
+      },
+      {
+        "t": "09:40",
+        "a": 230037894817.0
+      },
+      {
+        "t": "09:41",
+        "a": 243970106095.0
+      },
+      {
+        "t": "09:42",
+        "a": 258094806197.0
+      },
+      {
+        "t": "09:43",
+        "a": 270152567488.0
+      },
+      {
+        "t": "09:44",
+        "a": 282405407272.0
+      },
+      {
+        "t": "09:45",
+        "a": 294724204945.0
+      },
+      {
+        "t": "09:46",
+        "a": 306979695144.0
+      },
+      {
+        "t": "09:47",
+        "a": 320087434454.0
+      },
+      {
+        "t": "09:48",
+        "a": 332750633035.0
+      },
+      {
+        "t": "09:49",
+        "a": 344403263413.0
+      },
+      {
+        "t": "09:50",
+        "a": 356236012302.0
+      },
+      {
+        "t": "09:51",
+        "a": 367498755727.0
+      },
+      {
+        "t": "09:52",
+        "a": 377291334984.0
+      },
+      {
+        "t": "09:53",
+        "a": 386236890541.0
+      },
+      {
+        "t": "09:54",
+        "a": 394516649452.0
+      },
+      {
+        "t": "09:55",
+        "a": 403185070649.0
+      },
+      {
+        "t": "09:56",
+        "a": 411218910082.0
+      },
+      {
+        "t": "09:57",
+        "a": 419250947362.0
+      },
+      {
+        "t": "09:58",
+        "a": 427111184857.0
+      },
+      {
+        "t": "09:59",
+        "a": 435486380977.0
+      },
+      {
+        "t": "10:00",
+        "a": 446838370812.0
+      },
+      {
+        "t": "10:01",
+        "a": 460004455182.0
+      },
+      {
+        "t": "10:02",
+        "a": 469881348321.0
+      },
+      {
+        "t": "10:03",
+        "a": 479294143717.0
+      },
+      {
+        "t": "10:04",
+        "a": 487982935979.0
+      },
+      {
+        "t": "10:05",
+        "a": 496902393552.0
+      },
+      {
+        "t": "10:06",
+        "a": 505778228683.0
+      },
+      {
+        "t": "10:07",
+        "a": 515700917039.0
+      },
+      {
+        "t": "10:08",
+        "a": 526205059719.0
+      },
+      {
+        "t": "10:09",
+        "a": 534922302373.0
+      },
+      {
+        "t": "10:10",
+        "a": 542778001763.0
+      },
+      {
+        "t": "10:11",
+        "a": 552023960015.0
+      },
+      {
+        "t": "10:12",
+        "a": 559719954775.0
+      },
+      {
+        "t": "10:13",
+        "a": 566371894375.0
+      },
+      {
+        "t": "10:14",
+        "a": 574344522426.0
+      },
+      {
+        "t": "10:15",
+        "a": 582473771502.0
+      },
+      {
+        "t": "10:16",
+        "a": 589905966237.0
+      },
+      {
+        "t": "10:17",
+        "a": 597119232951.0
+      },
+      {
+        "t": "10:18",
+        "a": 604858415234.0
+      },
+      {
+        "t": "10:19",
+        "a": 611381801561.0
+      },
+      {
+        "t": "10:20",
+        "a": 618542376261.0
+      },
+      {
+        "t": "10:21",
+        "a": 626458784173.0
+      },
+      {
+        "t": "10:22",
+        "a": 635113205626.0
+      },
+      {
+        "t": "10:23",
+        "a": 645227743729.0
+      },
+      {
+        "t": "10:24",
+        "a": 651787386018.0
+      },
+      {
+        "t": "10:25",
+        "a": 657929233370.0
+      },
+      {
+        "t": "10:26",
+        "a": 663473725729.0
+      },
+      {
+        "t": "10:27",
+        "a": 668700152954.0
+      },
+      {
+        "t": "10:28",
+        "a": 673931324132.0
+      },
+      {
+        "t": "10:29",
+        "a": 677964798262.0
+      },
+      {
+        "t": "10:30",
+        "a": 683560313938.0
+      },
+      {
+        "t": "10:31",
+        "a": 689599689766.0
+      },
+      {
+        "t": "10:32",
+        "a": 695092714076.0
+      },
+      {
+        "t": "10:33",
+        "a": 699246849243.0
+      },
+      {
+        "t": "10:34",
+        "a": 703979573615.0
+      },
+      {
+        "t": "10:35",
+        "a": 708091668779.0
+      },
+      {
+        "t": "10:36",
+        "a": 712864922539.0
+      },
+      {
+        "t": "10:37",
+        "a": 717619829372.0
+      },
+      {
+        "t": "10:38",
+        "a": 722822536244.0
+      },
+      {
+        "t": "10:39",
+        "a": 727161685048.0
+      },
+      {
+        "t": "10:40",
+        "a": 730809445594.0
+      },
+      {
+        "t": "10:41",
+        "a": 734760367633.0
+      },
+      {
+        "t": "10:42",
+        "a": 738929547575.0
+      },
+      {
+        "t": "10:43",
+        "a": 742061007877.0
+      },
+      {
+        "t": "10:44",
+        "a": 747139203196.0
+      },
+      {
+        "t": "10:45",
+        "a": 751941836056.0
+      },
+      {
+        "t": "10:46",
+        "a": 758352807481.0
+      },
+      {
+        "t": "10:47",
+        "a": 763292115652.0
+      },
+      {
+        "t": "10:48",
+        "a": 766991131836.0
+      },
+      {
+        "t": "10:49",
+        "a": 772114132013.0
+      },
+      {
+        "t": "10:50",
+        "a": 776160052533.0
+      },
+      {
+        "t": "10:51",
+        "a": 780904446307.0
+      },
+      {
+        "t": "10:52",
+        "a": 784239491399.0
+      },
+      {
+        "t": "10:53",
+        "a": 788342846779.0
+      },
+      {
+        "t": "10:54",
+        "a": 791566808013.0
+      },
+      {
+        "t": "10:55",
+        "a": 794933619205.0
+      },
+      {
+        "t": "10:56",
+        "a": 798570379169.0
+      },
+      {
+        "t": "10:57",
+        "a": 801455669150.0
+      },
+      {
+        "t": "10:58",
+        "a": 805053235532.0
+      },
+      {
+        "t": "10:59",
+        "a": 808366432765.0
+      },
+      {
+        "t": "11:00",
+        "a": 813863187237.0
+      },
+      {
+        "t": "11:01",
+        "a": 818204496992.0
+      },
+      {
+        "t": "11:02",
+        "a": 822724771416.0
+      },
+      {
+        "t": "11:03",
+        "a": 826221038250.0
+      },
+      {
+        "t": "11:04",
+        "a": 829640437359.0
+      },
+      {
+        "t": "11:05",
+        "a": 832966940204.0
+      },
+      {
+        "t": "11:06",
+        "a": 836294021392.0
+      },
+      {
+        "t": "11:07",
+        "a": 840867297619.0
+      },
+      {
+        "t": "11:08",
+        "a": 845623930206.0
+      },
+      {
+        "t": "11:09",
+        "a": 849414777457.0
+      },
+      {
+        "t": "11:10",
+        "a": 852969017237.0
+      },
+      {
+        "t": "11:11",
+        "a": 856954135590.0
+      },
+      {
+        "t": "11:12",
+        "a": 860547351049.0
+      },
+      {
+        "t": "11:13",
+        "a": 863525097982.0
+      },
+      {
+        "t": "11:14",
+        "a": 866472426451.0
+      },
+      {
+        "t": "11:15",
+        "a": 868889054178.0
+      },
+      {
+        "t": "11:16",
+        "a": 872369226736.0
+      },
+      {
+        "t": "11:17",
+        "a": 877039200283.0
+      },
+      {
+        "t": "11:18",
+        "a": 881046515191.0
+      },
+      {
+        "t": "11:19",
+        "a": 884356970247.0
+      },
+      {
+        "t": "11:20",
+        "a": 887172733602.0
+      },
+      {
+        "t": "11:21",
+        "a": 889849833277.0
+      },
+      {
+        "t": "11:22",
+        "a": 892575145090.0
+      },
+      {
+        "t": "11:23",
+        "a": 895016246464.0
+      },
+      {
+        "t": "11:24",
+        "a": 897609501336.0
+      },
+      {
+        "t": "11:25",
+        "a": 899968439921.0
+      },
+      {
+        "t": "11:26",
+        "a": 903447548653.0
+      },
+      {
+        "t": "11:27",
+        "a": 907329249199.0
+      },
+      {
+        "t": "11:28",
+        "a": 911226355719.0
+      },
+      {
+        "t": "11:29",
+        "a": 915371260697.0
+      },
+      {
+        "t": "11:30",
+        "a": 919292870039.0
+      },
+      {
+        "t": "13:01",
+        "a": 933804619625.0
+      },
+      {
+        "t": "13:02",
+        "a": 938578167366.0
+      },
+      {
+        "t": "13:03",
+        "a": 943415374591.0
+      },
+      {
+        "t": "13:04",
+        "a": 947172947169.0
+      },
+      {
+        "t": "13:05",
+        "a": 951169891432.0
+      },
+      {
+        "t": "13:06",
+        "a": 955323372637.0
+      },
+      {
+        "t": "13:07",
+        "a": 959358854194.0
+      },
+      {
+        "t": "13:08",
+        "a": 962679700506.0
+      },
+      {
+        "t": "13:09",
+        "a": 966325445538.0
+      },
+      {
+        "t": "13:10",
+        "a": 969445350671.0
+      },
+      {
+        "t": "13:11",
+        "a": 972668271681.0
+      },
+      {
+        "t": "13:12",
+        "a": 977220643785.0
+      },
+      {
+        "t": "13:13",
+        "a": 980065351289.0
+      },
+      {
+        "t": "13:14",
+        "a": 983075578549.0
+      },
+      {
+        "t": "13:15",
+        "a": 986120620451.0
+      },
+      {
+        "t": "13:16",
+        "a": 991033101614.0
+      },
+      {
+        "t": "13:17",
+        "a": 997018975458.0
+      },
+      {
+        "t": "13:18",
+        "a": 1002084951363.0
+      },
+      {
+        "t": "13:19",
+        "a": 1007588522161.0
+      },
+      {
+        "t": "13:20",
+        "a": 1011056057745.0
+      },
+      {
+        "t": "13:21",
+        "a": 1014556398991.0
+      },
+      {
+        "t": "13:22",
+        "a": 1017622402405.0
+      },
+      {
+        "t": "13:23",
+        "a": 1021249497495.0
+      },
+      {
+        "t": "13:24",
+        "a": 1024772210776.0
+      },
+      {
+        "t": "13:25",
+        "a": 1027685709116.0
+      },
+      {
+        "t": "13:26",
+        "a": 1030724425282.0
+      },
+      {
+        "t": "13:27",
+        "a": 1033988278849.0
+      },
+      {
+        "t": "13:28",
+        "a": 1037873234112.0
+      },
+      {
+        "t": "13:29",
+        "a": 1042158436852.0
+      },
+      {
+        "t": "13:30",
+        "a": 1047564855520.0
+      },
+      {
+        "t": "13:31",
+        "a": 1051595910871.0
+      },
+      {
+        "t": "13:32",
+        "a": 1055701794126.0
+      },
+      {
+        "t": "13:33",
+        "a": 1058854461480.0
+      },
+      {
+        "t": "13:34",
+        "a": 1062469631932.0
+      },
+      {
+        "t": "13:35",
+        "a": 1066255466892.0
+      },
+      {
+        "t": "13:36",
+        "a": 1069670401551.0
+      },
+      {
+        "t": "13:37",
+        "a": 1073153482607.0
+      },
+      {
+        "t": "13:38",
+        "a": 1076890317158.0
+      },
+      {
+        "t": "13:39",
+        "a": 1080429623527.0
+      },
+      {
+        "t": "13:40",
+        "a": 1084201756156.0
+      },
+      {
+        "t": "13:41",
+        "a": 1088347298466.0
+      },
+      {
+        "t": "13:42",
+        "a": 1092663444509.0
+      },
+      {
+        "t": "13:43",
+        "a": 1097609331270.0
+      },
+      {
+        "t": "13:44",
+        "a": 1100672243540.0
+      },
+      {
+        "t": "13:45",
+        "a": 1103635383352.0
+      },
+      {
+        "t": "13:46",
+        "a": 1106908072452.0
+      },
+      {
+        "t": "13:47",
+        "a": 1110327665898.0
+      },
+      {
+        "t": "13:48",
+        "a": 1114832709881.0
+      },
+      {
+        "t": "13:49",
+        "a": 1119514520647.0
+      },
+      {
+        "t": "13:50",
+        "a": 1125868356591.0
+      },
+      {
+        "t": "13:51",
+        "a": 1130377252132.0
+      },
+      {
+        "t": "13:52",
+        "a": 1133904665552.0
+      },
+      {
+        "t": "13:53",
+        "a": 1137365350584.0
+      },
+      {
+        "t": "13:54",
+        "a": 1142100705332.0
+      },
+      {
+        "t": "13:55",
+        "a": 1147001534107.0
+      },
+      {
+        "t": "13:56",
+        "a": 1150751975584.0
+      },
+      {
+        "t": "13:57",
+        "a": 1154504873233.0
+      },
+      {
+        "t": "13:58",
+        "a": 1160400547150.0
+      },
+      {
+        "t": "13:59",
+        "a": 1170432641685.0
+      },
+      {
+        "t": "14:00",
+        "a": 1175796690658.0
+      },
+      {
+        "t": "14:01",
+        "a": 1182402657027.0
+      },
+      {
+        "t": "14:02",
+        "a": 1190120740779.0
+      },
+      {
+        "t": "14:03",
+        "a": 1196260008424.0
+      },
+      {
+        "t": "14:04",
+        "a": 1201697240928.0
+      },
+      {
+        "t": "14:05",
+        "a": 1207059215875.0
+      },
+      {
+        "t": "14:06",
+        "a": 1215022841529.0
+      },
+      {
+        "t": "14:07",
+        "a": 1222320170913.0
+      },
+      {
+        "t": "14:08",
+        "a": 1229059773049.0
+      },
+      {
+        "t": "14:09",
+        "a": 1234258804970.0
+      },
+      {
+        "t": "14:10",
+        "a": 1238675922012.0
+      },
+      {
+        "t": "14:11",
+        "a": 1243622362692.0
+      },
+      {
+        "t": "14:12",
+        "a": 1247137878770.0
+      },
+      {
+        "t": "14:13",
+        "a": 1251626734241.0
+      },
+      {
+        "t": "14:14",
+        "a": 1256327282200.0
+      },
+      {
+        "t": "14:15",
+        "a": 1262647230883.0
+      },
+      {
+        "t": "14:16",
+        "a": 1267465226453.0
+      },
+      {
+        "t": "14:17",
+        "a": 1271258439628.0
+      },
+      {
+        "t": "14:18",
+        "a": 1274624544574.0
+      },
+      {
+        "t": "14:19",
+        "a": 1278733725119.0
+      },
+      {
+        "t": "14:20",
+        "a": 1283299992314.0
+      },
+      {
+        "t": "14:21",
+        "a": 1287510534820.0
+      },
+      {
+        "t": "14:22",
+        "a": 1291010593594.0
+      },
+      {
+        "t": "14:23",
+        "a": 1294174382750.0
+      },
+      {
+        "t": "14:24",
+        "a": 1298157356252.0
+      },
+      {
+        "t": "14:25",
+        "a": 1301811372135.0
+      },
+      {
+        "t": "14:26",
+        "a": 1305852740415.0
+      },
+      {
+        "t": "14:27",
+        "a": 1309632078435.0
+      },
+      {
+        "t": "14:28",
+        "a": 1313216639011.0
+      },
+      {
+        "t": "14:29",
+        "a": 1316669069057.0
+      },
+      {
+        "t": "14:30",
+        "a": 1320065186477.0
+      },
+      {
+        "t": "14:31",
+        "a": 1325131958887.0
+      },
+      {
+        "t": "14:32",
+        "a": 1330101685398.0
+      },
+      {
+        "t": "14:33",
+        "a": 1334734780356.0
+      },
+      {
+        "t": "14:34",
+        "a": 1339477543021.0
+      },
+      {
+        "t": "14:35",
+        "a": 1344077260025.0
+      },
+      {
+        "t": "14:36",
+        "a": 1349465646254.0
+      },
+      {
+        "t": "14:37",
+        "a": 1355385150746.0
+      },
+      {
+        "t": "14:38",
+        "a": 1361994850588.0
+      },
+      {
+        "t": "14:39",
+        "a": 1366791597070.0
+      },
+      {
+        "t": "14:40",
+        "a": 1371816385034.0
+      },
+      {
+        "t": "14:41",
+        "a": 1377072326656.0
+      },
+      {
+        "t": "14:42",
+        "a": 1382635172726.0
+      },
+      {
+        "t": "14:43",
+        "a": 1387370593153.0
+      },
+      {
+        "t": "14:44",
+        "a": 1392698840653.0
+      },
+      {
+        "t": "14:45",
+        "a": 1398383784263.0
+      },
+      {
+        "t": "14:46",
+        "a": 1406834318895.0
+      },
+      {
+        "t": "14:47",
+        "a": 1412939530015.0
+      },
+      {
+        "t": "14:48",
+        "a": 1418648262862.0
+      },
+      {
+        "t": "14:49",
+        "a": 1425135301525.0
+      },
+      {
+        "t": "14:50",
+        "a": 1432945398396.0
+      },
+      {
+        "t": "14:51",
+        "a": 1441669348186.0
+      },
+      {
+        "t": "14:52",
+        "a": 1450130039570.0
+      },
+      {
+        "t": "14:53",
+        "a": 1459241239584.0
+      },
+      {
+        "t": "14:54",
+        "a": 1470237948743.0
+      },
+      {
+        "t": "14:55",
+        "a": 1483298814557.0
+      },
+      {
+        "t": "14:56",
+        "a": 1496720120207.0
+      },
+      {
+        "t": "14:57",
+        "a": 1509189199575.0
+      },
+      {
+        "t": "14:58",
+        "a": 1509687384170.0
+      },
+      {
+        "t": "14:59",
+        "a": 1509687384170.0
+      },
+      {
+        "t": "15:00",
+        "a": 1528708179180.0
+      }
+    ],
+    "forecast_full_day_amount": 1956257843600.0,
+    "prev_same_time_amount": 1528708179180.0,
+    "prev_same_time_diff": 427549664420.0,
+    "prev_same_time_diff_pct": 27.968,
+    "prev_time_source": "qmt-1m"
+  },
+  "market_breadth": {
+    "advance": 4200,
+    "decline": 887,
+    "flat": 138,
+    "total": 5225,
+    "limit_up": 82,
+    "limit_down": 9,
+    "source": "qmt:full-market-snapshot",
+    "asof": "2026-10-23 15:29:47"
+  },
+  "sector_rotation": {
+    "asof": "2026-10-23 15:29:45",
+    "date": "2026-10-23",
+    "source": "qmt:full-tick+l2-ew",
+    "leaders": [
+      {
+        "name": "电机",
+        "code": "881277.TI",
+        "change_pct": 5.3026,
+        "leader_stock": "301502"
+      },
+      {
+        "name": "自动化设备",
+        "code": "881171.TI",
+        "change_pct": 5.0807,
+        "leader_stock": "688836"
+      },
+      {
+        "name": "软件开发",
+        "code": "881272.TI",
+        "change_pct": 4.8909,
+        "leader_stock": "920207"
+      },
+      {
+        "name": "影视院线",
+        "code": "881274.TI",
+        "change_pct": 4.1061,
+        "leader_stock": "603721"
+      },
+      {
+        "name": "IT服务",
+        "code": "881271.TI",
+        "change_pct": 3.9499,
+        "leader_stock": "688787"
+      }
+    ],
+    "laggards": [
+      {
+        "name": "银行",
+        "code": "881155.TI",
+        "change_pct": -0.5413,
+        "leader_stock": "002966"
+      },
+      {
+        "name": "电力",
+        "code": "881145.TI",
+        "change_pct": -0.3807,
+        "leader_stock": "920770"
+      },
+      {
+        "name": "元件",
+        "code": "881270.TI",
+        "change_pct": -0.1281,
+        "leader_stock": "001232"
+      },
+      {
+        "name": "石油加工贸易",
+        "code": "881180.TI",
+        "change_pct": -0.0964,
+        "leader_stock": "600506"
+      },
+      {
+        "name": "种植业与林业",
+        "code": "881101.TI",
+        "change_pct": -0.0768,
+        "leader_stock": "000592"
+      }
+    ]
+  }
+}

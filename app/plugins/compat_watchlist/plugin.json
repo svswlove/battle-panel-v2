@@ -1,0 +1,49 @@
+{
+  "manifest_version": 1,
+  "id": "compat_watchlist",
+  "name": "旧前端自选池兼容层（含写）",
+  "version": "0.1.1",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "compat",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 15000,
+    "mount": "root",
+    "permissions": [
+      "read:amv_board",
+      "read:ths_board",
+      "read:buy_signal",
+      "write:watchlist",
+      "write:misc"
+    ]
+  },
+  "data": {
+    "read": [
+      "amv_board.db",
+      "ths_board.db",
+      "buy_signal.db"
+    ],
+    "panel": [
+      "watchlist",
+      "watchlist_quotes"
+    ],
+    "json": [
+      "stock_names",
+      "watchlist_enrich_cache"
+    ],
+    "lib": [
+      "amv_regime"
+    ],
+    "quotes": true,
+    "write": [
+      "watchlist"
+    ],
+    "misc": [
+      "watchlist_enrich_cache"
+    ]
+  },
+  "config": {},
+  "depends": []
+}

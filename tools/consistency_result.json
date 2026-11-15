@@ -1,0 +1,230 @@
+{
+  "generated_at": "2026-10-22 15:56:43",
+  "panel_dir": "C:\\Users\\65442\\Desktop\\OH-WorkSpace\\data\\panel",
+  "verdict": "FAIL",
+  "counts": {
+    "PASS": 7,
+    "FAIL": 3,
+    "UNPARSED": 1,
+    "SKIP": 0,
+    "INFO": 1
+  },
+  "exit_code": 1,
+  "missing": {},
+  "items": [
+    {
+      "id": "A1",
+      "name": "文本 AMV 值",
+      "status": "PASS",
+      "left": {
+        "label": "文本 AMV（亿，AMV语境·亿）",
+        "value": 137967.48
+      },
+      "right": {
+        "label": "amv_regime_latest.amv",
+        "value": 137967.48
+      },
+      "note": ""
+    },
+    {
+      "id": "A2",
+      "name": "文本 MA10",
+      "status": "FAIL",
+      "left": {
+        "label": "文本 MA10",
+        "value": 139824.51
+      },
+      "right": {
+        "label": "amv_regime_latest.ma10",
+        "value": 143013.53
+      },
+      "note": "文本 139824.51 ／ JSON 143013.53，差 3189.02"
+    },
+    {
+      "id": "A3",
+      "name": "文本 ratio",
+      "status": "FAIL",
+      "left": {
+        "label": "文本 ratio",
+        "value": 0.9867
+      },
+      "right": {
+        "label": "round(amv/ma10, 4)",
+        "value": 0.9647
+      },
+      "note": "原文写作 0.9867，口径算得 0.9647"
+    },
+    {
+      "id": "A4",
+      "name": "文本 当日涨跌%",
+      "status": "FAIL",
+      "left": {
+        "label": "文本当日涨跌%（AMV）",
+        "value": 0.18
+      },
+      "right": {
+        "label": "amv_regime_latest.pct",
+        "value": -0.58
+      },
+      "note": "文本涨跌与 regime.pct（当日 AMV 环比）方向/量级不符"
+    },
+    {
+      "id": "A5",
+      "name": "文本 空档第 N 日",
+      "status": "UNPARSED",
+      "left": {
+        "label": "文本 N",
+        "value": 40
+      },
+      "right": {
+        "label": "(last_switch.date=2026-09-24, regime.date=2026-10-21]",
+        "value": {
+          "natural_days": 27,
+          "weekdays": 19
+        }
+      },
+      "note": "文本 40 日与 last_switch 起算的 19（工作日）/ 27（自然日）都不符；起点可能不是 last_switch（如首次跌破 MA10 日），JSON 无该字段，不判冲突"
+    },
+    {
+      "id": "A6",
+      "name": "文本「距 MA10 差 X%」（证据项，不判定）",
+      "status": "INFO",
+      "left": {
+        "label": "文本 gap %",
+        "value": 1.35
+      },
+      "right": {
+        "label": "现算 gap %",
+        "value": -3.53
+      },
+      "note": "差 4.88 个百分点"
+    },
+    {
+      "id": "B1",
+      "name": "position_cap.regime ↔ regime.state",
+      "status": "PASS",
+      "left": {
+        "label": "position_cap_latest.regime",
+        "value": "空"
+      },
+      "right": {
+        "label": "amv_regime_latest.state",
+        "value": "空"
+      },
+      "note": ""
+    },
+    {
+      "id": "B2",
+      "name": "position_cap.cap_amount ↔ battle_plan.position_cap",
+      "status": "PASS",
+      "left": {
+        "label": "position_cap_latest.cap_amount",
+        "value": 142308.42
+      },
+      "right": {
+        "label": "battle_plan.position_cap",
+        "value": 142308.42
+      },
+      "note": ""
+    },
+    {
+      "id": "C1",
+      "name": "amv_live.state_date ↔ regime.date",
+      "status": "PASS",
+      "left": {
+        "label": "amv_live.state_date",
+        "value": "2026-10-21"
+      },
+      "right": {
+        "label": "amv_regime_latest.date",
+        "value": "2026-10-21"
+      },
+      "note": "口径：live.state_date 是 regime 对应的上一收盘日，不与 trade_date 比"
+    },
+    {
+      "id": "C2",
+      "name": "position_cap.trade_date ↔ amv_live.trade_date",
+      "status": "PASS",
+      "left": {
+        "label": "position_cap_latest.trade_date",
+        "value": "2026-10-22"
+      },
+      "right": {
+        "label": "amv_live.trade_date",
+        "value": "2026-10-22"
+      },
+      "note": ""
+    },
+    {
+      "id": "D1",
+      "name": "battle_plan.plan_date ↔ position_cap.trade_date",
+      "status": "PASS",
+      "left": {
+        "label": "battle_plan.plan_date",
+        "value": "2026-10-22"
+      },
+      "right": {
+        "label": "position_cap_latest.trade_date",
+        "value": "2026-10-22"
+      },
+      "note": ""
+    },
+    {
+      "id": "D2",
+      "name": "battle_plan.meta.trade_date ↔ position_cap.trade_date",
+      "status": "PASS",
+      "left": {
+        "label": "battle_plan.meta.trade_date",
+        "value": "2026-10-22"
+      },
+      "right": {
+        "label": "position_cap_latest.trade_date",
+        "value": "2026-10-22"
+      },
+      "note": ""
+    }
+  ],
+  "evidence": {
+    "amv_regime_latest": {
+      "date": "2026-10-21",
+      "state": "空",
+      "ma10": 143013.53,
+      "pct": -0.58,
+      "amv": 137967.48,
+      "resonance": false,
+      "last_switch": {
+        "i": 8213,
+        "date": "2026-09-24",
+        "dir": "空",
+        "mark": "共振",
+        "trigger": "P+M",
+        "delay_any": 0,
+        "delay_track": 0
+      },
+      "generated_at": "2026-10-22 11:00:29"
+    },
+    "position_cap_latest": {
+      "trade_date": "2026-10-22",
+      "regime": "空",
+      "final_pct": 30,
+      "cap_amount": 142308.42,
+      "degraded_mode": "carry_over",
+      "computed_at": "2026-10-22 01:12:46"
+    },
+    "amv_live": {
+      "trade_date": "2026-10-22",
+      "state_date": "2026-10-21",
+      "asof": "2026-10-22 14:10:45"
+    },
+    "battle_plan": {
+      "plan_date": "2026-10-22",
+      "meta_trade_date": "2026-10-22",
+      "position_cap": 142308.42,
+      "judgment_head": "10/21 判断：**空档内的换仓，不是二次杀跌**。① 大盘：仓位闸门 30%（142,308.42 元），AMV 空档第 40 日、137,967.48 亿 / MA10 139,824.51 / ratio 0.9867，距 MA10 差 1.35%、单轨未共振，仍为空档；但 AMV +0.18% 而全A −0.21%、上证 −0.60%，是 40 个空档日里第一次「钱涨指数跌」。② 情绪：judge_stage 判「分歧」（涨停 50 / 跌停 5 / 高度 4 板 / 2板+ 16 / 涨跌比 0.59）；昨日两个开关一红一绿——二板晋级 1/8（要求 ≥3，红灯）、L2 多头家数 40/90=44.44%（绿灯）→ 按纪律不动仓。③ 板块：宁德时代三季报增收不增利（−12.03%、成交 324 亿居首）是全场唯一的因；锂电链价崩但钱没撤（锂电池 −3.78%/钱 +1.91%、"
+    },
+    "derived": {
+      "amv_div_ma10": 0.964716,
+      "gap_pct": -3.53
+    }
+  }
+}

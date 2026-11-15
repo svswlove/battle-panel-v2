@@ -1,0 +1,51 @@
+{
+  "manifest_version": 1,
+  "id": "compat",
+  "name": "旧端点兼容层",
+  "version": "0.3.0",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "compat",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "mount": "root",
+    "timeout_ms": 5000,
+    "permissions": ["read:panel"]
+  },
+  "data": {
+    "read": ["buy_signal.db", "amv_board.db", "ths_board.db"],
+    "panel": [
+      "battle_plan",
+      "amv_live",
+      "amv_regime_latest",
+      "position_cap_latest",
+      "alert_todo",
+      "alert_plan_persistent",
+      "positions",
+      "real_positions",
+      "dashboard",
+      "intraday",
+      "watchlist_quotes",
+      "watchlist",
+      "amv_breadth_latest",
+      "all_a_latest",
+      "focus_levels",
+      "amv_live_sector_track",
+      "etf_sector_map",
+      "selection_latest",
+      "selection_pool",
+      "selection_filter",
+      "ops"
+    ],
+    "json": ["stock_names", "pinyin_index"],
+    "lib": ["amv_contrib", "amv_regime"],
+    "quotes": true,
+    "amv_live": true,
+    "paper": true,
+    "write": [],
+    "state": ["engine_state", "kill_switch"]
+  },
+  "config": {},
+  "depends": []
+}

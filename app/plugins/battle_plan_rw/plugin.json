@@ -1,0 +1,40 @@
+{
+  "manifest_version": 1,
+  "id": "battle_plan_rw",
+  "name": "作战表写域（原生，旧根路径）",
+  "version": "0.2.0",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "mount": "root",
+    "timeout_ms": 8000,
+    "permissions": [
+      "read:panel",
+      "write:battle_plan",
+      "write:engine_state",
+      "write:kill_switch"
+    ]
+  },
+  "data": {
+    "read": [],
+    "panel": [
+      "battle_plan",
+      "dashboard"
+    ],
+    "json": [],
+    "lib": [],
+    "quotes": false,
+    "write": [
+      "battle_plan"
+    ],
+    "state": [
+      "engine_state",
+      "kill_switch"
+    ]
+  },
+  "config": {},
+  "depends": []
+}

@@ -1,0 +1,51 @@
+{
+  "manifest_version": 1,
+  "id": "sector",
+  "name": "板块",
+  "version": "0.6.10",
+  "min_core_version": "0.2.0",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 10000,
+    "permissions": [
+      "read:amv_board",
+      "read:ths_board"
+    ]
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {
+        "id": "sector.board",
+        "title": "板块",
+        "slot": "main",
+        "order": 10
+      }
+    ]
+  },
+  "data": {
+    "read": [
+      "amv_board.db",
+      "ths_board.db",
+      "track_pool.db",
+      "buy_signal.db",
+      "amv_minute.db"
+    ],
+    "json": [
+      "stock_names"
+    ],
+    "lib": [
+      "amv_contrib",
+      "amv_regime",
+      "amv_struct_tag",
+      "panel_scores"
+    ],
+    "quotes": true,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

@@ -1,0 +1,40 @@
+{
+  "manifest_version": 1,
+  "id": "intraday",
+  "name": "盘中",
+  "version": "0.1.7",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 5000,
+    "permissions": [
+      "read:panel"
+    ]
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {
+        "id": "intraday.main",
+        "title": "盘中",
+        "slot": "main",
+        "order": 15
+      }
+    ]
+  },
+  "data": {
+    "read": [],
+    "panel": [
+      "amv_live_sector_track"
+    ],
+    "json": [],
+    "lib": [],
+    "quotes": true,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

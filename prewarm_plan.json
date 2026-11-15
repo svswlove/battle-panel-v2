@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "_note": "盘后预热清单（2026-11-07）：后台看板显示数据就绪后，core.prewarm 依次 GET 这些只读端点，让各插件落盘缓存先热。改这里不用改代码。只看首屏慢点，不预热带货量太大的端点（selection 8.2MB / 自选分时 38 票）。",
+  "ready_sources": ["amv_board", "intraday", "track_pool"],
+  "tasks": [
+    { "path": "/api/amv_research.json?level=L2&scope=all&live=1" },
+    { "path": "/api/amv_research.json?level=L3&scope=all&live=1" },
+    { "path": "/api/amv_research.json?level=CONCEPT&scope=all&live=1" },
+    { "path": "/api/p/sector/board_flow?period=3&level=L2" },
+    { "path": "/api/p/sector/board_flow?period=3&level=L3" },
+    { "path": "/api/p/sector/rank_recent?level=L2&days=80" },
+    { "path": "/api/p/sector/rank_recent?level=L3&days=80" },
+    { "path": "/api/watchlist.json" },
+    { "path": "/api/breadth_880.json" },
+    { "path": "/api/p/intraday/index-series" },
+    { "path": "/api/kline_sparks?tail=45&limit=160&codes={codes}",
+      "codes_from": { "panel": "watchlist", "items": "items", "key": "code",
+                      "where": { "kind": "stock" }, "max": 60 } }
+  ]
+}

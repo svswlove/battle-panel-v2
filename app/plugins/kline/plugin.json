@@ -1,0 +1,41 @@
+{
+  "manifest_version": 1,
+  "id": "kline",
+  "name": "K线",
+  "version": "0.9.67",
+  "min_core_version": "0.2.0",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 8000,
+    "permissions": [
+      "read:amv_board"
+    ]
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {
+        "id": "kline.main",
+        "title": "K线",
+        "slot": "main",
+        "order": 20
+      }
+    ]
+  },
+  "data": {
+    "read": [
+      "amv_board.db"
+    ],
+    "lib": [
+      "amv_regime",
+      "indicators"
+    ],
+    "write": [],
+    "quotes": true
+  },
+  "config": {},
+  "depends": []
+}

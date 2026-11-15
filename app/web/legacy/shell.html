@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>作战面板</title>
+<link rel="stylesheet" href="/themes.css">
+<style>
+/* 外壳 chrome 样式（2026-10-01）。色/形/字号一律走 themes.css 的语义 token ——
+   与面板内容区同一份主题真相源，侧边栏随主题逐字同步（禁在此复制色表）。 */
+:root{ --rail:52px; }
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);
+  font-family:var(--font-ui);font-size:0.82rem;line-height:1.5}
+
+/* ---- 侧边栏（半透明：降视觉重量，透出底色） ---- */
+#rail{position:fixed;left:0;top:0;bottom:0;width:var(--rail);
+  background:var(--card);                                              /* 不支持 color-mix 的回落 */
+  background:color-mix(in srgb, var(--card) 68%, transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-right:var(--border-w) var(--border-style) var(--border-color);
+  display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px;z-index:10}
+.rail-btn{width:38px;height:38px;border:0;background:transparent;border-radius:var(--radius-md);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--dim);
+  position:relative;transition:background .12s,color .12s}
+.rail-btn:hover{background:var(--card2);color:var(--fg)}
+.rail-btn.active{background:var(--accent-bg);color:var(--accent)}
+.rail-btn svg{width:20px;height:20px;display:block}
+.rail-btn .tip{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);
+  background:var(--card2);color:var(--fg-strong);border:var(--border-w) var(--border-style) var(--border-color);
+  border-radius:var(--radius-sm);padding:3px 9px;font-size:0.75rem;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .1s;z-index:20}
+.rail-btn:hover .tip{opacity:1}
+.rail-spacer{flex:1}
+#gear .lamp{position:absolute;right:5px;bottom:5px;width:7px;height:7px;border-radius:50%;
+  background:var(--dim);box-shadow:0 0 0 2px var(--card)}
+/* 状态色（用主题语义色：--down 绿系 / --up 红系 / --warn 黄系，随主题自适应） */
+#gear.s-running .lamp{background:var(--down)} #gear.s-running{color:var(--down)}
+#gear.s-frozen  .lamp{background:var(--up)}   #gear.s-frozen{color:var(--up)}
+#gear.s-readonly .lamp{background:var(--warn)} #gear.s-readonly{color:var(--warn)}
+#gear.s-down    .lamp{background:var(--up)}   #gear.s-down{color:var(--up)}
+
+/* ---- 内容区 ---- */
+#main{position:fixed;left:var(--rail);right:0;top:0;bottom:0}
+#frame{width:100%;height:100%;border:0;display:block;background:var(--bg)}
+#down{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:var(--bg);text-align:center;padding:24px}
+#down.on{display:flex}
+#down h2{color:var(--fg-strong);font-size:1.1rem;margin:0 0 8px}
+#down p{color:var(--dim);margin:0 0 18px;line-height:1.7}
+.btn{border:var(--border-w) var(--border-style) var(--border-color);background:transparent;color:var(--fg);
+  border-radius:var(--radius-md);padding:7px 14px;font-size:0.82rem;font-family:inherit;cursor:pointer}
+.btn:hover{background:var(--card2)}
+.btn.primary{border-color:var(--accent);color:var(--accent)}
+.btn.primary:hover{background:var(--accent-bg)}
+.btn.danger{border-color:var(--up);color:var(--up)}
+.btn.danger:hover{background:var(--up-bg)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---- 设置抽屉（收回时移出含侧边栏的整个宽度，防露边） ---- */
+#scrim{position:fixed;inset:0;background:rgba(5,8,15,.5);display:none;z-index:30}
+#scrim.on{display:block}
+#drawer{position:fixed;left:var(--rail);top:0;bottom:0;width:320px;background:var(--card);
+  border-right:var(--border-w) var(--border-style) var(--border-color);z-index:31;
+  transform:translateX(calc(-100% - var(--rail) - 4px));transition:transform .18s ease;
+  display:flex;flex-direction:column}
+#drawer.on{transform:translateX(0)}
+.dr-hd{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line-soft)}
+.dr-hd .t{font-weight:600;color:var(--fg-strong)}
+.dr-hd .x{margin-left:auto;border:0;background:transparent;color:var(--dim);cursor:pointer;font-size:1rem}
+.dr-hd .x:hover{color:var(--fg-strong)}
+.dr-body{padding:12px 14px;overflow:auto;flex:1}
+.sec{margin-bottom:16px}
+.sec-t{font-size:0.72rem;color:var(--dim);margin-bottom:7px;letter-spacing:.02em}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.seg{display:flex;gap:6px}
+.seg button{border:var(--border-w) var(--border-style) var(--border-color);background:transparent;color:var(--dim);
+  border-radius:var(--radius-sm);padding:4px 12px;font-size:0.8rem;font-family:inherit;cursor:pointer}
+.seg button.active{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+select{width:100%;background:var(--card2);color:var(--fg);border:var(--border-w) var(--border-style) var(--border-color);
+  border-radius:var(--radius-sm);padding:6px 9px;font-size:0.82rem;font-family:inherit}
+.stat{display:flex;align-items:center;gap:9px;background:var(--card2);
+  border:var(--border-w) var(--border-style) var(--border-color);border-radius:var(--radius-md);padding:9px 12px}
+.stat .dot{width:9px;height:9px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.stat .lab{font-weight:600;color:var(--fg-strong)}
+.stat .ts{margin-left:auto;font-size:0.7rem;color:var(--dim)}
+.stat.s-running .dot{background:var(--down)} .stat.s-running .lab{color:var(--down)}
+.stat.s-frozen  .dot{background:var(--up)}   .stat.s-frozen .lab{color:var(--up)}
+.stat.s-readonly .dot{background:var(--warn)} .stat.s-readonly .lab{color:var(--warn)}
+.stat.s-down    .dot{background:var(--up)}   .stat.s-down .lab{color:var(--up)}
+.hint{font-size:0.72rem;color:var(--dim);margin-top:6px;line-height:1.6}
+.msg{font-size:0.75rem;color:var(--dim);margin-top:8px;min-height:16px}
+.msg.err{color:var(--up)} .msg.ok{color:var(--down)}
+.dr-ft{padding:10px 14px;border-top:1px solid var(--line-soft);font-size:0.7rem;color:var(--dim)}
+/* 2026-10-21 侧栏搜索 */
+#sPanel{position:fixed;left:calc(var(--rail) + 6px);top:12px;width:336px;max-height:70vh;overflow:auto;z-index:70;
+  background:var(--card);border:1px solid var(--line,#26324a);border-radius:12px;
+  box-shadow:0 12px 34px rgba(0,0,0,.35);padding:8px;}
+.sp-hd{display:flex;gap:6px;align-items:center;margin-bottom:6px;}
+.sp-hd input{flex:1;min-width:0;height:30px;border:1px solid var(--line,#26324a);border-radius:8px;
+  background:transparent;color:var(--fg);padding:0 8px;font-size:13px;outline:none;}
+#sClose{border:0;background:transparent;color:var(--fg);opacity:.6;cursor:pointer;font-size:13px;}
+.sp-sec{font-size:11px;color:var(--fg);opacity:.55;margin:6px 2px 4px;}
+.sp-i{display:flex;gap:8px;align-items:baseline;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:12.5px;color:var(--fg);}
+.sp-i:hover{background:var(--accent-bg,rgba(120,150,255,.14));}
+.sp-n{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sp-c,.sp-k{opacity:.6;flex:0 0 auto;}
+</style>
+</head>
+<body>
+<aside id="rail">
+  <button id="railSearch" class="rail-btn" title="搜索（股票 / ETF / 板块）" aria-label="搜索">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.6"/><path d="M20 20l-4.2-4.2"/></svg>
+    <span class="tip">搜索</span>
+  </button>
+  <div id="railTabs" style="display:flex;flex-direction:column;gap:4px;align-items:center"></div>
+  <div class="rail-spacer"></div>
+  <button id="gear" class="rail-btn" title="设置" aria-label="设置">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.2 5.2l1.9 1.9M16.9 16.9l1.9 1.9M18.8 5.2l-1.9 1.9M7.1 16.9l-1.9 1.9"/></svg>
+    <span class="lamp"></span><span class="tip">设置</span>
+  </button>
+</aside>
+
+<div id="main">
+  <iframe id="frame" title="作战面板"></iframe>
+  <div id="down"><div class="box">
+    <h2>引擎服务未启动</h2>
+    <p>内容区需要 8800 引擎服务。侧边栏与设置仍可用——点下面按钮把服务拉回来。</p>
+    <button class="btn primary" onclick="Shell.restart()">重启服务</button>
+    <div class="msg" id="downMsg"></div>
+  </div></div>
+</div>
+
+<div id="scrim"></div>
+<div id="sPanel" hidden>
+  <div class="sp-hd"><input id="sInput" type="text" placeholder="代码 / 名称 / 拼音首字母" autocomplete="off" spellcheck="false"><button id="sClose" aria-label="关闭">✕</button></div>
+  <div id="sBody" class="sp-body"></div>
+</div>
+<aside id="drawer">
+  <div class="dr-hd"><span class="t">设置</span><button class="x" onclick="Shell.closeSettings()" aria-label="关闭">✕</button></div>
+  <div class="dr-body">
+    <div class="sec">
+      <div class="sec-t">引擎状态</div>
+      <div class="stat s-readonly" id="stat"><span class="dot"></span><span class="lab" id="statLab">加载中…</span><span class="ts" id="statTs"></span></div>
+      <div class="hint" id="statHint"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-t">主题</div>
+      <select id="themeSel"></select>
+    </div>
+    <div class="sec">
+      <div class="sec-t">字体大小</div>
+      <div class="seg" id="fsSeg">
+        <button data-fs="sm">小</button><button data-fs="md">中</button><button data-fs="lg">大</button>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-t">操作</div>
+      <div class="row">
+        <button class="btn" onclick="Shell.sign()">✔ 全部签收</button>
+        <button class="btn danger" id="killBtn" onclick="Shell.kill()">⛔ 急停</button>
+      </div>
+      <div class="msg" id="actMsg"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-t">服务</div>
+      <div class="row"><button class="btn" id="restartBtn" onclick="Shell.restart()">↻ 重启服务</button></div>
+      <div class="hint">杀掉 8800 引擎进程后重新拉起（侧边栏/设置不受影响）。</div>
+      <div class="msg" id="svcMsg"></div>
+    </div>
+  </div>
+  <div class="dr-ft" id="foot"></div>
+</aside>
+
+<script>
+"use strict";
+// 2026-10-23 panel-v2 自包含托管：外壳与内容页同源加载，ENGINE 不再写死 8800。
+// 旧仓原版是 'http://127.0.0.1:8800'；本项目要求自包含，所以改成同源 origin：
+// 页面从 8810 打开就请求 8810，从 8800 打开就请求 8800（同一份代码两边通用）。
+// ⚠ 本文件由 `tools/sync_vendor.py` 从 `engine/web/shell.html` 同步而来，
+//   补丁由该脚本自动重施（见 SHELL_PATCHES），不要手改。
+const ENGINE = window.location.origin;
+// 内容页（index.html）被托管在 `/legacy/` 下：新版 `/` 是六卡壳，不是旧界面。
+const PAGE_BASE = /\/legacy(\/|$)/.test(window.location.pathname)
+  ? window.location.origin + '/legacy'
+  : window.location.origin;
+const TABS = [
+  { key:'dashboard',   label:'仪表盘', icon:'<path d="M4 19a8 8 0 0 1 16 0"/><path d="M12 19l4.5-5"/>' },
+  { key:'battle_plan', label:'作战表', icon:'<path d="M9 5h9M9 12h9M9 19h9"/><circle cx="4.5" cy="5" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="19" r="1"/>' },
+  { key:'intraday',    label:'盘中',   icon:'<path d="M3 12h3.5l2.5-7 4 14 2.5-7H21"/>' },
+  { key:'sector',      label:'板块',   icon:'<rect x="3" y="3" width="7.5" height="7.5" rx="1.2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.2"/>' },
+  { key:'concept',     label:'概念',   icon:'<path d="M12 3a6 6 0 0 0-3.8 10.6c.6.5.9 1.2.9 1.9h5.8c0-.7.3-1.4.9-1.9A6 6 0 0 0 12 3z"/><path d="M9.5 18.5h5M10.5 21h3"/>' },
+  { key:'review',      label:'复盘',   icon:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M8 3v15"/>' },
+  { key:'watchlist',   label:'自选池', icon:'<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>' },
+  { key:'selection',   label:'选股',   icon:'<path d="M4 5h16"/><path d="M6 10h12"/><path d="M8 15h8"/><path d="M10 20h4"/>' },
+  { key:'ops',         label:'后台',   icon:'<rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><circle cx="7" cy="7" r="1"/><circle cx="7" cy="17" r="1"/>' },
+];
+const STATUS_CLASS = { RUNNING:'s-running', FROZEN:'s-frozen', READ_ONLY:'s-readonly', DOWN:'s-down' };
+const STATUS_LABEL = { RUNNING:'运行中', FROZEN:'已急停', READ_ONLY:'只读未签收', DOWN:'服务未启动' };
+
+function ls(k, d){ try { return localStorage.getItem(k) || d; } catch(e){ return d; } }
+function lsSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+
+/* 主题唯一清单：读 themes.css 的 --theme-manifest（与面板同源，禁在本文件手写主题表） */
+function readManifest(){
+  try {
+    let raw = getComputedStyle(document.documentElement).getPropertyValue('--theme-manifest') || '';
+    raw = raw.trim().replace(/^["']|["']$/g, '').trim();
+    if (!raw) return [];
+    return raw.split(';').map(e => { const p = e.split('|'); const code = (p[0]||'').trim();
+      return code ? { code, name: (p[1]||'').trim() || code } : null; }).filter(Boolean);
+  } catch(e){ return []; }
+}
+
+const Shell = {
+  tab: ls('shell_tab', 'dashboard'),
+  theme: ls('shell_theme', 'nightsail'),
+  fs: ls('shell_fs', 'md'),
+  engineCode: null,
+  _timer: null,
+
+  boot() {
+    this._buildRail();
+    this._buildThemeSel();
+    this._buildFsSeg();
+    document.getElementById('gear').onclick = () => this.toggleSettings();
+    document.getElementById('scrim').onclick = () => this.closeSettings();
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') this.closeSettings(); });
+    window.addEventListener('message', (e) => {
+      if (e.origin !== ENGINE) return;
+      const d = e.data || {};
+      if (d.type === 'shell:tab') this._markTab(d.tab);   // 面板内切 Tab 时同步侧边栏
+    });
+    document.getElementById('foot').textContent = '外壳 8801 · 引擎 8800';
+    this.applyTheme();
+    this._loadFrame();
+    this.status();
+    this._timer = setInterval(() => this.status(), 5000);
+  },
+
+  // ---------- 侧边栏 ----------
+  _buildRail() {
+    const wrap = document.getElementById('railTabs');
+    wrap.innerHTML = TABS.map(t =>
+      `<button class="rail-btn" data-key="${t.key}" aria-label="${t.label}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${t.icon}</svg>
+        <span class="tip">${t.label}</span></button>`).join('');
+    wrap.querySelectorAll('.rail-btn').forEach(b => { b.onclick = () => this.setTab(b.dataset.key); });
+    this._markTab(this.tab);
+  },
+  _markTab(key) {
+    document.querySelectorAll('#railTabs .rail-btn').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+  },
+  setTab(key) {
+    this.tab = key; lsSet('shell_tab', key);
+    this._markTab(key);
+    const f = document.getElementById('frame');
+    try { f.contentWindow.postMessage({ type:'shell:navigate', tab:key }, ENGINE); } catch(e){}
+  },
+
+  // ---------- 设置 ----------
+  _buildThemeSel() {
+    const sel = document.getElementById('themeSel');
+    const man = readManifest();
+    const themes = man.length ? man : [{ code:'nightsail', name:'夜航' }];
+    sel.innerHTML = themes.map(t => `<option value="${t.code}">${t.name}</option>`).join('');
+    if (!themes.some(t => t.code === this.theme)) this.theme = themes[0].code;
+    sel.value = this.theme;
+    sel.onchange = () => { this.theme = sel.value; lsSet('shell_theme', this.theme); this.applyTheme(); };
+  },
+  _buildFsSeg() {
+    const seg = document.getElementById('fsSeg');
+    const mark = () => seg.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.fs === this.fs));
+    seg.querySelectorAll('button').forEach(b => b.onclick = () => { this.fs = b.dataset.fs; lsSet('shell_fs', this.fs); mark(); this.applyTheme(); });
+    mark();
+  },
+  applyTheme() {
+    // 外壳与面板同用 themes.css：[data-theme]/[data-fs] 一设，侧边栏自动跟随（无需复制色表）
+    document.documentElement.setAttribute('data-theme', this.theme);
+    document.documentElement.setAttribute('data-fs', this.fs);
+    const f = document.getElementById('frame');
+    try { f.contentWindow.postMessage({ type:'shell:theme', theme:this.theme, fs:this.fs }, ENGINE); } catch(e){}
+  },
+  toggleSettings() { document.getElementById('drawer').classList.contains('on') ? this.closeSettings() : this.openSettings(); },
+  openSettings() { document.getElementById('drawer').classList.add('on'); document.getElementById('scrim').classList.add('on'); this.status(); },
+  closeSettings() { document.getElementById('drawer').classList.remove('on'); document.getElementById('scrim').classList.remove('on'); },
+
+  // ---------- 内容 iframe ----------
+  _loadFrame(ver) {
+    const f = document.getElementById('frame');
+    const v = ver ? ('&_v=' + encodeURIComponent(ver)) : '';
+    f.src = PAGE_BASE + '/?shell=1&theme=' + encodeURIComponent(this.theme) + '&fs=' + encodeURIComponent(this.fs) + v + '#' + this.tab;
+  },
+
+  // ---------- 状态 ----------
+  async status() {
+    let d = null;
+    try { d = await (await fetch('/api/shell/status', {cache:'no-store'})).json(); } catch(e){}
+    const eng = (d && d.engine) || { code:'DOWN', label:'服务未启动' };
+    const code = eng.code || 'DOWN';
+    this.engineCode = code;
+    const cls = STATUS_CLASS[code] || 's-readonly';
+    document.getElementById('gear').className = 'rail-btn ' + cls;
+    document.getElementById('stat').className = 'stat ' + cls;
+    document.getElementById('statLab').textContent = eng.label || STATUS_LABEL[code] || code;
+    document.getElementById('statTs').textContent = eng.updated_at || '';
+    const down = (code === 'DOWN');
+    document.getElementById('down').classList.toggle('on', down);
+    document.getElementById('killBtn').disabled = down;
+    document.getElementById('statHint').textContent = down
+      ? '引擎服务离线 —— 侧边栏与设置仍可用，可在下方「服务」里重启。'
+      : ('交易模式：' + (eng.trade_mode || '—') + (eng.kill_switch_active ? ' · 急停生效中' : ''));
+    document.getElementById('killBtn').textContent = (code === 'FROZEN') ? '⛔ 解除急停' : '⛔ 急停';
+  },
+
+  // ---------- 操作 ----------
+  _act(el, msg, ok) { const m = document.getElementById(el); m.textContent = msg; m.className = 'msg ' + (ok ? 'ok' : 'err'); },
+  async sign() {
+    if (!confirm('确认全部签收今日作战表全部预案？签收后引擎当日进入可下单模式（纸面单）。')) return;
+    try {
+      const r = await fetch(ENGINE + '/api/sign', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({signer:'主人', all:true})});
+      const x = await r.json();
+      this._act('actMsg', x.ok ? '已全部签收' : ('签收失败：' + JSON.stringify(x)), x.ok);
+    } catch(e) { this._act('actMsg', '签收失败：' + e.message, false); }
+    this.status();
+  },
+  async kill() {
+    const frozen = this.engineCode === 'FROZEN';
+    if (!confirm(frozen ? '确认解除急停？解除后引擎恢复运行。' : '确认执行急停？冻结引擎，禁止一切下单动作。')) return;
+    try {
+      const r = await fetch('/api/shell/kill', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({active: !frozen, reason: frozen ? '宿主解除急停' : '宿主急停'})});
+      const x = await r.json();
+      this._act('actMsg', x.ok ? (frozen ? '已解除急停' : '已执行急停') : (x.detail || '操作失败'), !!x.ok);
+    } catch(e) { this._act('actMsg', '操作失败：' + e.message, false); }
+    this.status();
+  },
+  async restart() {
+    if (!confirm('确认重启引擎服务（8800）？将杀掉现有引擎进程并重新拉起。')) return;
+    const btn = document.getElementById('restartBtn');
+    btn.disabled = true;
+    this._act('svcMsg', '重启中…', true);
+    this._act('downMsg', '重启中…', true);
+    try {
+      const r = await fetch('/api/shell/restart', {method:'POST'});
+      const x = await r.json();
+      this._act('svcMsg', x.ok ? ('已拉起（杀旧 ' + (x.killed||[]).length + ' 个进程）') : ('拉起失败：' + (x.stderr || x.detail || '')), !!x.ok);
+      this._act('downMsg', x.ok ? '已拉起，等待服务就绪…' : '拉起失败', !!x.ok);
+      setTimeout(() => { this._loadFrame(); this.status(); }, 3500);
+    } catch(e) {
+      this._act('svcMsg', '重启失败：' + e.message, false);
+    } finally {
+      btn.disabled = false;
+    }
+  },
+};
+/* 2026-10-21 侧栏搜索：外壳层实现（8801 与 8800 跳源，搜索走外壳代理，选股通过 postMessage 开 K 线） */
+const ShellSearch = (function () {
+  const KEY = 'shell_recent_v1', MAX = 8;
+  let timer = null;
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+  const recent = () => { try { return JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { return []; } };
+  const push = (it) => {
+    const a = recent().filter((x) => x.code !== it.code);
+    a.unshift(it);
+    try { localStorage.setItem(KEY, JSON.stringify(a.slice(0, MAX))); } catch (e) {}
+  };
+  const row = (it) => '<div class="sp-i" data-code="' + esc(it.code) + '" data-name="' + esc(it.name) + '" data-kind="' + esc(it.kind || '') + '">' +
+    '<span class="sp-n">' + esc(it.name) + '</span><span class="sp-c">' + esc(it.code) + '</span><span class="sp-k">' + esc(it.kind || '') + '</span></div>';
+  function renderRecent() {
+    const b = $('sBody'); if (!b) return;
+    const a = recent();
+    b.innerHTML = a.length ? ('<div class="sp-sec">最近搜索</div>' + a.map(row).join(''))
+      : '<p style="opacity:.55;font-size:12px">输入代码、名称或拼音首字母</p>';
+  }
+  function render(j) {
+    const b = $('sBody'); if (!b) return;
+    const st = (j && j.stocks) || [], sc = (j && j.sectors) || [];
+    if (!st.length && !sc.length) { b.innerHTML = '<p style="opacity:.55;font-size:12px">没有匹配结果</p>'; return; }
+    let h = '';
+    if (st.length) h += '<div class="sp-sec">股票 / ETF</div>' + st.map(row).join('');
+    if (sc.length) h += '<div class="sp-sec">板块</div>' + sc.map(row).join('');
+    b.innerHTML = h;
+  }
+  async function search(q) {
+    if (!q) { renderRecent(); return; }
+    try {
+      const r = await fetch('/api/shell/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ q, limit: 12 }) });
+      render(await r.json());
+    } catch (e) {}
+  }
+  function open() {
+    const p = $('sPanel'); if (!p) return;
+    p.hidden = false;
+    const i = $('sInput'); if (i) { i.value = ''; i.focus(); }
+    renderRecent();
+    document.addEventListener('mousedown', outside, true);
+  }
+  function close() {
+    const p = $('sPanel'); if (p) p.hidden = true;
+    document.removeEventListener('mousedown', outside, true);
+  }
+  function outside(e) {
+    const p = $('sPanel'); if (!p || p.hidden) return;
+    if (p.contains(e.target)) return;
+    if (e.target.closest && e.target.closest('#railSearch')) return;
+    close();
+  }
+  function toggle() { const p = $('sPanel'); if (p && !p.hidden) close(); else open(); }
+  function pick(it) {
+    if (!it || !it.code) return;
+    push(it); close();
+    try {
+      const f = document.getElementById('frame');
+      f.contentWindow.postMessage({ type: 'shell:open_kline', code: it.code, name: it.name, kind: it.kind || '' }, ENGINE);
+    } catch (e) {}
+  }
+  // 事件绑定
+  window.addEventListener('DOMContentLoaded', function () {
+    const btn = $('railSearch'), cl = $('sClose'), inp = $('sInput'), body = $('sBody');
+    if (btn) btn.addEventListener('click', toggle);
+    if (cl) cl.addEventListener('click', close);
+    if (inp) inp.addEventListener('input', function () {
+      clearTimeout(timer);
+      const q = inp.value.trim();
+      timer = setTimeout(() => search(q), 180);
+    });
+    if (body) body.addEventListener('click', function (e) {
+      const it = e.target.closest ? e.target.closest('.sp-i') : null;
+      if (!it) return;
+      pick({ code: it.getAttribute('data-code'), name: it.getAttribute('data-name'), kind: it.getAttribute('data-kind') });
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+  });
+  return { open: open, close: close, toggle: toggle };
+})();
+
+/* 内容页自动重载：index.html 改动后 15s 内刷新 iframe（主人报“改了没刷新”） */
+(function () {
+  let ver = null, pending = null, busy = false;
+  window.addEventListener('message', function (e) {
+    if (e.origin !== ENGINE) return;
+    if (e.data && e.data.type === 'shell:busy') busy = true;
+  });
+  async function tick() {
+    try {
+      const d = await (await fetch('/api/shell/version', { cache: 'no-store' })).json();
+      if (!d || !d.v) return;
+      if (ver === null) { ver = d.v; return; }
+      if (d.v === ver || pending === d.v) return;
+      pending = d.v;
+      busy = false;
+      // 2026-10-21：先问内容页是否在写标注/输入，忙就把这轮刷掉，下轮再试
+      try {
+        const f = document.getElementById('frame');
+        f.contentWindow.postMessage({ type: 'shell:can_reload' }, ENGINE);
+      } catch (e) {}
+      const v = d.v;
+      setTimeout(function () {
+        pending = null;
+        if (busy) return;
+        ver = v;
+        Shell._loadFrame(v);
+      }, 450);
+    } catch (e) {}
+  }
+  setInterval(tick, 15000);
+  tick();
+})();
+
+Shell.boot();
+</script>
+</body>
+</html>

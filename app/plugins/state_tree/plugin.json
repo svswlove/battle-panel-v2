@@ -1,0 +1,32 @@
+{
+  "manifest_version": 1,
+  "id": "state_tree",
+  "name": "多空判定状态树",
+  "version": "0.1.0",
+  "min_core_version": "0.1.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 12000,
+    "permissions": ["read:panel"]
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {"id": "state_tree.main", "title": "多空判定", "slot": "main", "order": 40}
+    ]
+  },
+  "data": {
+    "read": ["amv_board.db"],
+    "panel": ["amv_live_sector_track"],
+    "json": [],
+    "lib": ["amv_state_tree"],
+    "quotes": true,
+    "amv_live": true,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

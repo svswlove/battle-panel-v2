@@ -1,0 +1,30 @@
+{
+  "manifest_version": 1,
+  "id": "amv",
+  "name": "活跃市值",
+  "version": "0.4.0",
+  "min_core_version": "0.1.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 3000,
+    "permissions": ["read:panel"]
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {"id": "amv.main", "title": "活跃市值", "slot": "main", "order": 30},
+      {"id": "amv.hcl", "title": "HCL 离散度", "slot": "main", "order": 35}
+    ]
+  },
+  "data": {
+    "read": ["amv_board.db"],
+    "panel": ["amv_live", "amv_regime_latest", "position_cap_latest", "amv_breadth_latest", "all_a_latest"],
+    "json": ["hcl_latest"],
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

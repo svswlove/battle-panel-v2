@@ -1,0 +1,39 @@
+{
+  "manifest_version": 1,
+  "id": "compat_sector",
+  "name": "旧前端兼容·板块域",
+  "version": "0.2.1",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "compat",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "mount": "root",
+    "timeout_ms": 15000,
+    "permissions": [
+      "read:amv_board",
+      "quotes:read"
+    ]
+  },
+  "data": {
+    "read": [
+      "amv_board.db"
+    ],
+    "panel": [
+      "amv_live_sector_track",
+      "etf_sector_map"
+    ],
+    "json": [
+      "temperature_latest"
+    ],
+    "lib": [
+      "amv_regime",
+      "indicators"
+    ],
+    "quotes": true,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

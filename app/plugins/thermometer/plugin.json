@@ -1,0 +1,31 @@
+{
+  "manifest_version": 1,
+  "id": "thermometer",
+  "name": "情绪温度计",
+  "version": "0.1.0",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 8000,
+    "permissions": []
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {"id": "thermometer.main", "title": "情绪温度计", "slot": "main", "order": 74}
+    ]
+  },
+  "data": {
+    "read": ["track_pool.db"],
+    "panel": ["panic_breadth", "index_flow_series_880008"],
+    "json": [],
+    "lib": [],
+    "quotes": false,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

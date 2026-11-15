@@ -1,0 +1,31 @@
+{
+  "manifest_version": 1,
+  "id": "valuation",
+  "name": "估值",
+  "version": "0.2.6",
+  "min_core_version": "0.3.1",
+  "enabled": true,
+  "kind": "domain",
+  "backend": {
+    "module": "backend",
+    "entry": "register",
+    "timeout_ms": 5000,
+    "permissions": []
+  },
+  "frontend": {
+    "module": "frontend.js",
+    "cards": [
+      {"id": "valuation.main", "title": "估值", "slot": "main", "order": 75}
+    ]
+  },
+  "data": {
+    "read": [],
+    "panel": [],
+    "json": [],
+    "lib": [],
+    "quotes": false,
+    "write": []
+  },
+  "config": {},
+  "depends": []
+}

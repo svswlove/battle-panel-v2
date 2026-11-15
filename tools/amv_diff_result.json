@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "old": "http://127.0.0.1:8800",
+  "new": "http://127.0.0.1:8810",
+  "pairs": [
+    {
+      "name": "amv_live",
+      "old": "/api/amv_live.json",
+      "new": "/api/p/amv/live",
+      "equal": true
+    },
+    {
+      "name": "amv_regime_latest",
+      "old": "/api/amv_regime_latest.json",
+      "new": "/api/p/amv/regime",
+      "equal": true
+    },
+    {
+      "name": "position_cap_latest",
+      "old": "/api/position_cap_latest.json",
+      "new": "/api/p/amv/position_cap",
+      "equal": true
+    }
+  ]
+}
