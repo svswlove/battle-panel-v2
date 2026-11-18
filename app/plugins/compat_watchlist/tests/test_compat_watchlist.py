@@ -322,8 +322,8 @@ def _ctx(tmp_path: Path, **kwargs) -> FakeCtx:
                    amv_db=_mk_amv_db(tmp_path),
                    ths_db=_mk_ths_db(tmp_path),
                    sig_db=_mk_sig_db(tmp_path),
-                   names={"603629": "利通电子", "300750": "宁德时代",
-                          "000001": "平安银行", "881166": "军工装备"},
+                   names=kwargs.pop("names", {"603629": "利通电子", "300750": "宁德时代",
+                                               "000001": "平安银行", "881166": "军工装备"}),
                    **kwargs)
 
 
@@ -1035,3 +1035,42 @@ def test_add_auto_mmdd_no_group_at_all_creates_today(tmp_path, monkeypatch) -> N
                                    "kind": "stock", "autoMmdd": True}).json()
     assert body["group"] == "sel_1112"
     assert body["created_group"] == "1112"
+
+
+# ---------------------------------------------------------------- 8. 名称占位兜底（2026-11-18）
+#
+# 背景（主人报）：601985 中国核电明明在池里，自选卡与 K 线标题都显示“????”——
+#   泡盘的 name 就是占位符（加入那一刻取名失败/传了占位）。口径：新增时用名表纠正后落盘；
+#   存量脏名只在展示层纠正（读取不写盘），避免读端点变成隐式写入方。
+
+def test_add_heals_placeholder_name_from_name_table(tmp_path) -> None:
+    ctx = _ctx(tmp_path, doc=_base_doc(), names={"601985": "中国核电"})
+    body = _client(ctx).post("/api/watchlist/add",
+                             json={"kind": "stock", "code": "601985", "name": "????"}).json()
+    assert body["ok"] is True and body["code"] == "601985.SH"
+    saved = json.loads(ctx.wl_path.read_text(encoding="utf-8"))
+    hit = next(x for x in saved["items"] if x["code"] == "601985.SH")
+    assert hit["name"] == "中国核电"
+
+
+def test_add_keeps_real_name_untouched(tmp_path) -> None:
+    """真名一律不覆盖（名表只兜底占位符）。"""
+    ctx = _ctx(tmp_path, doc=_base_doc(), names={"601985": "名表里的名字"})
+    _client(ctx).post("/api/watchlist/add",
+                      json={"kind": "stock", "code": "601985", "name": "中国核电"}).json()
+    saved = json.loads(ctx.wl_path.read_text(encoding="utf-8"))
+    hit = next(x for x in saved["items"] if x["code"] == "601985.SH")
+    assert hit["name"] == "中国核电"
+
+
+def test_watchlist_json_heals_legacy_placeholder_without_rewrite(tmp_path) -> None:
+    doc = _base_doc()
+    doc["items"].append({"kind": "stock", "code": "601985.SH", "name": "????",
+                         "added_at": "2026-11-11 10:44:54", "order": 3, "group": "stock_default"})
+    ctx = _ctx(tmp_path, doc=doc, names={"601985": "中国核电"})
+    body = _client(ctx).get("/api/watchlist.json").json()
+    hit = next(x for x in body["items"] if x.get("code") == "601985.SH")
+    assert hit["name"] == "中国核电"
+    saved = json.loads(ctx.wl_path.read_text(encoding="utf-8"))
+    raw = next(x for x in saved["items"] if x["code"] == "601985.SH")
+    assert raw["name"] == "????"

@@ -266,17 +266,40 @@ def _prev_day8(legacy: Any, day8: str, series: list) -> str | None:
 
 def with_turnover(legacy: Any, raw: dict, day8: str, kind: str,
                   series: list) -> dict:
-    """把量能因子的原始值并进 raw（盘中预估 / 收盘实际，全部由旧仓 `turnover_context` 定）。"""
+    """把量能因子的原始值并进 raw（盘中预估 / 收盘实际，全部由旧仓 `turnover_context` 定）。
+
+    2026-11-18（主人：量能复用现成数据、不要再拉取以免拥堵）：
+      把**序列库里已经落好的每日全天额**（`panic_breadth.json` 序列的 amount 字段，
+      含昨日与今日）当作 amounts 注入 `turnover_context`。这样：
+        · 不再读 vipdoc `.day`（它自 2026-11-06 停更）；
+        · 更不另拉 eltdx 日线（先前那版兜底已拆除）——零新增请求；
+        · 盘中的「昨日全天额」直接取序列里昨天那一行（收盘链与历史回补已经算好）。
+    序列没有 amount（老库行）→ 退回原逻辑（不编造）。
+    """
     fn = _legacy_fn(legacy, "turnover_context")
     if fn is None:
         return raw
+    amounts = {}
+    for r in (series or []):
+        a = r.get("amount") if isinstance(r, dict) else None
+        if a is None:
+            continue
+        try:
+            amounts[str(r.get("date"))] = float(a)
+        except (TypeError, ValueError):
+            continue
+    prev_key = _prev_day8(legacy, day8, series)
     try:
-        ctx = fn(day8, _prev_day8(legacy, day8, series), kind)
+        ctx = fn(day8, prev_key, kind, amounts=amounts or None)
     except Exception:  # noqa: BLE001 - 量能拿不到 → 该项缺席，不阻断价三维
         return raw
     if isinstance(ctx, dict):
         for key in VOL_FIELDS:
             raw[key] = ctx.get(key)
+        # 来源标签如实：昨日额若取自序列库，就不是 `.day` 直读（不让人误以为是旧渠道）
+        if amounts.get(prev_key) and ctx.get("amount_source"):
+            raw["amount_source"] = str(ctx["amount_source"]).replace(
+                "prev=tdx:880005.day", "prev=store:panic_breadth.amount")
     return raw
 
 
@@ -347,6 +370,71 @@ def stage() -> dict[str, Any] | None:
 
 
 # ---------------------------------------------------------------- 读数归属（live/close/closed）
+
+
+# ---------------------------------------------------------------- 当日恐慌分时（2026-11-18）
+
+def _intraday_path():
+    return paths.WS / "data" / "panel" / "panic_intraday.json"
+
+
+def intraday_series(store_doc, day8, legacy=None):
+    """当日恐慌分时 → [{t, value, up_pct, limit_down_pct, limit_down, median_pct, state}]。
+
+    数据源：`data/panel/panic_intraday.json`（tick_feed 每 60s 落一个原始点，见
+    `engine/executor/panic_intraday.py`）；**分位与恐慌值不落盘**，在这里用日频历史现算：
+    直接调旧仓 `score_row`（与日频同一函数、同 250 窗口、同 MIN_SAMPLE），不另写公式。
+    缺项（该分钟没取到跌停/中位）→ 该点 value=None（前端断线，不插值、不补 0）。
+    文件不存在/不是当日 → []（前端如实显示「当日无记录」）。
+    """
+    try:
+        with open(_intraday_path(), encoding="utf-8") as f:
+            doc = json.load(f)
+    except Exception:  # noqa: BLE001 - 未落盘/坏 JSON → 空
+        return []
+    if not isinstance(doc, dict) or str(doc.get("date") or "") != str(day8 or ""):
+        return []
+    pts = [p for p in (doc.get("points") or []) if isinstance(p, dict) and p.get("t")]
+    if not pts:
+        return []
+    try:
+        lg = legacy or _load_legacy()
+    except Exception:  # noqa: BLE001 - 口径模块不可用 → 不出分时（不编造）
+        return []
+    hist = [r for r in (store_doc.get("series") or [])
+            if str(r.get("date") or "") < str(day8 or "")]
+    out = []
+    for p in pts:
+        up, down = p.get("up"), p.get("down")
+        try:
+            up_i, down_i = int(up), int(down)
+        except (TypeError, ValueError):
+            continue
+        denom = up_i + down_i
+        if denom <= 0:
+            continue
+        ld = p.get("limit_down")
+        med = p.get("median_pct")
+        raw = {"up": up_i, "down": down_i,
+               "up_pct": round(up_i / denom * 100.0, 4),
+               "limit_down": ld if isinstance(ld, (int, float)) else None,
+               "limit_down_pct": (round(ld / denom * 100.0, 4)
+                                  if isinstance(ld, (int, float)) else None),
+               "median_pct": med if isinstance(med, (int, float)) else None,
+               "limit_up": p.get("limit_up")}
+        if raw["limit_down_pct"] is None or raw["median_pct"] is None:
+            out.append({"t": p["t"], "value": None, "state": None,
+                        "up_pct": raw["up_pct"], "limit_down_pct": raw["limit_down_pct"],
+                        "limit_down": raw["limit_down"], "median_pct": raw["median_pct"]})
+            continue
+        try:
+            row = lg.score_row(hist, raw)
+        except Exception:  # noqa: BLE001 - 单点算不出 → 断线
+            row = {}
+        out.append({"t": p["t"], "value": row.get("panic"), "state": row.get("state"),
+                    "up_pct": raw["up_pct"], "limit_down_pct": raw["limit_down_pct"],
+                    "limit_down": raw["limit_down"], "median_pct": raw["median_pct"]})
+    return out
 
 
 def _is_trading_day(d: Any) -> bool:
@@ -489,6 +577,9 @@ def build_payload(store_doc: dict[str, Any], snap: dict[str, Any] | None,
                    "ratio_same_time": row.get("amount_ratio_same_time"),
                    "percentile": row.get("q_amount"),
                    "state": vol_state(row), "source": row.get("amount_source")},
+        # 当日恐慌分时（2026-11-18 主人：要「当日的恐慌走势图」，不是与昨日对比）：
+        #   由 tick_feed 每 60s 落原始点，这里现算分位/恐慌值（与日频同函数）。无记录 → []。
+        "intraday_series": intraday_series(store_doc, str(row.get("date") or day8), legacy),
         "note": ("恐慌广度=价三维（跌停占比/上涨占比/全A中位）+ 量一维（当日全天额÷昨日全天额，"
                  "盘中用预估、只在下跌日计入）250 日滚动分位（越高越恐慌）反向均值；低值=恐慌；"
                  "涨停家数为展示项，不进分数"),

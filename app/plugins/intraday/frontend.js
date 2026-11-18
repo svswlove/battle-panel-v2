@@ -43,6 +43,17 @@ const TRACK_TTL_MS = 60000;
 const PANIC_CLS = { '极冰': 'ice', '冰点': 'cold', '正常': 'normal', '乐观': 'warm', '过热': 'hot' };
 // 旧端 4566 口径（**禁改**）：两线同轴 0–100，方向统一为「低值 = 恐慌」
 const ICE_THRESHOLD = 10;
+// 冰点档上界（10–25 冰点、<10 极冰，与后端 state_of 同阈值）；当日视图的「距冰点」用它。
+const ICE_COLD_MAX = 25;
+// 冰点图视图（2026-11-18，标注 N20261118-184104-9「点击切换为当日的冰点情况」）：
+//   trend = 近 60 日趋势（原样）；today = 当日快照。数据本身是日频（panic_breadth.json 一日一行），
+//   当日没有分时恐慌序列落盘 —— 所以这里给的是**当日快照**（四项读数 + 分位 + 距离/最近冰点日），
+//   不画假分时曲线。点击图区切换，选择记在 localStorage。
+const PANIC_VIEW_KEY = 'it_panic_view';
+let PANIC_VIEW = 'trend';
+try { if (localStorage.getItem(PANIC_VIEW_KEY) === 'today') PANIC_VIEW = 'today'; } catch (e) { /* 无存储按趋势 */ }
+// YYYYMMDD → YYYY-MM-DD（当日视图用；bindPanicCursor 里那份是函数内局部，不复用）
+const fmtDate8 = (s) => { const t = String(s || ''); return t.length === 8 ? t.slice(0, 4) + '-' + t.slice(4, 6) + '-' + t.slice(6, 8) : t; };
 //: 恐慌图展示的交易日窗口（2026-10-30 主人：全A 叠上后 120 根太密，改 60 根试试）。
 //: 数据源仍给 120 根，只截尾巴——回看窗口只改这一个数。
 const PANIC_DAYS = 60;
@@ -129,7 +140,20 @@ const CSS = [
   '.it-pitem-c{color:var(--dim);font-size:0.7rem;margin-left:4px}',
   '.it-pitem-v{font-size:1rem;font-weight:700;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}',
   '.it-pitem-q{font-size:0.72rem;color:var(--dim);text-align:right;white-space:nowrap;min-width:66px;font-variant-numeric:tabular-nums}',
-  '.it-pchart-box{display:flex;flex-direction:column;justify-content:center;min-width:0}',
+  '.it-pchart-box{display:flex;flex-direction:column;justify-content:center;min-width:0;cursor:pointer}',
+  // ---- 冰点卡·当日快照视图（2026-11-18 标注 N20261118-184104-9，点击图区切换）
+  '.it-pday{display:flex;flex-direction:column;gap:6px;background:var(--card2);border:var(--border-w) var(--border-style) var(--border-color);border-radius:var(--radius-sm);padding:8px 10px;min-width:0}',
+  // 当日走势空态（2026-11-18）：当日分时未落盘时如实说明，不画假曲线
+  '.it-pday-empty{font-size:0.78rem;color:var(--dim);line-height:1.65}',
+  '.it-pday-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}',
+  '.it-pday-v{font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.05}',
+  '.it-pday-d{font-size:0.75rem;color:var(--dim)}',
+  '.it-pday-rows{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 12px}',
+  '.it-pday-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:baseline;font-size:0.78rem;min-width:0}',
+  '.it-pday-row .k{color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+  '.it-pday-row .v{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}',
+  '.it-pday-row .q{color:var(--dim);font-size:0.7rem;white-space:nowrap}',
+  '.it-pday-foot{font-size:0.7rem;color:var(--dim);line-height:1.5}',
   '.it-pchart-legend{display:flex;flex-wrap:wrap;gap:10px;color:var(--dim);font-size:0.7rem;margin-bottom:2px}',
   '.it-pfoot{display:flex;gap:4px 14px;flex-wrap:wrap;font-size:0.7rem;color:var(--dim);margin-top:6px}',
   '.it-pfoot b{color:var(--fg);font-weight:600}',
@@ -299,11 +323,35 @@ function panicChart(p, allA) {
     + '</svg><div class="it-pc-tip" hidden></div></div>';
 }
 
+// 视图切换本体（2026-11-18）：只换图区那块 DOM，不重绘整卡（不依赖 mount 内部的 render）。
+function togglePanicView(host, p, allA, br) {
+  PANIC_VIEW = (PANIC_VIEW === 'today') ? 'trend' : 'today';
+  try { localStorage.setItem(PANIC_VIEW_KEY, PANIC_VIEW); } catch (e) { /* 存不住也不影响本次切换 */ }
+  try {
+    const box = host && host.querySelector('.it-pchart-box');
+    if (!box) return;
+    const holder = document.createElement('div');
+    holder.innerHTML = (p && p.ok) ? panicBoxHtml(p, allA) : '';
+    const next = holder.firstElementChild;
+    if (next) { box.replaceWith(next); bindPanicCursor(host, p, allA, br); }
+  } catch (e) {
+    // 切视图失败不拖垮卡片：原图保持不动，错误只上控制台（不静默）
+    try { console.error('[intraday] panic view toggle failed', e); } catch (_) { /* 无 console */ }
+  }
+}
+
 // 恐慌图光标（2026-10-30 主人：加一条光标虚线，随光标在时间轴上显示日期与涨幅）。
 //   mousemove → 吸附到最近的交易日，竖虚线 + 三个点位（恐慌/跌停分位/全A）+ 左上浮层读数。
 //   几何与 panicChart 一致（viewBox 600×150，L40 R26 T10 B20）；内容重绘后靠 dataset 标记重绑。
 //   2026-10-30 主人收口：卡片只留三项——全A 涨幅、涨跌停家数对比、上涨下跌家数对比。
 function bindPanicCursor(host, p, allA, br) {
+  // 视图切换（2026-11-18）：点图区在「近 60 日趋势」↔「当日冰点情况」之间切。
+  //   绑在 .it-pchart-box 上（趋势/当日两种形态都有这个壳）；新节点用 dataset 去重，旧节点被替换后自然消失。
+  const pBox = host && host.querySelector('.it-pchart-box');
+  if (pBox && pBox.dataset.pvBound !== '1') {
+    pBox.dataset.pvBound = '1';
+    pBox.addEventListener('click', function () { togglePanicView(host, p, allA, br); });
+  }
   const box = host && host.querySelector('.it-pc-wrap');
   const svg = box && box.querySelector('svg.it-pchart');
   const tip = box && box.querySelector('.it-pc-tip');
@@ -385,10 +433,100 @@ function bindPanicCursor(host, p, allA, br) {
   svg.addEventListener('mouseleave', () => { g.style.display = 'none'; tip.hidden = true; });
 }
 
-function panicHtml(p, allA) {
-  // 全A 880008 最新一日涨跌幅（图例用）；序列未到位时为 null，图例不渲染这一项
+// ---------------------------------------------------------------- 冰点卡：当前视图（趋势 / 当日快照）
+//
+// 图区外壳统一由本函数出（legend + 图/当日卡），点击切视图（2026-11-18 主人标注 N20261118-184104-9）：
+//   ① 两块内容同源（/api/panic），不新增接口、不改任何分位口径；
+//   ② 选择记忆在 localStorage（it_panic_view），刷新不丢；
+//   ③ 当日视图只展示**已落盘的事实**：没有分时恐慌序列就不画分时（见字段注释）。
+function panicTodayChart(p) {
+  const pts = ((p.intraday_series || []).filter((x) => x && x.t)).slice()
+    .sort((a, b) => String(a.t).localeCompare(String(b.t)));
+  if (!pts.length) {
+    return '<div class="it-pday"><div class="it-pday-empty">'
+      + '当日走势暂无记录：盘中每分钟落一个点（09:30–11:30 / 13:00–15:00），跨日清零。'
+      + '本条自 2026-11-18 收盘后上线，今日无点，下个交易日开盘后开始累积。'
+      + '</div></div>';
+  }
+  const valid = pts.filter((x) => x.value != null);
+  const W = 600; const H = 150; const L = 34; const R = 12; const T = 10; const B = 20;
+  const iw = W - L - R; const ih = H - T - B;
+  const m0 = 570; const m1 = 900;                       // 09:30 – 15:00
+  const hm2m = (t) => { const a = String(t).split(':'); return (+a[0]) * 60 + (+a[1]); };
+  const X = (t) => L + iw * Math.max(0, Math.min(1, (hm2m(t) - m0) / (m1 - m0)));
+  const Y = (v) => T + ih * (1 - Math.max(0, Math.min(100, Number(v))) / 100);
+  const tick = (v) => '<text x="' + (L - 5) + '" y="' + (Y(v) + 3.5).toFixed(1)
+    + '" text-anchor="end" font-size="9" fill="var(--dim)">' + v + '</text>';
+  const gridY = (v) => '<line x1="' + L + '" y1="' + Y(v).toFixed(1) + '" x2="' + (W - R)
+    + '" y2="' + Y(v).toFixed(1) + '" stroke="var(--dim)" stroke-opacity="0.16" stroke-width="1"/>';
+  const ref = (v, color) => '<line x1="' + L + '" y1="' + Y(v).toFixed(1) + '" x2="' + (W - R)
+    + '" y2="' + Y(v).toFixed(1) + '" stroke="' + color + '" stroke-opacity="0.55"'
+    + ' stroke-dasharray="3 3" stroke-width="1"/>';
+  // 折线：值非空的点才连，遇到 null 就断开（不用 0 或前值填补）
+  let path = '';
+  let pen = false;
+  const dots = [];
+  pts.forEach((x) => {
+    if (x.value == null) { pen = false; return; }
+    const px = X(x.t).toFixed(1); const py = Y(x.value).toFixed(1);
+    path += (pen ? 'L' : 'M') + px + ' ' + py + ' ';
+    pen = true;
+    dots.push({ t: x.t, v: x.value, px: px, py: py });
+  });
+  const last = dots[dots.length - 1] || null;
+  const hi = valid.length ? valid.reduce((a, b) => (Number(b.value) > Number(a.value) ? b : a)) : null;
+  const lo = valid.length ? valid.reduce((a, b) => (Number(b.value) < Number(a.value) ? b : a)) : null;
+  const first = valid[0] || null;
+  const xlab = ['09:30', '11:30', '13:00', '15:00'].map((t) =>
+    '<text x="' + X(t).toFixed(1) + '" y="' + (H - 5)
+    + '" text-anchor="middle" font-size="9" fill="var(--dim)">' + t + '</text>').join('');
+  const stCls = PANIC_CLS[p.state] || 'normal';
+  const read = (x) => (x == null ? '—' : num(x.value, 1) + '（' + esc(String(x.t)) + '）');
+  return '<div class="it-pday">'
+    + '<div class="it-pday-h"><b>' + esc(fmtDate8(p.trade_date || '')) + '</b>'
+    + '<span class="it-pb-state ' + stCls + '">' + esc(p.state || '—') + '</span>'
+    + '<span class="it-pday-v">' + num(p.value, 1) + '</span>'
+    + '<span class="it-pday-d">当日走势 ' + dots.length + ' 点</span></div>'
+    + '<svg class="it-pchart it-pdchart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="当日恐慌广度走势（每分钟一点，低值=恐慌）">'
+    + gridY(0) + gridY(50) + gridY(100) + tick(0) + tick(50) + tick(100)
+    + ref(ICE_THRESHOLD, 'var(--danger)') + ref(ICE_COLD_MAX, 'var(--warn)') + ref(90, 'var(--dim)')
+    + xlab
+    + '<path d="' + path + '" fill="none" stroke="var(--dim)" stroke-width="1.7"/>'
+    + (last ? '<circle cx="' + last.px + '" cy="' + last.py + '" r="2.8" fill="var(--danger)"><title>'
+      + esc(last.t) + ' 恐慌 ' + num(last.v, 1) + '</title></circle>' : '')
+    + '</svg>'
+    + '<div class="it-pday-foot">'
+    + '开盘 ' + read(first) + ' ｜ 最高 ' + read(hi) + ' ｜ 最低 ' + read(lo)
+    + ' ｜ 参考线：极冰 &lt;' + ICE_THRESHOLD + '、冰点 ' + ICE_COLD_MAX + '、过热 90'
+    + '</div></div>';
+}
+
+function panicBoxHtml(p, allA) {
+  if (PANIC_VIEW === 'today') {
+    return '<div class="it-pchart-box is-today" title="点击切回近 60 个交易日的趋势图">'
+      + '<div class="it-pchart-legend"><span class="it-lg"><i class="lg-panic"></i>当日恐慌走势</span>'
+      + '<span>每分钟一点 · 低值=恐慌</span>'
+      + '<span>极冰 &lt;' + ICE_THRESHOLD + ' · 冰点 ' + ICE_COLD_MAX + '</span>'
+      + '<span>点击切回趋势</span></div>'
+      + panicTodayChart(p) + '</div>';
+  }
   const allARow = (allA && allA.ok && allA.rows && allA.rows.length) ? allA.rows[allA.rows.length - 1] : null;
   const allAPct = (allARow && allARow.pct != null) ? Number(allARow.pct) : null;
+  const nPts = Math.min((p.series || []).filter((x) => x && x.value != null).length, PANIC_DAYS);
+  return '<div class="it-pchart-box" title="点击切换：当日的冰点情况">'
+    + '<div class="it-pchart-legend"><span class="it-lg"><i class="lg-panic"></i>恐慌广度</span>'
+    + '<span class="it-lg"><i class="lg-ldc"></i>跌停家数分位（反向）</span>'
+    + (allAPct == null ? '' : '<span class="it-lg"><i class="lg-alla" style="background:var(--'
+      + (allAPct >= 0 ? 'up' : 'down') + ')"></i>全A 880008 '
+      + '<b style="color:var(' + (allAPct >= 0 ? '--up' : '--down') + ')">' + (allAPct >= 0 ? '+' : '') + num(allAPct, 2) + '%</b>'
+      + '（渐变面积）</span>')
+    + '<span class="it-lg"><i class="lg-ice"></i>冰点（&lt;' + ICE_THRESHOLD + '）</span>'
+    + '<span>两线同向：低值=恐慌</span><span>参考线 10 / 90</span>'
+    + '<span>近 ' + nPts + ' 个交易日</span></div>'
+    + panicChart(p, allA) + '</div>';
+}
+
+function panicHtml(p, allA) {
   if (!p) return '<p class="it-muted">恐慌广度加载中…（/api/panic）</p>';
   if (!p.ok) {
     return '<p class="it-muted">恐慌广度暂不可用：' + esc(p.error || p.hint || p.detail || 'no data') + '</p>';
@@ -424,7 +562,6 @@ function panicHtml(p, allA) {
   }).join('');
   const stg = (p.stage && p.stage.label) ? (esc(p.stage.label) + '（' + esc(p.stage.date || '') + '）') : '—';
   const modeTxt = p.mode === 'live' ? '（盘中）' : (p.mode === 'close' ? '（收盘）' : '（已收盘）');
-  const nPts = Math.min((p.series || []).filter((x) => x && x.value != null).length, PANIC_DAYS);
   return '<div class="it-panic">'
     + '<div class="it-panic-hero">'
     + '<div class="it-panic-lab">恐慌广度</div>'
@@ -433,18 +570,8 @@ function panicHtml(p, allA) {
     + '<div class="it-panic-lab">0–100 · 低值=恐慌</div>'
     + '</div>'
     + '<div class="it-pitems">' + items + '</div>'
-    + '<div class="it-pchart-box">'
-    + '<div class="it-pchart-legend"><span class="it-lg"><i class="lg-panic"></i>恐慌广度</span>'
-    + '<span class="it-lg"><i class="lg-ldc"></i>跌停家数分位（反向）</span>'
-    + (allAPct == null ? '' : '<span class="it-lg"><i class="lg-alla" style="background:var(--'
-      + (allAPct >= 0 ? 'up' : 'down') + ')"></i>全A 880008 '
-      + '<b style="color:var(' + (allAPct >= 0 ? '--up' : '--down') + ')">' + (allAPct >= 0 ? '+' : '') + num(allAPct, 2) + '%</b>'
-      + '（渐变面积）</span>')
-    + '<span class="it-lg"><i class="lg-ice"></i>冰点（&lt;' + ICE_THRESHOLD + '）</span>'
-    + '<span>两线同向：低值=恐慌</span><span>参考线 10 / 90</span>'
-    + '<span>近 ' + nPts + ' 个交易日</span></div>'
-    + panicChart(p, allA)
-    + '</div></div>'
+    + panicBoxHtml(p, allA)
+    + '</div>'
     + '<div class="it-pfoot">'
     + '<span>六阶段：<b>' + stg + '</b></span>'
     + '<span>数据时点：<b>' + esc(p.asof || '') + '</b>' + modeTxt + '</span>'

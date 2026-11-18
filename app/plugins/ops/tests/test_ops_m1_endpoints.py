@@ -164,7 +164,10 @@ def test_panic_store_mode_shape(env: Env) -> None:
     assert [it["key"] for it in body["items"]] == ["limit_down", "up_ratio", "median", "amount"]
     assert set(body) == {"ok", "asof", "trade_date", "mode", "live", "source", "window",
                          "value", "state", "items", "series", "stage", "note",
-                         "volume"}, set(body)   # volume：2026-10-29 新增的量能汇总（只加键）
+                         "volume", "intraday_series"}, set(body)
+    # volume：2026-10-29 新增的量能汇总（只加键）
+    # intraday_series：2026-11-18 新增的**当日恐慌分时**（主人要「当日的恐慌走势图」）——
+    #   tick_feed 每分钟落原始点，这里用日频 250 日历史现算分位/恐慌值；无记录时为 []（只加键）
     # 120 日裁剪（库里 260 行）
     assert len(body["series"]) == 120
     assert body["series"][-1]["date"] == today

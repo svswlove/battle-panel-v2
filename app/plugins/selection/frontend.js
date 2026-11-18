@@ -232,6 +232,9 @@ const CSS = [
   '.sel-sg.mo{color:var(--accent);background:var(--accent-bg)}',
   '.sel-sg.wk{color:var(--dim);background:var(--card2)}',
   '.sel-sg.p{color:var(--down);background:var(--down-bg)}',
+  // 五日线战法（2026-11-18）：首进=买点主信号（跟涨色）、回马枪=二次进场（黄）
+  '.sel-sg.sd-e{color:var(--up-ink,var(--up));background:var(--up-bg)}',
+  '.sel-sg.sd-r{color:var(--warn-ink,var(--warn));background:var(--warn-bg)}',
   '.sel-dk{display:inline-block;padding:0 4px;border-radius:3px;border:1px solid currentColor;font-size:0.6rem;line-height:1.4;margin-left:3px}',
   '.sel-dk.up{color:var(--up);background:var(--up-bg)}',
   '.sel-dk.down{color:var(--down);background:var(--down-bg)}',
@@ -850,7 +853,7 @@ export default {
           + '</span>' + bd + split + '</div>'
           + '<div class="c c-cat" title="' + esc(r.sub || '') + '">' + esc(r.cat || '—') + '</div>'
           + '<div class="c num" data-k="pct"'
-          + (lq ? ' title="实时 ' + esc(Number(lq.last).toFixed(2) + '（昨收 '
+          + (lq ? ' title="' + (isTradingNow() ? '实时 ' : '收盘 ') + esc(Number(lq.last).toFixed(2) + '（昨收 '
             + Number(lq.pre).toFixed(2) + '）· ' + (lq.asof || '')) + '"' : '')
           + '>' + numCell(lq ? lq.pct : r.pct, 2, true) + '</div>'
           + '<div class="c num">' + numCell(r.pct5, 2, true) + '</div>'
@@ -887,11 +890,11 @@ export default {
           + '</span>' + hitBadges(r) + '</div>'
           + '<div class="c c-sec">' + sectorCell(r.sector) + '</div>'
           + '<div class="c num" data-k="pct"'
-          + (lq ? ' title="实时 ' + esc(Number(lq.last).toFixed(2) + '（昨收 '
+          + (lq ? ' title="' + (isTradingNow() ? '实时 ' : '收盘 ') + esc(Number(lq.last).toFixed(2) + '（昨收 '
             + Number(lq.pre).toFixed(2) + '）· ' + (lq.asof || '')) + '"' : '')
           + '>' + numCell(lq ? lq.pct : r.pct, 2, true) + '</div>'
           + '<div class="c num" data-k="vr"'
-          + (lq && lq.vr != null ? ' title="盘中实时量比（累计 '
+          + (lq && lq.vr != null ? ' title="' + (isTradingNow() ? '盘中实时量比' : '全日量比') + '（累计 '
             + esc(Number(lq.vol || 0).toFixed(0)) + ' 手 / 前20日均量）· ' + esc(lq.asof || '') + '"' : '')
           + '>' + numCell(lq && lq.vr != null ? lq.vr : r.vol_ratio, 2, false) + '</div>'
           + '<div class="c num">' + numCell(r.mav_pct, 2, true) + '</div>'
@@ -1002,8 +1005,11 @@ export default {
         } else if (sc.state === 'none') {
           s += ' · <b class="sel-off" title="' + esc(sc.reason || '') + '">无打分数据</b>';
         }
-        if (S.liveAt && isTradingNow()) {
-          s += ' · <b class="sel-live">涨幅实时 ' + esc(S.liveAt) + '</b>';
+        if (S.liveAt) {
+          // 盘中=实时；收盘后/非盘中=最新一批行情（收盘后即当日收盘值）。写清时点，不拿旧值冒充实时。
+          s += isTradingNow()
+            ? ' · <b class="sel-live">涨幅实时 ' + esc(S.liveAt) + '</b>'
+            : ' · <b class="sel-live">涨幅取最新行情 ' + esc(S.liveAt) + '</b>';
         }
         if (S.html.stat !== s) { S.html.stat = s; S.el.stat.innerHTML = s; }
       };
@@ -1783,6 +1789,12 @@ export default {
       // 所以这里**只覆盖「涨幅」这一列**：名单/信号/打分/防线一律不动，也不新增取数通道
       // （数据源 = /api/selection_quotes，后端走 core 的 eltdx 单例快照）。
       const LIVE_QUOTE_MS = 10000;
+      // 2026-11-16（主人问「收盘后怎么变成昨天的涨幅」的根因修复）：旧实现只在盘中覆盖，
+      // 15:05 一过就停手，页面一刷新就退回快照里的上一交易日涨幅。而收盘后 eltdx 快照
+      // 仍返回当日收盘真值（实测 11-16 15:21 顺鑫农业 last=12.70/pre=11.97/+6.10%），
+      // 所以覆盖窗口扩到「竞价+盘中+收盘后当天」；盘前 00:00–09:15 不覆盖：
+      // 那时通达信把 last/pre 都停在上一收盘价（pct≈0），覆盖上去整表变 0% 更误导。
+      const LIVE_IDLE_MS = 120000;    // 非盘中不做 10s 轮询，最多 2 分钟补一次
       const isTradingNow = () => {
         const d = new Date();
         const wd = d.getDay();
@@ -1790,8 +1802,17 @@ export default {
         const hm = d.getHours() * 100 + d.getMinutes();
         return (hm >= 925 && hm <= 1135) || (hm >= 1255 && hm <= 1505);
       };
-      const liveQuotes = async () => {
-        if (!S.alive || !isTradingNow() || !S.el.rows) return;
+      const quoteWindow = () => {
+        const d = new Date();
+        const hm = (d.getHours() * 100) + d.getMinutes();
+        return hm >= 915;
+      };
+      let quoteAt = 0;
+      const liveQuotes = async (force) => {
+        if (!S.alive || !S.el.rows || !quoteWindow()) return;
+        const trading = isTradingNow();
+        if (!trading && !force && Date.now() - quoteAt < LIVE_IDLE_MS) return;
+        quoteAt = Date.now();
         const nodes = S.el.rows.querySelectorAll('.sel-r[data-code]');
         if (!nodes.length) return;
         const codes = [];
@@ -1802,6 +1823,20 @@ export default {
         } catch (e) { return; }
         const q = (j && j.quotes) || {};
         const asof = (j && j.asof) || '';
+        // 非盘中防御：整批 last 与 pre 相同（pct≈0）超过一半 → 行情还没切到新交易日
+        // （盘前/长假前通达信会把两个价都停在上一收盘价），丢弃本次结果，保留页面原值。
+        if (!trading) {
+          let flat = 0;
+          let valid = 0;
+          for (const k in q) {
+            const row0 = q[k] || {};
+            const p = Number(row0.pct), l = Number(row0.last), pc = Number(row0.pre);
+            if (!isFinite(p) || !isFinite(l) || !isFinite(pc)) continue;
+            valid += 1;
+            if (l === pc) flat += 1;
+          }
+          if (valid && (flat / valid) > 0.5) return;
+        }
         let hit = 0;
         for (let i = 0; i < nodes.length; i++) {
           const code = nodes[i].getAttribute('data-code');
@@ -1817,12 +1852,14 @@ export default {
           const cell = nodes[i].querySelector('[data-k="pct"]');
           if (cell) {
             cell.innerHTML = numCell(pct, 2, true);
-            cell.title = '实时 ' + last.toFixed(2) + '（昨收 ' + pre.toFixed(2) + '）· ' + asof;
+            cell.title = (trading ? '实时 ' : '收盘 ') + last.toFixed(2)
+            + '（昨收 ' + pre.toFixed(2) + '）· ' + asof;
           }
           const vc = nodes[i].querySelector('[data-k="vr"]');
           if (vc && vr != null && isFinite(vr)) {
             vc.innerHTML = numCell(vr, 2, false);
-            vc.title = '盘中实时量比（累计 ' + vol.toFixed(0) + ' 手 / 前20日均量）· ' + asof;
+            vc.title = (trading ? '盘中实时量比' : '全日量比') + '（累计 '
+              + vol.toFixed(0) + ' 手 / 前20日均量）· ' + asof;
           }
           hit += 1;
         }
@@ -1833,7 +1870,7 @@ export default {
       let liveKick = 0;
       let liveLast = 0;
       S.kickLive = () => {
-        if (!S.alive || !isTradingNow()) return;
+        if (!S.alive || !quoteWindow()) return;
         if (liveKick) clearTimeout(liveKick);
         liveKick = setTimeout(() => {
           liveKick = 0;
@@ -2325,7 +2362,7 @@ export default {
       // 盘中实时涨幅（标注 N89）：拉一次，之后每 LIVE_QUOTE_MS 刷一次
       if (S.liveTimer) clearInterval(S.liveTimer);
       S.liveTimer = setInterval(() => { if (S.alive) liveQuotes(); }, LIVE_QUOTE_MS);
-      if (S.alive) liveQuotes();
+      if (S.alive) liveQuotes(true);
     },
 
     async unmount() {

@@ -58,6 +58,7 @@ from __future__ import annotations
 
 import contextlib
 import os
+import re
 import threading
 import time
 import uuid
@@ -119,8 +120,9 @@ _WATCH_SIG_META: Dict[str, Tuple[str, str, str]] = {
     "B1_Q": ("B1", "q", "B1·缩量蓄势（窄幅基底、无阴量派发，ACCUM_BASE）"),
     "TOP_RES": ("B1", "r", "B1·砖首转强（砖型图首根走强 + J 低位）"),
     "B2": ("B2", "b2", "B2 放量突破"),
-    "B3": ("B3", "b3", "B3"),
-    "B4": ("B4", "b4", "B4"),
+    "B3": ("B3", "b3", "B3 回踩缩量（B2 次日缩量下探企稳）"),
+    "B4": ("B4", "b4", "B4 回踩平量（B2 次日温和缩量整理）"),
+    "B5": ("B5", "b3", "B5 二次回踩（B3/B4 次日再缩量踩稳）"),
     "A_GOLD": ("针", "y", "黄金针（仅日线）"),
     "B_WHITE": ("针", "w", "白金针"),
     "MOM": ("动", "mo", "动能选股"),
@@ -129,6 +131,10 @@ _WATCH_SIG_META: Dict[str, Tuple[str, str, str]] = {
     "ZHU_W": ("砖", "zhu-w", "砖形图·反转确立（个股｜砖体由绿转红且力度达标）"),
     "周": ("周", "wk", "周线B1（每周五更新）"),
     "WEEK_B1": ("周", "wk", "周线B1（每周五更新）"),
+    # 五日线战法（2026-11-18）：盘后链 buysignal 步与买点徽标同批写库（只算自选池）。
+    #   与 engine/server.py::_WATCH_SIG_META 同源同名——两张表必须同时改。
+    "SD_ENTRY": ("首进", "sd-e", "五日线·首进（站上MA5+连续3日放量+7日内巨量1-2次，且真业绩）"),
+    "SD_REENTRY": ("回马", "sd-r", "五日线·回马枪（巨量+距MA5 -4~-5%+MA5向上+近30日破位后5-10日）"),
 }
 
 # 读-改-写互斥（模块级）：防两个请求交叉覆盖同一份文件（旧端 `_WATCH_LOCK` 同款）。
@@ -1021,6 +1027,15 @@ def _build_watchlist(ctx: Any, mode: str = "") -> Dict[str, Any]:
     out: List[Dict[str, Any]] = []
     bull_n = 0
     asofs: List[str] = []
+    # 名称兜底（2026-11-18）：名表只读一次；存量脏名（如 601985 的 “????”）只在展示层纠正，不回写盘。
+    names_tbl, etfs_tbl = _search_index(ctx)
+
+    def _nm(code: str, raw: Any) -> str:
+        nm = str(raw or "").strip()
+        if nm and not _NAME_BAD.match(nm):
+            return nm
+        c6 = str(code or "").split(".")[0].strip().upper()
+        return str(names_tbl.get(c6) or etfs_tbl.get(c6) or "").strip() or nm or c6
     for it in stocks:
         ts = it["code"]
         code6 = ts.split(".")[0]
@@ -1047,7 +1062,7 @@ def _build_watchlist(ctx: Any, mode: str = "") -> Dict[str, Any]:
             sector["l3"] = dict(sec["l3"], regime=_sector_regime(ctx, "L3", sec["l3"]["code"]))
         if regime in ("多", "偏多"):
             bull_n += 1
-        out.append({"kind": "stock", "code": ts, "name": it["name"],
+        out.append({"kind": "stock", "code": ts, "name": _nm(ts, it["name"]),
                     "added_at": it["added_at"], "order": it["order"], "group": it["group"],
                     "quote": quote, "quote_source": qsrc,
                     "regime": regime, "sector": sector, "div": _stock_div(ctx, code6),
@@ -1062,7 +1077,7 @@ def _build_watchlist(ctx: Any, mode: str = "") -> Dict[str, Any]:
         if regime == "多":
             bull_n += 1
         out.append({"kind": "sector", "code": code,
-                    "name": it["name"] or (meta or {}).get("name") or code,
+                    "name": _nm(code, it["name"] or (meta or {}).get("name")),
                     "added_at": it["added_at"], "order": it["order"], "group": it["group"],
                     "level": level, "regime": regime,
                     "pct": (sq or {}).get("pct"), "quote_date": (sq or {}).get("date")})
@@ -1199,6 +1214,25 @@ def _search_index(ctx: Any) -> Tuple[Dict[str, str], Dict[str, str]]:
 # ---------------------------------------------------------------- 写操作（读-改-写）
 
 
+# 名称占位符（2026-11-18）：601985 中国核电在自选池里显示 “????” 且 K 线标题同样 ——
+#   泡盘里 name 就是占位符（兼容旧数据）。这里只在**展示/新增**时代码查权威名表兜底，不改历史条目。
+_NAME_BAD = re.compile(r"^[\s?？\ufffd]*$")
+
+
+def _name_or_lookup(ctx: Any, code: str, name: Any) -> str:
+    """名称兜底：空/占位→按 6 位码查 stock_names（个股 names ∪ ETF etfs）；查不到原样返回。"""
+    nm = str(name or "").strip()
+    if nm and not _NAME_BAD.match(nm):
+        return nm
+    try:
+        names, etfs = _search_index(ctx)
+    except Exception:  # noqa: BLE001 - 名表不可用 → 保持原值（不编造）
+        names, etfs = {}, {}
+    c6 = str(code or "").split(".")[0].strip().upper()
+    hit = names.get(c6) or names.get(c6.lower()) or etfs.get(c6) or ""
+    return str(hit).strip() or nm or c6
+
+
 def _body_dict(body: Any) -> Dict[str, Any]:
     return body if isinstance(body, dict) else {}
 
@@ -1289,7 +1323,7 @@ def build_add(ctx: Any, body: Any) -> Dict[str, Any]:
         code = str(payload.get("code") or "").strip().upper()
         if not code:
             raise HTTPException(status_code=422, detail="板块代码不能为空")
-    name = str(payload.get("name") or "").strip()
+    name = _name_or_lookup(ctx, code, payload.get("name"))
     want_group = str(payload.get("group") or "").strip()
     # 2026-11-13：autoMmdd=true = 「加入选股」（K 线右键）——用日期分组 + 超量清理；
     #   不传仍是普通加自选（行为不变）。
