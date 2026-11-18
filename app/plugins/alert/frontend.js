@@ -113,7 +113,54 @@ const CSS = `
 .al-td.danger{color:var(--down-ink)}
 .al-empty{font-size:12px;color:var(--dim);padding:6px 0}
 .al-note{font-size:11px;color:var(--dim);line-height:1.7;border-top:1px solid var(--line-soft);padding-top:8px}
-@media(max-width:760px){.al-form{grid-template-columns:repeat(2,1fr)}.al-grid{grid-template-columns:1fr}}
+
+/* ---- 决策点分区（2026-11-16 主人 20:47：并进预警卡，不新开页） ---- */
+.al-dp{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line-soft);
+  border-radius:var(--radius-md,10px);padding:9px 11px 10px;background:var(--card)}
+.al-dp-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--dim)}
+.al-dp-ttl{font-size:13px;font-weight:650;color:var(--fg-strong)}
+.al-dp-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:1px 8px;
+  font-size:11px;border:1px solid currentColor;white-space:nowrap}
+.al-dp-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.al-dp-pill.run{color:var(--accent)}
+.al-dp-pill.stale{color:var(--warn)}
+.al-dp-pill.exit{color:var(--dim)}
+.al-dp-pill.unknown{color:var(--warn)}
+.al-dp-kpis{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--dim);
+  font-variant-numeric:tabular-nums}
+.al-dp-kpis b{font-size:16px;color:var(--fg-strong);font-variant-numeric:tabular-nums;margin-right:2px}
+.al-dp-kpis b.zero{color:var(--dim);font-weight:600}
+.al-dpw{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;line-height:1.6;
+  border:1.5px solid var(--down);border-radius:var(--radius-sm);padding:7px 10px;
+  background:color-mix(in srgb, var(--down) 14%, transparent);color:var(--down-ink)}
+.al-dpw b{color:var(--down-ink)}
+.al-dpw.warn{border-color:var(--warn);background:color-mix(in srgb, var(--warn) 14%, transparent);color:var(--warn)}
+.al-dpw.warn b{color:var(--warn)}
+.al-dp-on{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim);flex-wrap:wrap}
+.al-dp-on b{color:var(--fg)}
+.al-dpi{border-top:1px dashed var(--line-soft);padding:2px 0}
+.al-dpr{display:grid;grid-template-columns:132px minmax(0,1fr) 46px 84px 62px minmax(0,1.2fr) 94px;
+  gap:8px;align-items:center;cursor:pointer;font-size:12px;padding:4px 0;list-style:none}
+.al-dpr::-webkit-details-marker{display:none}
+.al-dpr .i{font-family:var(--font-mono,monospace);font-size:11px;color:var(--fg-strong);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.al-dpr .t{color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.al-dpr .sev{font-size:10.5px;text-align:center;border-radius:3px;border:1px solid currentColor;white-space:nowrap}
+.al-dpr .sev.alert{color:var(--down-ink)}
+.al-dpr .sev.action{color:var(--warn)}
+.al-dpr .sev.other{color:var(--dim)}
+.al-dpr .w,.al-dpr .c{font-size:11px;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+.al-dpr .cd{font-size:11.5px;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.al-dpr .h{text-align:right;font-size:11px;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+.al-dpr .h.on{color:var(--down-ink);font-weight:650}
+.al-dpd{padding:3px 0 7px;font-size:11.5px;line-height:1.75;color:var(--fg)}
+.al-dpd .k{color:var(--dim)}
+.al-dpd .raw{font-family:var(--font-mono,monospace);font-size:10.5px;color:var(--dim);
+  word-break:break-all;margin-top:3px}
+.al-dp-note{font-size:11px;color:var(--dim);line-height:1.7}
+@media(max-width:760px){.al-form{grid-template-columns:repeat(2,1fr)}.al-grid{grid-template-columns:1fr}
+  .al-dpr{grid-template-columns:minmax(0,1fr) 78px}
+  .al-dpr .sev,.al-dpr .w,.al-dpr .c{display:none}}
 `;
 
 const STYLE_ID = 'alert-page-css';
@@ -178,6 +225,7 @@ export default {
       const st = {
         data: null, formOpen: false, lastFlowTs: null, booted: false,
         soundOn: false, msg: '', msgErr: false, open: {},
+        dp: null, dpErr: '', dpOpen: {},
         form: { type: 'PRICE_BELOW', code: '', name: '', value: '', line: 'white', ma: 'ma5',
                 dir: 'down', target: 'auto', window: '09:35-14:55', source: 'session' },
       };
@@ -547,6 +595,187 @@ export default {
         return el;
       }
 
+      // ---- 决策点分区（2026-11-16 主人 20:47：并进预警卡，不新开页；只展示不判定）
+      const SEV_CN = { alert: '告警', action: '行动' };
+      const t8 = (v) => {
+        const s = String(v == null ? '' : v);
+        const m = s.match(/(\d{2}:\d{2}:\d{2})/);
+        return m ? m[1] : (s || '—');
+      };
+      function ageText(sec) {
+        if (sec == null || !isFinite(Number(sec)) || Number(sec) < 0) return '—';
+        const n = Number(sec);
+        if (n < 60) return n + ' 秒前';
+        if (n < 3600) return Math.floor(n / 60) + ' 分钟前';
+        return (n / 3600).toFixed(1) + ' 小时前';
+      }
+
+      function dpEvalPill(ev) {
+        let cls = 'unknown';
+        let txt = '评估器 状态未知';
+        if (ev && ev.state === 'RUNNING' && !ev.stale) { cls = 'run'; txt = '评估器 在跑'; }
+        else if (ev && ev.state === 'RUNNING') { cls = 'stale'; txt = '评估器 在跑·心跳陈旧'; }
+        else if (ev && ev.state === 'EXITED') { cls = 'exit'; txt = '评估器 已退出'; }
+        const p = div('al-dp-pill ' + cls);
+        const dot = document.createElement('span'); dot.className = 'dot';
+        p.append(dot, document.createTextNode(txt));
+        return p;
+      }
+
+      function renderDp() {
+        const box = div('al-dp');
+        const dp = st.dp || {};
+        if (st.dpErr || dp.ok === false) {
+          const bar = div('al-dp-bar');
+          bar.append(div('al-dp-ttl', '决策点'));
+          box.append(bar);
+          box.append(div('al-msg err', '决策点读取失败：' +
+            (st.dpErr || (dp && (dp.detail || dp.error)) || '接口异常')));
+          return box;
+        }
+        const ev = dp.evaluator || {};
+        const sw = dp.switch || {};
+        const plan = dp.plan || {};
+        const hits = dp.hits || {};
+
+        const bar = div('al-dp-bar');
+        bar.append(div('al-dp-ttl', '决策点'));
+        bar.append(div('', '数据日 ' + (dp.date || '—') + (dp.is_today === false ? '（非今日）' : '')));
+        bar.append(dpEvalPill(ev));
+        bar.append(div('', ev.last_heartbeat
+          ? '最后心跳 ' + t8(ev.last_heartbeat) + '（' + ageText(ev.heartbeat_age_s) + '）'
+          : '无心跳记录'));
+        box.append(bar);
+
+        // 唤醒总开关：关 / 异常 → 通栏醒目横幅（主人：一眼能看出“现在不会叫醒夏天”）；开 → 一行小字
+        if (!sw.enabled || sw.ok === false) {
+          const sane = sw.ok !== false;
+          const banner = div('al-dpw' + (sane ? '' : ' warn'));
+          const strong = document.createElement('b');
+          strong.textContent = sane
+            ? '唤醒总开关已关闭 —— 现在不会叫醒夏天'
+            : '唤醒总开关状态异常，按「开」处理';
+          banner.append(strong);
+          banner.append(div('', sane
+            ? '评估照常跑、命中照常落 wake_events.jsonl、面板命中照常显示；只停了「新建会话叫醒」这一步，alert 的 QQ 推送不受影响。关闭于 '
+              + (sw.updated_at || '—') + '，操作者 ' + (sw.by || '—') + '。'
+            : '开关文件读不出或字段非法（' + (sw.reason || '—') +
+              '），程序按「开」执行：误唤醒比漏唤醒安全，但你不能以为已经关了。'));
+          banner.append(btn(sane ? '恢复叫醒' : '重置为开', '', 'wake-switch', { en: '1' }));
+          box.append(banner);
+        } else {
+          const onRow = div('al-dp-on');
+          onRow.append(div('', '唤醒总开关：开（触发时会新建会话叫醒夏天）'));
+          onRow.append(btn('关闭唤醒', '', 'wake-switch', { en: '0' }));
+          box.append(onRow);
+        }
+
+        // KPI：数字全取流水原值（计数用「数字在前」与预警卡既有 KPI 一致；时间用「标签在前」更好读）
+        const tl = hits.timeline || [];
+        const kp = div('al-dp-kpis');
+        const addNum = (name, val, zero) => {
+          const b = div('');
+          b.innerHTML = '<b' + (zero ? ' class="zero"' : '') + '>' + esc(val) + '</b>' + esc(name);
+          kp.append(b);
+        };
+        const addText = (name, val) => {
+          const b = div('');
+          b.append(document.createTextNode(name + ' ' + (val == null || val === '' ? '—' : String(val))));
+          kp.append(b);
+        };
+        addNum('今日命中', hits.count || 0, !hits.count);
+        addNum('计划条目', plan.present ? (plan.count || 0) : '—', !plan.present);
+        addText('首触发', tl.length ? t8(tl[0].ts) : '—');
+        addText('末触发', tl.length ? t8(tl[tl.length - 1].ts) : '—');
+        box.append(kp);
+
+        // 今日计划（原样展示；不打「已满足/未满足」）
+        if (!plan.present) {
+          const reason = {
+            not_generated: '今日计划未生成',
+            trade_date_mismatch: '计划文件日期不符',
+            unreadable: '计划文件无法解析',
+          }[plan.reason] || '今日计划不可用';
+          let tail = '';
+          if (plan.reason === 'not_generated') {
+            tail = '：盘前 build_wake_plan.py 今天还没落盘（或今天不是交易日）。';
+          } else if (plan.reason === 'trade_date_mismatch') {
+            tail = '：文件里 meta.trade_date = ' + (plan.trade_date || '—') + '，与今天不符，按口径拒收。';
+          } else {
+            tail = '：JSON 解析失败（写到一半/被改坏），不拿它充数。';
+          }
+          tail += plan.latest_plan_date
+            ? '最近一份可用计划：' + plan.latest_plan_date + '（仅提示，不是今天的数据）。'
+            : '回溯 10 天也没有可用计划。';
+          box.append(div('al-empty', reason + tail));
+        } else {
+          (plan.items || []).forEach(it => {
+            const det = document.createElement('details');
+            det.className = 'al-dpi';
+            if (st.dpOpen[it.dp_id]) det.open = true;
+            det.addEventListener('toggle', () => { st.dpOpen[it.dp_id] = det.open; });
+            const sum = document.createElement('summary');
+            sum.className = 'al-dpr';
+            sum.append(div('i', it.dp_id || '—'));
+            sum.append(div('t', it.theme || '—'));
+            sum.append(div('sev ' + (SEV_CN[it.severity] ? it.severity : 'other'),
+              SEV_CN[it.severity] || it.severity || '—'));
+            sum.append(div('w', it.window || '—'));
+            sum.append(div('c', '确认 ' + (it.confirm_points == null ? '—' : it.confirm_points) + ' 点'));
+            sum.append(div('cd', it.condition_text || '（无条件摘要）'));
+            sum.append(div('h' + (it.hits ? ' on' : ''), it.hits
+              ? '命中 ' + it.hits + ' 次 · ' + t8(it.last_hit_ts)
+              : '命中 0 次'));
+            det.append(sum);
+
+            const body = div('al-dpd');
+            const rb = it.runbook || {};
+            const line = (k, v) => { if (v) body.append(div('', k + '：' + v)); };
+            line('为什么', rb.why);
+            line('待判断', (rb.questions || []).join('；'));
+            line('要查', (rb.data_to_check || []).join('、'));
+            line('选项', (rb.options || []).join(' / '));
+            line('滞回复位', it.hysteresis_text);
+            if (it.require_cross_down) line('跨线', '首点须由上方下穿阈值才计数（防开盘已在下方时假触发）');
+            if (it.last_trigger_text) line('最后触发值', it.last_trigger_text);
+            body.append(div('raw', '条件原文（计划原样，未做任何判定）：' +
+              JSON.stringify(it.condition || {}) +
+              (it.hysteresis_exit ? ' · 复位：' + JSON.stringify(it.hysteresis_exit) : '')));
+            det.append(body);
+            box.append(det);
+          });
+        }
+
+        // 今日命中时间线（原值直出）
+        if (tl.length) {
+          const fl = div('al-flow');
+          tl.forEach(r => {
+            const row = div('al-fr');
+            row.append(div('t', t8(r.ts)));
+            row.append(div('s', (r.dp_id || '') + '　' + (r.theme || '')));
+            row.append(div('d', r.trigger_text || '（无 trigger_values）'));
+            fl.append(row);
+          });
+          box.append(fl);
+        } else if (plan.present) {
+          box.append(div('al-empty',
+            '今日无命中：评估器在窗口内跑满 60s 一轮也没触发条件，这是正常态（不是数据缺失）。'));
+        }
+
+        const un = hits.unplanned || [];
+        if (un.length) {
+          box.append(div('al-dp-note', '另有命中的 dp 不在今日计划里：' +
+            un.map(u => u.dp_id + ' × ' + u.count + '（最后 ' + t8(u.last_ts) + '）').join('、') +
+            '。计划白天重渲或长期预警额外跑过，原样列出不改口径。'));
+        }
+        const cal = dp.caliber || {};
+        const src = cal.sources || {};
+        box.append(div('al-dp-note',
+          '只读：命中次数/触发值全部取 wake_events.jsonl 原值，面板不重算条件；计划条目原样展示，不标已满足/未满足。' +
+          '数据源：' + [src.plan, src.events, src.status, src.switch].filter(Boolean).join(' / ')));
+        return box;
+      }
+
       function render() {
         closeCardMenu();
         const d = st.data || {};
@@ -573,6 +802,7 @@ export default {
         wrap.append(top);
         if (st.msg) wrap.append(div('al-msg' + (st.msgErr ? ' err' : ''), st.msg));
         wrap.append(renderForm(d));
+        wrap.append(renderDp());
 
         // ---- 条件（按股票一张卡）
         const groups = d.groups || [];
@@ -644,7 +874,12 @@ export default {
 
       async function load(force) {
         try {
-          const d = await ctx.api.get('/alert/list');
+          const [d, dp] = await Promise.all([
+            ctx.api.get('/alert/list'),
+            ctx.api.get('/alert/decision_points').catch(e => ({ ok: false, detail: (e && e.message) || String(e) })),
+          ]);
+          st.dp = dp || null;
+          st.dpErr = (dp && dp.ok === false) ? (dp.detail || dp.error || '接口异常') : '';
           const prev = st.lastFlowTs;
           st.data = d;
           const flow = d.flow || [];
@@ -676,8 +911,29 @@ export default {
               if (g) { st.open[g.key] = true; st.msg = ''; render(); }
               return;
             }
-            if (act === 'review') {
+            if (act === 'wake-switch') {
+              // 唤醒总开关（2026-11-16）：关 = 不叫醒夏天，评估与事件落盘照常。
+              // 关闭是「止血」方向，先弹一次确认防手滑；开启不拦。
+              const on = el.dataset.en === '1';
+              if (!on && typeof window !== 'undefined' && typeof window.confirm === 'function'
+                  && !window.confirm('关闭后 wake_eval 不再新建会话叫醒夏天（评估照常跑、命中照常落盘、面板照常显示）。确定关闭？')) {
+                return;
+              }
               try {
+                const r = await ctx.api.post('/alert/wake_switch', { enabled: on, by: 'panel' });
+                if (!r || !r.ok) throw new Error((r && r.error) || '写入失败');
+                st.msg = '唤醒总开关已' + (on ? '开启（会叫醒夏天）' : '关闭（不会叫醒夏天）') +
+                  '（' + ((r.switch && r.switch.updated_at) || '') + '）';
+                st.msgErr = false;
+                await load(true);
+              } catch (e) {
+                st.msg = '切换唤醒开关失败：' + (e.message || e);
+                st.msgErr = true;
+                render();
+              }
+              return;
+            }
+            if (act === 'review') {              try {
                 const r = await post({ action: 'review_close' });
                 if (!r.ok) throw new Error(r.error || '确认失败');
                 const s = r.stats || {};

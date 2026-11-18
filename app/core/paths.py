@@ -226,6 +226,13 @@ WRITABLE_STATE: dict[str, Path] = {
     "kill_switch": STATE_DIR / "kill_switch.json",
     # UI 备注（旧 /api/ui_notes/* 的落盘目标；在 state 目录、历史归属运维域，随本批一并开写）
     "ui_notes": STATE_DIR / "ui_notes.json",
+    # 决策点唤醒总开关（2026-11-16 补登）：`wake_eval` 每轮读它决定要不要调 `wake_agent`。
+    # 为什么进白名单：开关的**唯一写入口是面板**（预警卡里的总开关）——属于“插件写 engine/state”
+    # 那一类，就必须走「manifest 声明 + 本白名单 + ctx.state_write」三道，不能因为模块自带了锁/原子/审计
+    # 就绕过通道（否则下一个插件一句“alert 也这么写”就把契约掏空）。
+    # 读侧：`common/wake_switch.py` 只读（口径与降级缺省唯一在此），`wake_eval` 每轮一次；
+    # 写侧：只有 `ctx.state_write("wake_switch", doc)`，备份/原子替换/核心审计由 core 统一做。
+    "wake_switch": STATE_DIR / "wake_switch.json",
 }
 
 

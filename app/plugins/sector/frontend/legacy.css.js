@@ -114,14 +114,7 @@ html{
 .sector-card .dual input[type=range]::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:var(--paper-card);border:1.5px solid var(--accent);pointer-events:auto;cursor:pointer}
 
 .sector-card .l1box{margin-bottom:8px}
-.sector-card .l1box > summary{font-family:var(--ui);font-size:12px;color:var(--ink-3);cursor:pointer;list-style:none}
-.sector-card .l1box > summary::-webkit-details-marker{display:none}
-.sector-card .l1box > summary::before{content:'▸';font-size:9px;color:var(--accent);margin-right:4px}
-.sector-card .l1box[open] > summary::before{content:'▾'}
-.sector-card .l1box > summary:hover{color:var(--ink-2)}
-.sector-card .l1-sum-t{color:var(--ink-2)}
 .sector-card .l1box .l1-body{padding:2px 12px 10px}
-.sector-card .l1box .crumb{margin-bottom:6px;min-height:0}
 .sector-card .l1box .dir{margin-bottom:0}
 
 .sector-card .crumb{font-family:var(--ui);font-size:12px;color:var(--ink-3);margin-bottom:8px}

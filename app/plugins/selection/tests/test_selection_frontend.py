@@ -433,6 +433,23 @@ def test_pool_snapshot_switch_is_read_only() -> None:
     assert "(cur ? '<button type=\"button\" class=\"sel-star on\" data-pool=" in src
 
 
+# ---------------------------------------------------------------- 盘中实时涨幅（N89 / 2026-11-16）
+
+
+def test_live_quote_overlay_covers_after_close() -> None:
+    """收盘后仍用最新行情覆盖涨幅列（主人 2026-11-16 问「收盘后怎么变成昨天的涨幅」）。
+
+    旧实现把 `isTradingNow()` 当成取数闸门：15:05 一过就停手，页面一刷新就退回
+    快照里的上一交易日涨幅。现在闸门分两层——`quoteWindow()` 决定能不能取数
+    （盘中 + 收盘后当天），`isTradingNow()` 只决定轮询频率与文案口径。
+    """
+    src = _src()
+    assert "const quoteWindow = () => {" in src
+    assert "if (!S.alive || !S.el.rows || !quoteWindow()) return;" in src
+    assert "LIVE_IDLE_MS" in src, "非盘中必须限频，否则每次滚动重绘都打一遍 eltdx"
+    assert "涨幅取最新行情" in src, "非盘中要写清时点，不能拿旧值冒充实时"
+
+
 # ---------------------------------------------------------------- 刷新 / 生命周期
 
 

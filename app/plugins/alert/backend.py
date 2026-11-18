@@ -54,6 +54,22 @@ for _p in (ENGINE, os.path.join(ENGINE, "tools")):
 import add_alert as AA  # noqa: E402  条目结构与阈值算法唯一实现
 import alert_store as STORE  # noqa: E402  落盘唯一写入口
 from common import alert_schema as AS  # noqa: E402  三张枚举唯一源
+from common import wake_switch as WAKE_SW  # noqa: E402  唤醒总开关（读写唯一实现，路径写死在模块里）
+
+try:                                        # 1) 包导入（pytest / 其他模块 import）
+    from . import decisions as DU  # type: ignore
+except ImportError:                         # pragma: no cover - core 按文件加载时走这里
+    try:
+        from app.plugins.alert import decisions as DU  # type: ignore
+    except ImportError:                     # 3) 兜底：按路径加载同目录兄弟模块
+        import importlib.util as _ilu
+
+        _du_spec = _ilu.spec_from_file_location(
+            "_panel_v2_alert_decisions", os.path.join(os.path.dirname(os.path.abspath(__file__)), "decisions.py"))
+        if _du_spec is None or _du_spec.loader is None:
+            raise ImportError("无法加载 alert 插件的 decisions 模块")
+        DU = _ilu.module_from_spec(_du_spec)
+        _du_spec.loader.exec_module(DU)
 
 PANEL_DIR = str(_paths.PANEL_DIR)
 PERSISTENT = os.path.join(PANEL_DIR, "alert_plan_persistent.json")
@@ -652,6 +668,59 @@ def register(ctx: Any) -> APIRouter:
                     return {"ok": False, "error": str(e)}
                 return {"ok": True, "channels": cur}
             return {"ok": False, "error": "action 须为 add/remove/toggle/channels，收到 %r" % action}
+
+    @router.get("/alert/decision_points")
+    def alert_decision_points(date: Optional[str] = Query(
+            default=None, description="YYYYMMDD，缺省=今天（自测/排障用）")) -> Dict[str, Any]:
+        """决策点分区（只读）：今日计划 + 今日命中流水 + 评估器心跳 + 唤醒总开关。
+
+        **不做二次判定**：命中次数/触发值全部取 `wake_events.jsonl` 原值，不重算条件。
+        空态由 `present / count / state` 三个字段表达，前端不靠“没数据就算完”。
+        """
+        day = str(date or "").strip()
+        if day and not DU.DAY8_RE.match(day):
+            return {"ok": False, "error": "bad_date",
+                    "detail": "date 须 YYYYMMDD，实际: %r" % day}
+        return DU.build(date8=day or None)
+
+    @router.post("/alert/wake_switch")
+    def alert_wake_switch(payload: Optional[dict] = Body(default=None)) -> Dict[str, Any]:
+        """唤醒总开关（**本插件唯一的新增写操作**，2026-11-16 主人定）。
+
+        关 = wake_eval 不再调 `wake_agent`（不叫醒夏天）；评估照常跑、事件照常落盘、
+        alert 的 QQ 推送不受影响。
+
+        **写必须走受控写通道**（2026-11-16 收口夏天提的契约缺口）：
+        manifest `data.state: ["wake_switch"]` + `paths.WRITABLE_STATE` + `ctx.state_write()`，
+        备份/原子替换/核心审计由 core 统一做；`common/wake_switch.py` 只管读取、口径与审计追加。
+        路径写死在白名单里，不接受任何外部路径。
+        """
+        p = payload or {}
+        if "enabled" not in p:
+            return {"ok": False, "error": "缺 enabled（布尔）"}
+        enabled = p.get("enabled")
+        if not isinstance(enabled, bool):
+            return {"ok": False, "error": "enabled 必须是布尔值，收到 %r" % (enabled,)}
+        if ctx is None:
+            return {"ok": False, "error": "无插件上下文（register(None) 不支持写）"}
+        by = str(p.get("by") or "panel")
+        prev = WAKE_SW.read_switch()
+        try:
+            doc = WAKE_SW.build_doc(enabled, by=by)
+        except ValueError as e:
+            return {"ok": False, "error": str(e)}
+        try:
+            ctx.state_write("wake_switch", doc)
+        except PermissionError as e:
+            return {"ok": False,
+                    "error": "wake_switch 未登记可写（manifest.data.state / WRITABLE_STATE）：%s" % e}
+        except (OSError, ValueError) as e:
+            return {"ok": False, "error": "写开关失败：%s" % e}
+        WAKE_SW.append_audit({"ts": doc["updated_at"], "enabled": enabled, "by": doc["by"],
+                              "source": "alert_panel",
+                              "prev_enabled": prev["enabled"], "prev_ok": prev["ok"],
+                              "prev_reason": prev["reason"]})
+        return {"ok": True, "switch": WAKE_SW.read_switch()}
 
     @router.get("/alert/health")
     def alert_health() -> Dict[str, Any]:

@@ -364,12 +364,74 @@ def test_import_target_reports_import_error(monkeypatch: pytest.MonkeyPatch, tmp
 
 
 def test_concurrent_callers_use_stale_frame(monkeypatch: pytest.MonkeyPatch) -> None:
-    """锁被占（上一轮还在算）→ 直接返回旧帧，不排队、不重复打旧仓。"""
+    """上一轮还在算（inflight）→ 直接返回旧帧，不排队、不重复打旧仓。
+
+    2026-11-16：以前用 `_LOCK.acquire()` 表达“在飞”，但 join 超时后锁被立即还回去，
+    而后台 worker 还在跑 → 下一拍又起一个（N 个并发全量快照互抢，盘初全超时）。
+    现改为独立的 `inflight` 标记，本用例直接置位模拟“还在算”。
+    """
     mod = FakeModule(doc=SNAP)
     _use_module(monkeypatch, mod)
-    assert amvlive._LOCK.acquire(blocking=False)
+    amvlive._STATE["inflight"] = True
+    amvlive._STATE["inflight_at"] = time.time()
     try:
         assert amvlive.snapshot() is None      # 旧帧为空
         assert mod.calls == 0
     finally:
-        amvlive._LOCK.release()
+        amvlive._STATE["inflight"] = False
+
+
+def test_snapshot_timeout_keeps_stale_frame(monkeypatch: pytest.MonkeyPatch) -> None:
+    """超时**不清**已有实时帧，且后台算完自己落到缓存（2026-11-16 根因固定）。
+
+    旧行为：join 超时后 `_STATE["doc"] = None`，把上一帧成功的实时快照一起冲掉——
+    盘初数据源一慢（>6s），面板就从实时掉回收盘口径，且下一拍从零重来，爬不回来。
+    """
+    _use_module(monkeypatch, FakeModule(doc=SNAP))
+    assert amvlive.snapshot() == SNAP
+    amvlive._STATE["ts"] = time.time() - 10_000.0        # 越过 TTL
+
+    fresh = dict(SNAP, asof="2026-10-26 10:32:00")
+    slow = FakeModule(doc=fresh, delay=0.5)
+    _use_module(monkeypatch, slow)
+    monkeypatch.setattr(amvlive, "JOIN_TIMEOUT_S", 0.05)
+
+    t0 = time.time()
+    assert amvlive.snapshot() is SNAP, "超时只能返回旧帧，不能清空"
+    assert time.time() - t0 < 0.4, "join 上限必须真的生效"
+    assert amvlive.last_error() == "timeout"
+
+    deadline = time.time() + 3.0                          # 等后台跑完
+    while amvlive._STATE["inflight"] and time.time() < deadline:
+        time.sleep(0.02)
+    assert amvlive._STATE["inflight"] is False
+    assert slow.calls == 1
+    assert amvlive.snapshot() is fresh, "后台结果已在缓存里，下一拍直接命中"
+    assert slow.calls == 1, "命中缓存，不该再打一次旧仓"
+    assert amvlive.last_error() is None
+
+
+def test_timeout_does_not_stack_workers(monkeypatch: pytest.MonkeyPatch) -> None:
+    """超时后 worker 仍在跑 → 下一拍不能再起一个（防并发叠乘）。"""
+    mod = FakeModule(doc=SNAP, delay=0.4)
+    _use_module(monkeypatch, mod)
+    monkeypatch.setattr(amvlive, "JOIN_TIMEOUT_S", 0.05)
+    assert amvlive.snapshot() is None
+    assert mod.calls == 1
+    assert amvlive.snapshot() is None                     # 仍在飞 → 旧帧，不再起 worker
+    assert mod.calls == 1
+    deadline = time.time() + 3.0
+    while amvlive._STATE["inflight"] and time.time() < deadline:
+        time.sleep(0.02)
+    assert amvlive.snapshot() == SNAP
+    assert mod.calls == 1
+
+
+def test_inflight_stale_released(monkeypatch: pytest.MonkeyPatch) -> None:
+    """inflight 超上限（worker 卡死）→ 允许重起，不把面板永久冻在旧帧上。"""
+    mod = FakeModule(doc=SNAP)
+    _use_module(monkeypatch, mod)
+    amvlive._STATE["inflight"] = True
+    amvlive._STATE["inflight_at"] = time.time() - (amvlive.INFLIGHT_MAX_S + 1.0)
+    assert amvlive.snapshot() == SNAP
+    assert mod.calls == 1

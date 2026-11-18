@@ -712,6 +712,29 @@ def test_shell_search_returns_old_shape():
     assert body["stocks"][0] == {"code": "600000.SH", "name": "浦发银行", "kind": "股票"}
 
 
+def test_shell_search_covers_etf_name_table() -> None:
+    """ETF 也要搜得到（2026-11-16 主人报「侧栏搜索搜不到 ETF」）。
+
+    名表把 ETF **单独放 `etfs` 段**（`names` 段 5582 只全是个股，5/1 开头一只没有），
+    旧实现只遍历 `names`，于是 510300 / 沪深300ETF 全空。这里钉住：两段都进候选、
+    kind 按号段标 ETF、个股不受影响。
+    """
+    from types import SimpleNamespace  # noqa: PLC0415 - 局部构造最小 ctx
+
+    names = {"600519": "贵州茅台"}
+    etfs = {"510300": "沪深300ETF华泰柏", "159915": "创业板ETF易方达"}
+    ctx = SimpleNamespace(
+        json_read=lambda n: ({"names": names, "etfs": etfs} if n == "stock_names" else {}),
+        db_read=lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("no db")),
+    )
+    by_code = {s["code"]: s for s in backend.build_search(ctx, "510300", 8)["stocks"]}
+    assert by_code["510300.SH"] == {
+        "code": "510300.SH", "name": "沪深300ETF华泰柏", "kind": "ETF"}
+    assert any(s["code"] == "159915.SZ"
+               for s in backend.build_search(ctx, "创业板ETF", 8)["stocks"])
+    assert backend.build_search(ctx, "茅台", 8)["stocks"][0]["code"] == "600519.SH"
+
+
 def test_shell_search_sector_code_lands_in_stocks_with_kind():
     """同花顺板块指数（880xxx）经名字表命中时落 stocks 段且 kind=板块。
 

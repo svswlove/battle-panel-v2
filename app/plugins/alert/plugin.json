@@ -2,7 +2,7 @@
   "manifest_version": 1,
   "id": "alert",
   "name": "预警（只提醒不下单）",
-  "version": "0.2.7",
+  "version": "0.3.1",
   "min_core_version": "0.3.1",
   "enabled": true,
   "kind": "domain",
@@ -21,6 +21,7 @@
   },
   "data": {
     "panel": [],
+    "state": ["wake_switch"],
     "write": []
   },
   "config": {},

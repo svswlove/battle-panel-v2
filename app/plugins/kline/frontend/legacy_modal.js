@@ -20,7 +20,9 @@ import './labels_layer.js?v=0.9.67';
 
 const V = '0.9.67';
 const ASSET = `/plugins/kline/frontend/legacy`;
-const B = '&b=20261113i';
+// 构建号：旧模块与 vendor 库的 URL 缓存串（2026-11-16 换 b 值——修了分时悬停 tooltip
+// 的索引口径，只改 kline_lc.js 不改这里的话，浏览器会继续用缓存里的旧 JS）。
+const B = '&b=20261116a';
 
 const CSS_ID = 'kline-legacy-css';
 const CSS_HREF = `${ASSET}/modal.css?v=${V}${B}`;

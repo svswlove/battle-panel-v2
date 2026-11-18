@@ -21,6 +21,10 @@
 #   - 兜底不用 Start-Process $url：本机默认浏览器是 ego lite，不是 Chrome
 #
 # 退出码：0 已打开；1 8810 未就绪。日志：data/panel_v2/logs/open_panel.log
+#
+# 2026-11-15：所有 exit 改为 Quit（[Environment]::Exit）。实测 11-04~11-13 留下 22 个
+# 跑完不退的启动器（共 ~685MB），日志都写全了、脚本逻辑走完了，就差在 exit 那一步
+# 不退出（它们父进程是已退的 cmd.exe）。启动器无清理需求，直接硬退出最稳。
 
 $ErrorActionPreference = 'Continue'
 $url = 'http://127.0.0.1:8810'
@@ -32,6 +36,8 @@ $logDir = Join-Path $dataDir 'logs'
 if (-not (Test-Path -LiteralPath $logDir)) { New-Item -ItemType Directory -Force -Path $logDir | Out-Null }
 $log = Join-Path $logDir 'open_panel.log'
 $stateFile = Join-Path $dataDir 'launcher_state.json'
+
+function Quit([int]$code) { [System.Environment]::Exit($code) }
 
 function Write-Log([string]$m) {
     $line = "{0} {1}" -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $m
@@ -202,7 +208,7 @@ if ($state -and $state.hwnd) {
     $h = [IntPtr][int64]$state.hwnd
     if ([PanelWin]::Alive($h, $titlePart, 'chrome')) {
         [void](Invoke-Activate $h '上次记录的面板窗口')
-        exit 0
+        Quit 0
     }
     Write-Log ("记录的面板窗口已失效 hwnd={0} -> 重新开" -f $state.hwnd)
 }
@@ -216,7 +222,7 @@ Write-Log ("现有 chrome 窗口 {0} 个{1}" -f $beforeKeys.Count, $(if ($before
 if (-not (Test-Path -LiteralPath $chrome)) {
     Write-Log "找不到 Chrome：$chrome"
     Write-Log '失败：无浏览器可用'
-    exit 1
+    Quit 1
 }
 Start-Process -FilePath $chrome -ArgumentList "--app=$url", '--window-size=1500,1000'
 Write-Log '已请求 chrome --app 新窗口'
@@ -248,7 +254,7 @@ if ($target -ne [IntPtr]::Zero) {
     } catch {
         Write-Log ("状态文件写入失败：{0}" -f $_.Exception.Message)
     }
-    exit 0
+    Quit 0
 }
 
 # ---------------- 6) 没等到新窗口 ----------------
@@ -267,11 +273,11 @@ if ($reused -ne [IntPtr]::Zero) {
     Write-Log ("15 秒无新窗口；已置前既有同名窗口 hwnd={0} 标题={1}（可能是 Chrome 复用了旧 App 窗口）" -f $reused, $reusedTitle)
     $saved = @{ hwnd = $reused.ToInt64(); title = $reusedTitle; saved_at = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') }
     try { $saved | ConvertTo-Json -Compress | Set-Content -LiteralPath $stateFile -Encoding UTF8 } catch {}
-    exit 0
+    Quit 0
 }
 
 # 真正兜底：明确用 Chrome 开普通标签页（不用 Start-Process $url，本机默认浏览器是 ego lite）
 Write-Log '15 秒内既无新窗口也无同名窗口 -> 兜底用 Chrome 开普通标签页'
 Start-Process -FilePath $chrome -ArgumentList '--new-tab', $url
 Write-Log '兜底已执行'
-exit 1
+Quit 1

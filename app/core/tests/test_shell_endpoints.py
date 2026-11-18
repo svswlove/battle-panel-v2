@@ -184,12 +184,18 @@ def test_kept_symbols_still_present() -> None:
 
 def _real_client() -> TestClient:
     """用 create_app 起真应用（不扫真实插件目录），验证路由确实注册在 /api 上。"""
+    import atexit
+    import shutil
     import tempfile
 
     from app.core.main import create_app
 
     plugins = Path(tempfile.mkdtemp(prefix="panel_v2_empty_plugins_"))
     web = Path(tempfile.mkdtemp(prefix="panel_v2_empty_web_"))
+    # 每次调用建两个临时目录，必须登记回收。不回收会在 %TEMP% 每轮留两个目录，
+    # 攒到几千个会拖慢 User Profile Service 登录通知（2026-09-15、11-17 两次实测）。
+    atexit.register(shutil.rmtree, plugins, True)
+    atexit.register(shutil.rmtree, web, True)
     return TestClient(create_app(plugins_dir=plugins, web_dir=web))
 
 

@@ -19,9 +19,9 @@
 ## 与旧端的对齐（`engine/server.py::_rs_live`，L2765）
 
 - 缓存 TTL：盘中 25s / 盘外 300s（同 `_RS_LIVE_TTL_ON` / `_RS_LIVE_TTL_OFF`）；
-- 线程 + `join(6s)`：典型 0.5s，超时用旧帧/None，**不阻塞请求线程、不 kill 后台**；
-- 非阻塞锁：上一轮还在算 → 直接返回旧帧，不排队（旧端同款）；
-- **失败也写缓存**：QMT 未开时连点不会每次都重新 import + 打穿 QMT；
+- 线程 + `join(6s)`：典型 0.5s；到点不 kill，后台跑完**自己写缓存**（结果不丢），本轮返回上一帧；
+- inflight 单飞：上一轮还在算 → 直接返回旧帧，不排队、不叠加 worker（`INFLIGHT_MAX_S` 防卡死）；
+- **失败也写缓存**：数据源未开时连点不会每次都重新 import + 打穿数据源；
 - 错误文本口径同旧端：`"timeout"` / `"<ExcType>: <msg>"` / `"empty"`（有文档时为 None）。
 
 差异一处：`_RS_LIVE_JOIN_S` 旧端 8s，本模块 6s（任务书指定）。周末 QMT 未开时实测同步调用
@@ -53,6 +53,7 @@ from app.core import paths
 TTL_IN_SESSION = 25.0        # 盘中：25s
 TTL_OFF_SESSION = 300.0      # 盘外（周末/收盘后）：300s，只算很少几次，不白烧 QMT
 JOIN_TIMEOUT_S = 6.0         # 等快照上限（典型 0.5s；周末 QMT 未开约 4.2s 返回 None）
+INFLIGHT_MAX_S = 60.0        # 单次计算最长占用上限：超过判卡死，允许下一拍重起（正常 4–6s）
 SESSION_PROBE_TIMEOUT_S = 2.0  # 交易日历探测上限（eltdx 无缓存时可能慢，超时按工作日兜底）
 SESSION_TTL_S = 20.0         # 时段判定缓存，避免每请求都探日历
 SESSION_FALLBACK_START = "09:30"   # 日历不可用时的兜底窗口（任务书指定）
@@ -62,9 +63,10 @@ SESSION_FALLBACK_END = "15:00"
 IMPORT_PACKAGE = "executor"
 IMPORT_MODULE = "amv_live"
 
-_LOCK = threading.Lock()                  # 快照计算锁（非阻塞抢）
+_LOCK = threading.Lock()                  # 只护 _STATE 字段读写（不再当计算锁）
 _IMPORT_LOCK = threading.Lock()           # sys.path 改动串行化（只护 import，不护整个计算）
-_STATE: dict[str, Any] = {"ts": 0.0, "doc": None, "err": None}
+_STATE: dict[str, Any] = {"ts": 0.0, "doc": None, "err": None,
+                            "inflight": False, "inflight_at": 0.0, "gen": 0}
 _SESSION: dict[str, Any] = {"ts": 0.0, "value": False}
 
 
@@ -179,42 +181,64 @@ def _valid_snapshot(doc: Any) -> bool:
 def snapshot() -> Optional[dict]:
     """实时逐股快照（缓存：盘中 25s / 盘外 300s）。
 
-    返回旧仓 `stocks_snapshot()` 原样 dict；取不到（QMT 未开 / 超时 / 异常 / 空快照）→ `None`。
-    **失败也写缓存**：防连点把 QMT 打穿（旧端同款）。原因用 `last_error()` 查。
+    返回旧仓 `stocks_snapshot()` 原样 dict；取不到（数据源未开 / 超时 / 异常 / 空快照）→ `None`。
+    **失败也写缓存**：防连点把数据源打穿（旧端同款）。原因用 `last_error()` 查。
+
+    超时语义（2026-11-16 修）：`join` 到点只代表“本轮没等到”，后台照旧跑完并写缓存；
+    已有的实时帧**不清空**，返回上一帧 + `last_error()=="timeout"`，下一拍直接命中。
     """
     now = time.time()
     ttl = TTL_IN_SESSION if in_session() else TTL_OFF_SESSION
-    if (now - float(_STATE["ts"])) < ttl:
-        return _STATE["doc"]
-    if not _LOCK.acquire(blocking=False):
-        return _STATE["doc"]          # 上一轮还在算 → 用旧帧，不排队（旧端同款）
-
-    box: dict[str, Any] = {}
+    with _LOCK:
+        if (now - float(_STATE["ts"])) < ttl:
+            return _STATE["doc"]
+        # 上一轮还在算 → 用旧帧，不排队、**不叠加**新 worker（旧端同款）。
+        # 2026-11-16 修：以前用 `_LOCK.acquire(blocking=False)` 表达这条语义，但 join 超时后
+        # finally 立即还锁，而后台 worker 还在跑 → 下一拍又起一个，盘初数据源变慢时叠出 N 个
+        # 并发全量快照，彼此抢 CPU/连接，越算越慢、个个超时（主人报“开盘近半小时实时不可用”）。
+        if _STATE["inflight"] and (now - float(_STATE["inflight_at"])) < INFLIGHT_MAX_S:
+            return _STATE["doc"]
+        _STATE["inflight"] = True
+        _STATE["inflight_at"] = now
+        gen = int(_STATE["gen"])
 
     def _job() -> None:
+        """算一次全市场快照，**不管请求线程还在不在等，跑完都把结果写进缓存**。
+
+        2026-11-16 修：以前结果只活在 `box` 里，请求线程 join 超时后就丢掉——后台白算一场，
+        下一次请求从零重来，永远热不起来；而且超时分支会把 `_STATE["doc"]` 覆盖成 None，
+        连上一次成功的实时帧一起清掉，前端立刻掉回收盘口径且长时间爬不回来。
+        """
+        doc = None
+        err = None
         try:
             module = _import_target()
-            box["doc"] = module.stocks_snapshot()
+            doc = module.stocks_snapshot()
         except Exception as exc:  # noqa: BLE001 - 不拖垮面板
-            box["err"] = "%s: %s" % (type(exc).__name__, exc)
-
-    try:
-        worker = threading.Thread(target=_job, name="panel-v2-amv-live", daemon=True)
-        worker.start()
-        worker.join(JOIN_TIMEOUT_S)
-        if worker.is_alive():
-            box["err"] = "timeout"    # 到点不 kill：后台继续跑完，本轮如实报超时
-        doc = box.get("doc")
+            err = "%s: %s" % (type(exc).__name__, exc)
         if doc is not None and not _valid_snapshot(doc):
-            doc = None
-            box.setdefault("err", "bad_snapshot")
-        err = box.get("err") if box.get("err") else (None if doc else "empty")
-        _STATE["doc"] = doc
-        _STATE["err"] = err
-        _STATE["ts"] = time.time()
-        return doc
-    finally:
-        _LOCK.release()
+            doc, err = None, (err or "bad_snapshot")
+        if doc is None and err is None:
+            err = "empty"
+        with _LOCK:
+            if _STATE["gen"] != gen:
+                return        # 缓存已被重置（测试隔离 / 进程重载）→ 本轮结果作废，不覆盖新代
+            _STATE["doc"] = doc
+            _STATE["err"] = err
+            _STATE["ts"] = time.time()
+            _STATE["inflight"] = False
+
+    worker = threading.Thread(target=_job, name="panel-v2-amv-live", daemon=True)
+    worker.start()
+    worker.join(JOIN_TIMEOUT_S)
+    if worker.is_alive():
+        # 到点不 kill：后台继续跑完并自己写缓存；本轮只报原因，**不动已有实时帧、不刷 ts**
+        # （刷 ts 会把“正在算”错记成“刚失败”，多占 25s TTL；清 doc 会让面板从实时掉回收盘）。
+        # 锁内再确认一次 inflight：worker 恰好已跑完时不覆盖它刚写好的真实原因。
+        with _LOCK:
+            if _STATE["gen"] == gen and _STATE["inflight"]:
+                _STATE["err"] = "timeout"
+    return _STATE["doc"]
 
 
 def last_error() -> Optional[str]:
@@ -232,9 +256,17 @@ def cached_at() -> float:
 
 
 def reset_cache() -> None:
-    """清缓存（测试隔离用；生产不需要调）。"""
-    _STATE["ts"] = 0.0
-    _STATE["doc"] = None
-    _STATE["err"] = None
+    """清缓存（测试隔离用；生产不需要调）。
+
+    同时自增代际号：已经在飞的后台 worker 跑完后不再回写（否则会把上一条用例的
+    快照涂到下一条用例的缓存里，测试顺序一变就红）。
+    """
+    with _LOCK:
+        _STATE["ts"] = 0.0
+        _STATE["doc"] = None
+        _STATE["err"] = None
+        _STATE["inflight"] = False
+        _STATE["inflight_at"] = 0.0
+        _STATE["gen"] = int(_STATE["gen"]) + 1
     _SESSION["ts"] = 0.0
     _SESSION["value"] = False

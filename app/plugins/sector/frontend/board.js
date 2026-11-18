@@ -524,23 +524,16 @@ export const fmtAmt = (v) => (v == null ? '—' : (v / 10).toFixed(1));
 export const fmtPctNum = (v) => (v == null ? '—' : (v > 0 ? '+' : '') + Number(v).toFixed(2) + '%');
 export const clsNum = (v) => (v == null ? 'flat' : (v > 0 ? 'pos' : (v < 0 ? 'neg' : 'flat')));
 
-/* ---------------------------------------------------------------- 一级行业目录 / 面包屑
+/* ---------------------------------------------------------------- 分类目录
 
-   8002 `renderCrumb` app.js:895 与 `renderDirectory` app.js:916（30 行）。
-   结构：.crumb > a + span.sep + span.cur ｜ .dir > button.chip（.on 为当前）。
-   v2 里没有 L1 层（8002 也已废），所以目录来自 catalog 的 l1 字段去重。 */
-export function renderCrumb(host, drillL1, onPick) {
-  const parts = ['<a data-l1="">全部</a>'];
-  if (drillL1) parts.push('<span class="cur">' + esc(drillL1) + '</span>');
-  host.innerHTML = parts.join('<span class="sep">›</span>');
-  host.querySelectorAll('a').forEach((a) => {
-    a.addEventListener('click', () => onPick(a.dataset.l1 || null));
-  });
-}
-
+   8002 `renderDirectory` app.js:916 的结构逐字。
+   结构：.dir > button.chip（.on 为当前）。
+   v2 里没有 L1 层（8002 也已废），所以目录来自 catalog 的 l1 字段去重。
+   2026-11-15 主人定：不折叠、不渲染标题与面包屑，「全部」排在最后。 */
 export function renderDirectory(host, l1s, drillL1, onPick) {
-  host.innerHTML = '<button class="chip' + (drillL1 ? '' : ' on') + '" data-l1="">全部</button>'
-    + l1s.map((n) => '<button class="chip' + (drillL1 === n ? ' on' : '') + '" data-l1="' + esc(n) + '">' + esc(n) + '</button>').join('');
+  // 「全部」排在最后（2026-11-15 主人定）：它是兜底项，跟在具体分类之后更顺手。
+  host.innerHTML = l1s.map((n) => '<button class="chip' + (drillL1 === n ? ' on' : '') + '" data-l1="' + esc(n) + '">' + esc(n) + '</button>').join('')
+    + '<button class="chip' + (drillL1 ? '' : ' on') + '" data-l1="">全部</button>';
   host.querySelectorAll('.chip').forEach((b) => {
     b.addEventListener('click', () => onPick(b.dataset.l1 || null));
   });

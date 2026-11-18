@@ -233,6 +233,24 @@ def _name_index(ctx: Any) -> Dict[str, str]:
     return names if isinstance(names, dict) else {}
 
 
+def _etf_index(ctx: Any) -> Dict[str, str]:
+    """ETF 代码→名称（`ctx.json_read("stock_names")` 的 `etfs` 段：6 位码→名称）。
+
+    2026-11-16 主人报「侧栏搜索搜不到 ETF」：名表把 ETF **单独放 `etfs` 段**
+    （1706 只；`names` 段 5582 只全是个股，5/1 开头一只没有），旧实现只遍历 `names`，
+    于是 `510300` / `沪深300ETF` 全空。
+    """
+    reader = getattr(ctx, "json_read", None)
+    if not callable(reader):
+        return {}
+    try:
+        data = reader("stock_names")
+    except Exception:  # noqa: BLE001 - 名表不可用 → 搜索少召回，不阻断
+        return {}
+    etfs = data.get("etfs") if isinstance(data, dict) else None
+    return etfs if isinstance(etfs, dict) else {}
+
+
 def _code_hit(token: str, code6: str, full: str) -> bool:
     """代码命中口径（2026-10-28 主人定）：纯数字**至少 3 位**且只按**后 N 位**（代码尾部）匹配。
 
@@ -1068,7 +1086,9 @@ def build_search(ctx: Any, q: Any = "", limit: Any = None) -> Dict[str, Any]:
         limit_n = SEARCH_LIMIT_DEFAULT
 
     stocks: List[Dict[str, Any]] = []
-    names = _name_index(ctx)
+    # 2026-11-16：ETF 名表独立成 `etfs` 段，不合并进来就搜不到（`_is_etf` 按号段自动标 kind=ETF）。
+    names = dict(_etf_index(ctx))
+    names.update(_name_index(ctx))
     py = _pinyin_map(ctx)
     for code6, nm in names.items():
         suffix = _suffix_of(str(code6))
@@ -1103,7 +1123,12 @@ def build_search(ctx: Any, q: Any = "", limit: Any = None) -> Dict[str, Any]:
         pref = 0 if (c6.endswith(head) or nm2_low.startswith(head)
                      or str(p2.get("i") or "").startswith(head)
                      or str(p2.get("f") or "").startswith(head)) else 1
-        return (exact, code_pref, pref, len(nm2), x["code"])
+        # 2026-11-16：ETF 名称后级是厂商名（「沪深300ETF华泰柏」），长度纯噪声——
+        # 按长度排会让 10 字的 159xxx 占满 12 条，把主力 510300 挤出可见范围。ETF 不看长度；
+        # 另加 kind 权重（股票 > ETF > 板块）：否则搜「银行」时名字带前缀的银行ETF 会把宁波银行等个股全挤掉。
+        kind_rank = 0 if x.get("kind") == "股票" else (1 if x.get("kind") == "ETF" else 2)
+        return (exact, kind_rank, code_pref, pref,
+                0 if x.get("kind") == "ETF" else len(nm2), x["code"])
 
     stocks.sort(key=_rank)
     stocks = stocks[:limit_n]

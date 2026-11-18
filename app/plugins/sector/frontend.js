@@ -20,7 +20,7 @@
  */
 
 import { createCompute, LEVEL_NAME } from './frontend/compute.js';
-import { el, seg, buildPanel, nextSort, renderCrumb, renderDirectory, esc, HM_CSS } from './frontend/board.js';
+import { el, seg, buildPanel, nextSort, renderDirectory, esc, HM_CSS } from './frontend/board.js';
 import { vizRows, renderGrid, renderQuad } from './frontend/views.js';
 import { openDetail, mountDetail } from './frontend/detail.js';
 import { injectCardCss } from './frontend/legacy.css.js';
@@ -263,14 +263,12 @@ const card = {
     this.adv.append(advRow);
     this.controls.append(row1, this.adv);
 
-    // 一级行业目录（折叠，8002 .l1box）
-    this.l1Box = el('details', { class: 'l1box' });
-    this.l1Summary = el('summary', null, '一级行业 · 全部');
-    this.l1Box.append(this.l1Summary);
+    // 分类目录（常显，不折叠，无标题/面包屑；2026-11-15 主人定：
+    // 分类是主要筛选手段，chip 行本身已表达「有哪些组、当前选哪个」，标题与面包屑均为冗余）
+    this.l1Box = el('div', { class: 'l1box' });
     this.l1Dir = el('div', { class: 'dir' });
-    this.crumb = el('div', { class: 'crumb' });
     const l1Body = el('div', { class: 'l1-body' });
-    l1Body.append(this.crumb, this.l1Dir);
+    l1Body.append(this.l1Dir);
     this.l1Box.append(l1Body);
 
     this.status = el('div', { class: 'meta' }, '加载中…');
@@ -337,7 +335,9 @@ const card = {
   },
 
   _hasL1() {
-    return !!this._catKey();
+    // 2026-11-15 主人定：只有概念层有四组分组（题材/风格/政策区域/自建）；
+    // 行业层（L2/L3）只看全量榜单，不再挂一级行业筛选条。
+    return this.level === 'CONCEPT';
   },
 
   /** 结构标签筛选栏（2026-10-27）。
@@ -534,9 +534,8 @@ const card = {
     this.btnLast.disabled = this.dayB === hi;
   },
 
-  /** 一级目录与面包屑（8002 renderDirectory / renderCrumb 的结构逐字）。
-   *  概念层（2026-11-14）的 l1 = 四组（题材/风格/政策区域/自建），按固定组序排；
-   *  行业层仍按申万一级行业名排序。 */
+  /** 分类目录（chip 行），仅概念层有。概念层的 l1 = 四组（题材/风格/政策区域/自建），按固定组序排。
+   *  当前位置由 chip 的 .on 高亮表达，不渲染标题/面包屑（2026-11-15 主人定）。 */
   _renderDir() {
     if (!this._hasL1()) { this.l1Box.hidden = true; return; }
     this.l1Box.hidden = false;
@@ -556,9 +555,6 @@ const card = {
       this._render();
     };
     renderDirectory(this.l1Dir, l1s, this.drillL1, pick);
-    renderCrumb(this.crumb, this.drillL1, pick);
-    this.l1Summary.textContent = (isConcept ? '分组 · ' : '一级行业 · ')
-      + (this.drillL1 || '全部') + '（' + l1s.length + '）';
   },
 
   // ------------------------------------------------------------ 交互

@@ -15,7 +15,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -95,11 +95,26 @@ function check(name, cond, detail) {
   const proc = spawn(chrome, ['--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check',
     '--remote-debugging-port=' + port2, '--user-data-dir=' + profile, '--window-size=1400,900', 'about:blank'],
     { stdio: 'ignore' });
+  // 删临时 profile：Windows 上 proc.kill() 只是发信号，Chrome 子进程未死透时 rmSync
+  // 会因句柄占用失败。先 taskkill 整棵进程树再带重试删；失败必须出声——静默吞错会让
+  // %TEMP% 无感累积（2026-11-17 实测堆到 218 个 p2dom-*，拖慢登录）。
+  const cleanupProfile = () => {
+    try { proc.kill(); } catch (e) {}
+    try { execSync('taskkill /PID ' + proc.pid + ' /T /F', { stdio: 'ignore' }); } catch (e) {}
+    try {
+      fs.rmSync(profile, { recursive: true, force: true, maxRetries: 20, retryDelay: 150 });
+    } catch (e) { console.log('WARN: 临时 profile 未删除 ' + profile + ' — ' + e.message); }
+  };
   let targets = null;
   for (let i = 0; i < 80; i++) {
     try { targets = await getJson('http://127.0.0.1:' + port2 + '/json/list'); break; } catch (e) { await sleep(250); }
   }
-  if (!targets) { console.log('SKIP: CDP 未就绪'); srv.close(); proc.kill(); process.exit(0); }
+  if (!targets) {
+    console.log('SKIP: CDP 未就绪');
+    srv.close();
+    cleanupProfile();
+    process.exit(0);
+  }
 
   const page = targets.find((t) => t.type === 'page');
   const cdp = new CDP(page.webSocketDebuggerUrl);
@@ -221,8 +236,8 @@ function check(name, cond, detail) {
     failed++;
     console.log('NOT OK - 异常：' + ((e && e.message) || e));
   } finally {
-    cdp.close(); srv.close(); try { proc.kill(); } catch (e) {}
-    try { fs.rmSync(profile, { recursive: true, force: true }); } catch (e) {}
+    cdp.close(); srv.close();
+    cleanupProfile();
     process.exit(failed ? 1 : 0);
   }
 })();
