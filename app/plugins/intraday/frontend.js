@@ -509,8 +509,16 @@ function panicTodayChart(p) {
   let allALayer = '';
   let allATxt = '—';
   if (pvals.length >= 2) {
-    const M = Math.max(0.5, Math.ceil(Math.max.apply(null, pvals.map((v) => Math.abs(v)))));
-    const Y2 = (pct) => T + ih * (1 - (pct + M) / (2 * M));
+    // 2026-11-19（主人）：「还是要叠加，把实际走势图作为背景板，但可以将它拉高，
+    //   不要挤在底下一小块」。→ 纵坐标不按 ±M 居中（那种画法 0% 在正中，曲线
+    //   只在中间窄带摆，面积只能铺在下半），改成**当日极值自适应铺满全高**：
+    //   最深跌幅贴底、最浅贴顶（上下各留 8% 余量），面积从曲线一直铺到图底，整幅当背板。
+    const pmin0 = Math.min.apply(null, pvals);
+    const pmax0 = Math.max.apply(null, pvals);
+    const span0 = pmax0 - pmin0;
+    const pad = span0 < 0.2 ? 0.1 : span0 * 0.08;
+    const lo = pmin0 - pad; const hi = pmax0 + pad;
+    const Y2 = (pct) => T + ih * (1 - (pct - lo) / (hi - lo));
     const baseY = T + ih;
     // 同样按连续段画（午休断开）：跨午休连成一片会把两个时段的形态混在一起
     const segs = [];
@@ -538,18 +546,20 @@ function panicTodayChart(p) {
       area += '';
       const lastPct = pvals[pvals.length - 1];
       const tone = lastPct >= 0 ? 'var(--up)' : 'var(--down)';
-      const pmin = Math.min.apply(null, pvals); const pmax = Math.max.apply(null, pvals);
+      const pmin = pmin0; const pmax = pmax0;
       allATxt = (lastPct >= 0 ? '+' : '') + num(lastPct, 2) + '%'
         + '（区间 ' + num(pmin, 2) + ' ~ ' + num(pmax, 2) + '%）';
       allALayer = '<defs><linearGradient id="it-pd-alla" x1="0" y1="0" x2="0" y2="1">'
-        + '<stop offset="0" stop-color="' + tone + '" stop-opacity="0.26"/>'
-        + '<stop offset="0.6" stop-color="' + tone + '" stop-opacity="0.10"/>'
+        + '<stop offset="0" stop-color="' + tone + '" stop-opacity="0.22"/>'
+        + '<stop offset="0.6" stop-color="' + tone + '" stop-opacity="0.09"/>'
         + '<stop offset="1" stop-color="' + tone + '" stop-opacity="0.02"/>'
         + '</linearGradient></defs>'
         + '<path d="' + area + '" fill="url(#it-pd-alla)" stroke="none"/>'
-        + '<line x1="' + L + '" y1="' + Y2(0).toFixed(1) + '" x2="' + (W - R)
-        + '" y2="' + Y2(0).toFixed(1) + '" stroke="var(--fg)" stroke-opacity="0.16"'
-        + ' stroke-width="1" stroke-dasharray="2 4"/>';
+        + (lo <= 0 && hi >= 0
+          ? '<line x1="' + L + '" y1="' + Y2(0).toFixed(1) + '" x2="' + (W - R)
+            + '" y2="' + Y2(0).toFixed(1) + '" stroke="var(--fg)" stroke-opacity="0.18"'
+            + ' stroke-width="1" stroke-dasharray="2 4"/>'
+          : '');
     }
   }
   const hi = valid.length ? valid.reduce((a, b) => (Number(b.value) > Number(a.value) ? b : a)) : null;
