@@ -324,6 +324,25 @@ def score_row(legacy: Any, series: list, raw: dict, day8: str) -> dict:
         return legacy.score_row(series, raw)
 
 
+def vol_confirm(value, ratio):
+    """量能确认标签（2026-11-19 夏天论证后定：量能不参与打分，只做单向确认）。
+
+    只在恐慌 <25（冰点及以下）时给标签，正常区不掺杂声：
+      ratio ≥ 1 → 「放量确认」（放量下跌 = 恐慌宣泄，三次大底都是这种）
+      ratio < 1 → 「缩量未出清」（没人卖也不买，往往是地量相持，不等于底）
+    任一缺失 → None（不猜）。
+    """
+    if value is None or ratio is None:
+        return None
+    try:
+        v, r = float(value), float(ratio)
+    except (TypeError, ValueError):
+        return None
+    if v >= 25:
+        return None
+    return "放量确认" if r >= 1 else "缩量未出清"
+
+
 def vol_state(row: dict) -> str:
     """量能项为何在位/缺位：in（计入）/ up_day（上涨日不计入）/ no_amount / thin_sample。"""
     if row.get("q_amount") is not None:
@@ -378,7 +397,7 @@ def _intraday_path():
     return paths.WS / "data" / "panel" / "panic_intraday.json"
 
 
-def intraday_series(store_doc, day8, legacy=None, kind=None):
+def intraday_series(store_doc, day8, legacy=None):
     """当日恐慌分时 → [{t, value, up_pct, limit_down_pct, limit_down, median_pct, state}]。
 
     数据源：`data/panel/panic_intraday.json`（tick_feed 每 60s 落一个原始点，见
@@ -401,31 +420,10 @@ def intraday_series(store_doc, day8, legacy=None, kind=None):
         lg = legacy or _load_legacy()
     except Exception:  # noqa: BLE001 - 口径模块不可用 → 不出分时（不编造）
         return []
-    # 量能维（2026-11-19 主人：「恐慌广度 30 却在黄线下面」）：
-    #   日频口径的第四项是「**预估全天额** ÷ 昨日全天额」——注意是**预估**，不是当前累计额：
-    #   累计额从开盘涨到收盘，直接拿它比昨日全天会把早盘看小、尾盘看大，不是同一个量。
-    #   预估 = 累计 ÷ 量能进度 w(t)（近 20 日同刻累计占全天中位数），由旧仓
-    #   `turnover_context(kind="live")` 吐 `forecast_full_day_amount`，我们不自己外推。
-    #   分时点若不算它（先前就是），就是三维；头部算四维 → 同一分钟差 ~15 分。
-    #   量能天然是日粒度输入，盘中只有当前预估这一个值 → 当日**所有**分时点共用它
-    #   （与头部同一个 ratio），不逐点伪造。缺预估 → 该项缺席（保留三维，不编）。
-    vol_raw = {}
-    if kind in ("live", "close"):
-        try:
-            vol_raw = with_turnover(lg, {}, day8, kind, store_doc.get("series") or [])
-        except Exception:  # noqa: BLE001 - 量能拿不到 → 该项缺席（保留三维，不编）
-            vol_raw = {}
-    ratio = vol_raw.get("amount_ratio")
-    if ratio is None:
-        # 当日已落库（收盘后）→ 用库行里已算好的 amount_ratio（同源，不再现估一遍）
-        for _r in reversed(store_doc.get("series") or []):
-            if str(_r.get("date") or "") == str(day8 or "") and _r.get("amount_ratio") is not None:
-                ratio = _r.get("amount_ratio")
-                break
-    try:
-        win = amount_window(lg, store_doc.get("series") or [], day8)
-    except Exception:  # noqa: BLE001
-        win = None
+    # 2026-11-19（夏天论证 + 回测，主人托「你们决定」）：量能**退出等权打分**。
+    #   今早那版曾给分时点注入 amount_ratio（让分时=四维、跟头部对齐）；现在头部也回三维了，
+    #   两头同口径靠「都不用」，而不是「都额外算一维」——分时保持三维即与头部一致。
+    #   量能改为标签（见 build_payload 的 items.confirm），不进 value。
     hist = [r for r in (store_doc.get("series") or [])
             if str(r.get("date") or "") < str(day8 or "")]
     out = []
@@ -447,16 +445,13 @@ def intraday_series(store_doc, day8, legacy=None, kind=None):
                                   if isinstance(ld, (int, float)) else None),
                "median_pct": med if isinstance(med, (int, float)) else None,
                "limit_up": p.get("limit_up")}
-        if ratio is not None:
-            raw["amount_ratio"] = ratio
         if raw["limit_down_pct"] is None or raw["median_pct"] is None:
             out.append({"t": p["t"], "value": None, "state": None,
                         "up_pct": raw["up_pct"], "limit_down_pct": raw["limit_down_pct"],
                         "limit_down": raw["limit_down"], "median_pct": raw["median_pct"]})
             continue
         try:
-            row = (lg.score_row(hist, raw, amount_window=win) if win
-                   else lg.score_row(hist, raw))
+            row = lg.score_row(hist, raw)
         except Exception:  # noqa: BLE001 - 单点算不出 → 断线
             row = {}
         out.append({"t": p["t"], "value": row.get("panic"), "state": row.get("state"),
@@ -554,11 +549,14 @@ def build_payload(store_doc: dict[str, Any], snap: dict[str, Any] | None,
         {"key": "median", "label": "全A中位涨跌", "unit": "%",
          "value": row.get("median_pct"), "count": None,
          "percentile": row.get("q_median")},
-        # 第四项·量能（2026-10-29）：value = 当日全天额 ÷ 昨日全天额；kind 标预估/实际
+        # 第四项·量能（2026-10-29 加；2026-11-19 起**不参与打分**，只做确认标签）：
+        #   value = 预估全天额÷昨日全天额；confirm 只在恐慌<25 时给（放量确认/缩量未出清），
+        #   percentile 仍下发供排查，但不再进 value（见旧仓 panic_score）。
         {"key": "amount", "label": "量能（成交额/昨日）", "unit": "×",
          "value": row.get("amount_ratio"), "count": None,
          "percentile": row.get("q_amount"),
-         "kind": row.get("amount_kind"), "active": row.get("q_amount") is not None,
+         "confirm": vol_confirm(value, row.get("amount_ratio")),
+         "kind": row.get("amount_kind"), "active": False,
          "state": vol_state(row), "amount": row.get("amount"),
          "prev_amount": row.get("amount_prev"),
          "ratio_same_time": row.get("amount_ratio_same_time")},
@@ -607,7 +605,7 @@ def build_payload(store_doc: dict[str, Any], snap: dict[str, Any] | None,
                    "state": vol_state(row), "source": row.get("amount_source")},
         # 当日恐慌分时（2026-11-18 主人：要「当日的恐慌走势图」，不是与昨日对比）：
         #   由 tick_feed 每 60s 落原始点，这里现算分位/恐慌值（与日频同函数）。无记录 → []。
-        "intraday_series": intraday_series(store_doc, str(row.get("date") or day8), legacy, kind),
+        "intraday_series": intraday_series(store_doc, str(row.get("date") or day8), legacy),
         "note": ("恐慌广度=价三维（跌停占比/上涨占比/全A中位）+ 量一维（当日全天额÷昨日全天额，"
                  "盘中用预估、只在下跌日计入）250 日滚动分位（越高越恐慌）反向均值；低值=恐慌；"
                  "涨停家数为展示项，不进分数"),

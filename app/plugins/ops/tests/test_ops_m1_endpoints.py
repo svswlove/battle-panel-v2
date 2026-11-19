@@ -278,7 +278,10 @@ def _turnover_env(env: Env, monkeypatch: pytest.MonkeyPatch, mt: Dict[str, Any],
 
 
 def test_panic_volume_item_forecast_on_down_day(env: Env, monkeypatch: pytest.MonkeyPatch) -> None:
-    """盘中下跌日：第四项用**预估**全天额、参与分位，并并列下发昨日同时刻比值。"""
+    """盘中下跌日：第四项用**预估**全天额，并并列下发昨日同时刻比值。
+
+    2026-11-19（夏天论证后）：量能**不参与打分**（active 恒 False），只在冰点区给确认标签。
+    """
     _turnover_env(env, monkeypatch, {"asof": "2026-10-29 14:00:00", "progress": 0.9,
                                      "total_amount": 1.50e12,
                                      "forecast_full_day_amount": 1.60e12,
@@ -288,11 +291,16 @@ def test_panic_volume_item_forecast_on_down_day(env: Env, monkeypatch: pytest.Mo
     body = panic_calc.payload(_FakeQuotes(), store_doc=_panic_doc(last="20260101"),
                               now_dt=datetime(2026, 10, 29, 14, 0))
     vol = body["items"][3]
-    assert vol["key"] == "amount" and vol["active"] is True
+    assert vol["key"] == "amount" and vol["active"] is False
     assert vol["kind"] == "forecast" and vol["state"] == "in"
     assert vol["value"] == round(1.60e12 / 1.70e12, 4)      # 预估全天 / 昨日全天
     assert vol["ratio_same_time"] == round(1.50e12 / 1.45e12, 4)   # 校验比：背离不改分
-    assert vol["percentile"] is not None
+    assert vol["percentile"] is not None                    # 仍下发供排查
+    # 确认标签：只有在冰点区（<25）才给；比值 <1 → 缩量未出清
+    if body["value"] is not None and body["value"] < 25:
+        assert vol["confirm"] == "缩量未出清"
+    else:
+        assert vol["confirm"] is None
     assert body["volume"]["kind"] == "forecast"
 
 

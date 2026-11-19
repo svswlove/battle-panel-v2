@@ -547,18 +547,19 @@ function panicHtml(p, allA) {
       : '';
     const lab = isVol ? ('量能（成交额/昨日）' + (mark ? ' · ' + mark : '')) : x.label;
     const tip = isVol
-      ? '量能 当前 ' + num(x.value, 3) + '×（今日成交额 ÷ 昨日全天额），分位 ' + num(x.percentile, 1)
-        + '；同日刻比 ' + num(x.ratio_same_time, 3) + '×（与预估比背离=盘中节奏差异，不改分）'
+      ? '量能 当前 ' + num(x.value, 3) + '×（今日成交额 ÷ 昨日全天额）；同日刻比 '
+        + num(x.ratio_same_time, 3) + '×（与预估比背离=盘中节奏差异，不改分）'
         + (mark ? '；口径：' + mark : '')
+        + '；2026-11-19 起量能**不参与打分**，只在冰点区做确认标签'
+        + (x.confirm ? '（当前：' + x.confirm + '）' : '')
       : (x.label + ' 当前 ' + num(x.value, nd) + (x.unit || '') + '，处于过去 '
         + num(p.window, 0) + ' 个交易日分位 ' + num(x.percentile, 1));
+    const volTag = isVol ? (x.confirm || '不参与打分') : ('分位 ' + num(x.percentile, 1));
     return '<div class="it-pitem" style="--pq:' + pq.toFixed(1) + '%" title="' + esc(tip) + '">'
       + '<span class="it-pitem-k">' + esc(lab)
       + (x.count != null ? '<span class="it-pitem-c">' + num(x.count, 0) + ' 家</span>' : '') + '</span>'
       + '<span class="it-pitem-v ' + valCls + '">' + num(x.value, nd) + esc(x.unit || '') + '</span>'
-      + '<span class="it-pitem-q">'
-      + (isVol && x.active === false ? '未计入' : ('分位 ' + num(x.percentile, 1)))
-      + '</span></div>';
+      + '<span class="it-pitem-q">' + esc(volTag) + '</span></div>';
   }).join('');
   const stg = (p.stage && p.stage.label) ? (esc(p.stage.label) + '（' + esc(p.stage.date || '') + '）') : '—';
   const modeTxt = p.mode === 'live' ? '（盘中）' : (p.mode === 'close' ? '（收盘）' : '（已收盘）');
