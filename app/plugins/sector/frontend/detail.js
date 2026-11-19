@@ -196,7 +196,13 @@ function sparkInner(vals, mas, W0) {
   const lastM = mas[n - 1];
   const lastUp = (lastV != null && lastM != null) ? (lastV >= lastM) : null;
   const bias = (lastV == null || lastM == null || !lastM) ? null : (lastV / lastM - 1) * 100;
-  const biasTxt = bias == null ? '' : (bias >= 0 ? '多头 +' : '空头 ') + bias.toFixed(1) + '%';
+  // 2026-11-19（主人：徽标显「空」但图上写「多头」）：
+  //   这两个说法本来就不是一回事——**徽标**是双轨确认态（`amv_regime.compute_regime`，
+  //   要共振或二次确认才翻），**这行字**以前写的却是单点比较（末值站上 MA10 就叫多头）。
+  //   刚上穿那天必然矛盾（图为多、徽标为空）。这里改成**描述幅度**而不是下状态结论：
+  //   「高于/低于 MA10 ±x%」，状态由徽标统一说，不再在图上另下一个“多头/空头”。
+  const biasTxt = bias == null ? ''
+    : (bias >= 0 ? '高于 MA10 +' : '低于 MA10 ') + bias.toFixed(1) + '%';
   return pBand
     + '<path d="' + pLine + '" fill="none" stroke="var(--fg-strong)" stroke-width="1.4" stroke-linejoin="round"/>'
     + (pMa ? '<path d="' + pMa + '" fill="none" stroke="var(--warn-solid)" stroke-width="1.1" stroke-dasharray="3 2"/>' : '')
