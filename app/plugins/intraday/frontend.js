@@ -474,6 +474,45 @@ function panicTodayChart(p) {
     dots.push({ t: x.t, v: x.value, px: px, py: py });
   });
   const last = dots[dots.length - 1] || null;
+  // 2026-11-19（主人）：「当日分时背后叠一条当日全A走势，作对比，不需要重新拉数据」。
+  //   数据就在每个分时点自己身上——`median_pct`（全A中位涨跌 %）本来就是落点五字段之一，
+  //   零新增取数、零新增接口。画法与趋势图的全A 层同语言（线下渐变面积 + 0 轴虚线，
+  //   2026-11-05 标注 70 主人已明确不要那条全A 折线）。量纲不同 → 单独映射 Y2，
+  //   只占图高、不碰左边 0–100 主轴刻度；缺值断开，不插值、不拿 0 填。
+  const pcts = pts.map((x) => (x.median_pct == null ? null : Number(x.median_pct)));
+  const pvals = pcts.filter((v) => v != null && isFinite(v));
+  let allALayer = '';
+  let allATxt = '—';
+  if (pvals.length >= 2) {
+    const M = Math.max(0.5, Math.ceil(Math.max.apply(null, pvals.map((v) => Math.abs(v)))));
+    const Y2 = (pct) => T + ih * (1 - (pct + M) / (2 * M));
+    const baseY = T + ih;
+    let i0 = -1; let i1 = -1;
+    pcts.forEach((v, i) => { if (v != null) { if (i0 < 0) i0 = i; i1 = i; } });
+    let area = '';
+    for (let i = i0; i <= i1; i += 1) {
+      if (pcts[i] == null) continue;
+      area += (area ? 'L' : 'M') + X(pts[i].t).toFixed(1) + ' ' + Y2(pcts[i]).toFixed(1) + ' ';
+    }
+    if (area) {
+      area += 'L ' + X(pts[i1].t).toFixed(1) + ' ' + baseY.toFixed(1)
+        + ' L ' + X(pts[i0].t).toFixed(1) + ' ' + baseY.toFixed(1) + ' Z';
+      const lastPct = pvals[pvals.length - 1];
+      const tone = lastPct >= 0 ? 'var(--up)' : 'var(--down)';
+      const pmin = Math.min.apply(null, pvals); const pmax = Math.max.apply(null, pvals);
+      allATxt = (lastPct >= 0 ? '+' : '') + num(lastPct, 2) + '%'
+        + '（区间 ' + num(pmin, 2) + ' ~ ' + num(pmax, 2) + '%）';
+      allALayer = '<defs><linearGradient id="it-pd-alla" x1="0" y1="0" x2="0" y2="1">'
+        + '<stop offset="0" stop-color="' + tone + '" stop-opacity="0.26"/>'
+        + '<stop offset="0.6" stop-color="' + tone + '" stop-opacity="0.10"/>'
+        + '<stop offset="1" stop-color="' + tone + '" stop-opacity="0.02"/>'
+        + '</linearGradient></defs>'
+        + '<path d="' + area + '" fill="url(#it-pd-alla)" stroke="none"/>'
+        + '<line x1="' + L + '" y1="' + Y2(0).toFixed(1) + '" x2="' + (W - R)
+        + '" y2="' + Y2(0).toFixed(1) + '" stroke="var(--fg)" stroke-opacity="0.16"'
+        + ' stroke-width="1" stroke-dasharray="2 4"/>';
+    }
+  }
   const hi = valid.length ? valid.reduce((a, b) => (Number(b.value) > Number(a.value) ? b : a)) : null;
   const lo = valid.length ? valid.reduce((a, b) => (Number(b.value) < Number(a.value) ? b : a)) : null;
   const first = valid[0] || null;
@@ -487,7 +526,8 @@ function panicTodayChart(p) {
     + '<span class="it-pb-state ' + stCls + '">' + esc(p.state || '—') + '</span>'
     + '<span class="it-pday-v">' + num(p.value, 1) + '</span>'
     + '<span class="it-pday-d">当日走势 ' + dots.length + ' 点</span></div>'
-    + '<svg class="it-pchart it-pdchart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="当日恐慌广度走势（每分钟一点，低值=恐慌）">'
+    + '<svg class="it-pchart it-pdchart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="当日恐慌广度走势与当日全A中位（面积）——每分钟一点，低值=恐慌">'
+    + allALayer
     + gridY(0) + gridY(50) + gridY(100) + tick(0) + tick(50) + tick(100)
     + ref(ICE_THRESHOLD, 'var(--danger)') + ref(ICE_COLD_MAX, 'var(--warn)') + ref(90, 'var(--dim)')
     + xlab
@@ -497,6 +537,7 @@ function panicTodayChart(p) {
     + '</svg>'
     + '<div class="it-pday-foot">'
     + '开盘 ' + read(first) + ' ｜ 最高 ' + read(hi) + ' ｜ 最低 ' + read(lo)
+    + ' ｜ 全A中位 ' + allATxt
     + ' ｜ 参考线：极冰 &lt;' + ICE_THRESHOLD + '、冰点 ' + ICE_COLD_MAX + '、过热 90'
     + '</div></div>';
 }
@@ -507,6 +548,7 @@ function panicBoxHtml(p, allA) {
       + '<div class="it-pchart-legend"><span class="it-lg"><i class="lg-panic"></i>当日恐慌走势</span>'
       + '<span>每分钟一点 · 低值=恐慌</span>'
       + '<span>极冰 &lt;' + ICE_THRESHOLD + ' · 冰点 ' + ICE_COLD_MAX + '</span>'
+      + '<span>背景面积 = 全A中位涨跌（红涨绿跌）</span>'
       + '<span>点击切回趋势</span></div>'
       + panicTodayChart(p) + '</div>';
   }
