@@ -50,7 +50,9 @@ from typing import Any, Optional
 from app.core import paths
 
 # 旧端常量（`engine/server.py:2534-2537`）；JOIN 上限按任务书取 6s。
-TTL_IN_SESSION = 25.0        # 盘中：25s
+TTL_IN_SESSION = 60.0        # 盘中：60s（2026-11-19 主人：与 tick_feed 的 60s 全市场快照同频，
+                             #   避免「面板 live=1 每 25s 另取一次全市场」与它相撞 → 服务端限流、
+                             #   覆盖率掉到 23%（当日实证）。宁可多等 35 秒，也不重复拉。
 TTL_OFF_SESSION = 300.0      # 盘外（周末/收盘后）：300s，只算很少几次，不白烧 QMT
 JOIN_TIMEOUT_S = 6.0         # 等快照上限（典型 0.5s；周末 QMT 未开约 4.2s 返回 None）
 INFLIGHT_MAX_S = 60.0        # 单次计算最长占用上限：超过判卡死，允许下一拍重起（正常 4–6s）

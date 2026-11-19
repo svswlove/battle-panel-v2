@@ -234,8 +234,8 @@ def test_success_cached_within_ttl(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 def test_ttl_two_tiers(monkeypatch: pytest.MonkeyPatch) -> None:
-    """盘中 25s / 盘外 300s（旧端 `_RS_LIVE_TTL_ON` / `_RS_LIVE_TTL_OFF` 同值）。"""
-    assert amvlive.TTL_IN_SESSION == 25.0
+    """盘中 60s / 盘外 300s（2026-11-19 主人：盘中改 60s 与 tick_feed 快照同频，避免双取数相撞）。"""
+    assert amvlive.TTL_IN_SESSION == 60.0
     assert amvlive.TTL_OFF_SESSION == 300.0
     assert amvlive.JOIN_TIMEOUT_S == 6.0
 
@@ -244,7 +244,7 @@ def test_ttl_two_tiers(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr(amvlive, "in_session", lambda: True)
     amvlive.snapshot()
-    amvlive._STATE["ts"] = time.time() - 30.0     # 超过 25s → 盘中重算
+    amvlive._STATE["ts"] = time.time() - 70.0     # 超过 60s → 盘中重算
     amvlive.snapshot()
     assert mod.calls == 2
 
