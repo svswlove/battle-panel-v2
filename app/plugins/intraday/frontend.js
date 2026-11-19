@@ -269,13 +269,21 @@ function panicChart(p, allA) {
   for (const row of ((allA && allA.rows) || [])) {
     if (row && row.date && row.pct != null) amap[String(row.date)] = Number(row.pct);
   }
-  const pcts = pts.map((pt) => (amap[String(pt.date)] == null ? null : amap[String(pt.date)]));
+  const pctsRaw = pts.map((pt) => (amap[String(pt.date)] == null ? null : amap[String(pt.date)]));
+  // 2026-11-19（主人抓的视觉 bug）：面积必须画**累计涨跌**（相对窗口首日），不能画逐日涨跌幅——
+  //   11-16 −2.33%、11-17 −1.52%、11-18 −1.08%，天天在跌但跌幅在收窄，逐日线是往上爬的，
+  //   看上去像在涨。累计后形状才是「这几天一共跌了多少」。缺日不进累计（不拿 0 填）。
+  let cumPct = 0;
+  const pcts = pctsRaw.map((p) => {
+    if (p == null) return null;
+    cumPct = (1 + cumPct / 100) * (1 + p / 100) * 100 - 100;
+    return Math.round(cumPct * 100) / 100;
+  });
   const vals = pcts.filter((v) => v != null);
   let allALayer = '';
   if (vals.length >= 2) {
     const M = Math.max(2, Math.ceil(Math.max.apply(null, vals.map((v) => Math.abs(v)))));
     const Y2 = (pct) => T + ih * (1 - (pct + M) / (2 * M));
-    // 面积：从曲线一直铺到图底（2026-10-30 主人要求「折线图下方全部渲染」），只取连续有值的那一段
     const idxs = [];
     pcts.forEach((v, i) => { if (v != null) idxs.push(i); });
     const i0 = idxs[0]; const i1 = idxs[idxs.length - 1];
@@ -451,9 +459,17 @@ function panicTodayChart(p) {
   const valid = pts.filter((x) => x.value != null);
   const W = 600; const H = 150; const L = 34; const R = 12; const T = 10; const B = 20;
   const iw = W - L - R; const ih = H - T - B;
-  const m0 = 570; const m1 = 900;                       // 09:30 – 15:00
   const hm2m = (t) => { const a = String(t).split(':'); return (+a[0]) * 60 + (+a[1]); };
-  const X = (t) => L + iw * Math.max(0, Math.min(1, (hm2m(t) - m0) / (m1 - m0)));
+  // 2026-11-19（主人）：「不应该是把中间断开，而是把中间那一截取消掉」——
+  //   X 轴按**交易分钟**排（共 240 分钟），午休 11:30–13:00 压成一点、不留白：
+  //   11:30 与 13:00 落在同一 x，曲线自然接上；只有真缺档（如某分钟取数失败）才断。
+  const tmin = (t) => {
+    const m = hm2m(t);
+    if (m <= 690) return Math.max(0, m - 570);          // 09:30–11:30 → 0..120
+    if (m >= 780) return 120 + (m - 780);               // 13:00–15:00 → 120..240
+    return 120;                                          // 11:30–13:00 压成一点
+  };
+  const X = (t) => L + iw * Math.max(0, Math.min(1, tmin(t) / 240));
   const Y = (v) => T + ih * (1 - Math.max(0, Math.min(100, Number(v))) / 100);
   const tick = (v) => '<text x="' + (L - 5) + '" y="' + (Y(v) + 3.5).toFixed(1)
     + '" text-anchor="end" font-size="9" fill="var(--dim)">' + v + '</text>';
@@ -474,7 +490,7 @@ function panicTodayChart(p) {
   const dots = [];
   pts.forEach((x) => {
     if (x.value == null) { pen = false; prevMin = null; return; }
-    const curMin = hm2m(x.t);
+    const curMin = tmin(x.t);
     if (prevMin == null || curMin - prevMin > GAP_MIN) pen = false;
     prevMin = curMin;
     const px = X(x.t).toFixed(1); const py = Y(x.value).toFixed(1);
@@ -501,7 +517,7 @@ function panicTodayChart(p) {
     let run = [];
     let prevM = null;
     pcts.forEach((v, i) => {
-      const m = hm2m(pts[i].t);
+      const m = tmin(pts[i].t);
       const gap = prevM != null && m - prevM > GAP_MIN;
       prevM = m;
       if (v == null || gap) { if (run.length) segs.push(run); run = []; }
@@ -539,9 +555,12 @@ function panicTodayChart(p) {
   const hi = valid.length ? valid.reduce((a, b) => (Number(b.value) > Number(a.value) ? b : a)) : null;
   const lo = valid.length ? valid.reduce((a, b) => (Number(b.value) < Number(a.value) ? b : a)) : null;
   const first = valid[0] || null;
-  const xlab = ['09:30', '11:30', '13:00', '15:00'].map((t) =>
-    '<text x="' + X(t).toFixed(1) + '" y="' + (H - 5)
-    + '" text-anchor="middle" font-size="9" fill="var(--dim)">' + t + '</text>').join('');
+  const xlab = '<text x="' + L + '" y="' + (H - 5)
+    + '" text-anchor="start" font-size="9" fill="var(--dim)">09:30</text>'
+    + '<text x="' + X('11:30').toFixed(1) + '" y="' + (H - 5)
+    + '" text-anchor="middle" font-size="9" fill="var(--dim)">11:30/13:00</text>'
+    + '<text x="' + (W - R) + '" y="' + (H - 5)
+    + '" text-anchor="end" font-size="9" fill="var(--dim)">15:00</text>';
   const stCls = PANIC_CLS[p.state] || 'normal';
   const read = (x) => (x == null ? '—' : num(x.value, 1) + '（' + esc(String(x.t)) + '）');
   return '<div class="it-pday">'
@@ -584,7 +603,7 @@ function panicBoxHtml(p, allA) {
     + (allAPct == null ? '' : '<span class="it-lg"><i class="lg-alla" style="background:var(--'
       + (allAPct >= 0 ? 'up' : 'down') + ')"></i>全A 880008 '
       + '<b style="color:var(' + (allAPct >= 0 ? '--up' : '--down') + ')">' + (allAPct >= 0 ? '+' : '') + num(allAPct, 2) + '%</b>'
-      + '（渐变面积）</span>')
+      + '（面积=累计）</span>')
     + '<span class="it-lg"><i class="lg-ice"></i>冰点（&lt;' + ICE_THRESHOLD + '）</span>'
     + '<span>两线同向：低值=恐慌</span><span>参考线 10 / 90</span>'
     + '<span>近 ' + nPts + ' 个交易日</span></div>'
