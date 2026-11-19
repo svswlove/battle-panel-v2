@@ -1640,6 +1640,22 @@ def build_amv_research(ctx: Any, level: Any = "L2", code: Any = "", days: Any = 
                 live_err = "%s: %s" % (type(exc).__name__, exc)
             if snap is not None and str(snap.get("date") or "") < str(d1):
                 snap = None                 # 快照归属日比 EOD 还旧 → 不采信（不拿旧 tick 充实时）
+            # 2026-11-19（主人：「数据突然消失 / 可能是双口径」）：
+            #   当日快照只回来 1443/6168 只（coverage 23%）→ 实时 all_amv 只剩 EOD 的 23%，
+            #   分母缩水把分项放大到几百 ‰（截图：停牌/缺数 -375.854、大盘基准 +440.708），
+            #   而 v2 盘中卡的指数贡献不走这个残缺分母——所以一张卡正常、一页爆表。
+            #   闸：实时 all_amv 与 EOD 同日口径偏离 >50% → 判为残缺，回退收盘口径（不编造）。
+            if snap is not None:
+                try:
+                    _a = float(snap.get("all_amv") or 0.0)
+                    _b = float(T1 or 0.0)
+                    if _a <= 0 or _b <= 0 or not (0.5 <= _a / _b <= 2.0):
+                        live_err = ("实时快照覆盖不足（全A AMV %.2f 万亿 vs EOD %.2f 万亿），"
+                                    "已回退收盘口径" % (_a / 1e12, _b / 1e12))
+                        snap = None
+                except (TypeError, ValueError):
+                    snap = None
+                    live_err = "实时快照字段异常，已回退收盘口径"
             if snap is None and live_err is None:
                 try:
                     live_err = panel.last_error()   # 空快照 / 超时 / 异常原因（可能为 None）
