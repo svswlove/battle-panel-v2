@@ -457,7 +457,7 @@ function panicTodayChart(p) {
       + '</div></div>';
   }
   const valid = pts.filter((x) => x.value != null);
-  const W = 600; const H = 150; const L = 34; const R = 12; const T = 10; const B = 20;
+  const W = 600; const H = 150; const L = 34; const R = 40; const T = 10; const B = 20;
   const iw = W - L - R; const ih = H - T - B;
   const hm2m = (t) => { const a = String(t).split(':'); return (+a[0]) * 60 + (+a[1]); };
   // 2026-11-19（主人）：「不应该是把中间断开，而是把中间那一截取消掉」——
@@ -508,6 +508,7 @@ function panicTodayChart(p) {
   const pvals = pcts.filter((v) => v != null && isFinite(v));
   let allALayer = '';
   let allATxt = '—';
+  let pctAxis = '';
   if (pvals.length >= 2) {
     // 2026-11-19（主人）：「还是要叠加，把实际走势图作为背景板，但可以将它拉高，
     //   不要挤在底下一小块」。→ 纵坐标不按 ±M 居中（那种画法 0% 在正中，曲线
@@ -547,6 +548,15 @@ function panicTodayChart(p) {
       const lastPct = pvals[pvals.length - 1];
       const tone = lastPct >= 0 ? 'var(--up)' : 'var(--down)';
       const pmin = pmin0; const pmax = pmax0;
+    // 2026-11-19（主人）：右边加全A 涨幅标尺——背景板的形状要有定量参照，
+    //   否则只能看出「在跌」，看不出到底跌了多少。步长按当日跨度选（0.5 / 1 / 2）。
+    const spanT = hi - lo;
+    const stepT = spanT > 8 ? 2 : (spanT > 4 ? 1 : 0.5);
+    for (let v = Math.ceil(lo / stepT) * stepT; v <= hi + 1e-9; v += stepT) {
+      const vv = Math.round(v * 100) / 100;
+      pctAxis += '<text x="' + (W - R + 5) + '" y="' + (Y2(vv) + 3.5).toFixed(1)
+        + '" text-anchor="start" font-size="9" fill="var(--dim)">' + vv.toFixed(1) + '%</text>';
+    }
       allATxt = (lastPct >= 0 ? '+' : '') + num(lastPct, 2) + '%'
         + '（区间 ' + num(pmin, 2) + ' ~ ' + num(pmax, 2) + '%）';
       allALayer = '<defs><linearGradient id="it-pd-alla" x1="0" y1="0" x2="0" y2="1">'
@@ -586,6 +596,7 @@ function panicTodayChart(p) {
     + '<path d="' + path + '" fill="none" stroke="var(--dim)" stroke-width="1.7"/>'
     + (last ? '<circle cx="' + last.px + '" cy="' + last.py + '" r="2.8" fill="var(--danger)"><title>'
       + esc(last.t) + ' 恐慌 ' + num(last.v, 1) + '</title></circle>' : '')
+    + pctAxis
     + '</svg>'
     + '<div class="it-pday-foot">'
     + '开盘 ' + read(first) + ' ｜ 最高 ' + read(hi) + ' ｜ 最低 ' + read(lo)
