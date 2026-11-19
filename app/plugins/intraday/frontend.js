@@ -143,6 +143,8 @@ const CSS = [
   '.it-pchart-box{display:flex;flex-direction:column;justify-content:center;min-width:0;cursor:pointer}',
   // ---- 冰点卡·当日快照视图（2026-11-18 标注 N20261118-184104-9，点击图区切换）
   '.it-pday{display:flex;flex-direction:column;gap:6px;background:var(--card2);border:var(--border-w) var(--border-style) var(--border-color);border-radius:var(--radius-sm);padding:8px 10px;min-width:0}',
+  // 2026-11-19（主人）：「也像日线一样加上悬停」——当日图也需要相对定位的包层放光标读数卡
+  '.it-pd-wrap{position:relative}',
   // 当日走势空态（2026-11-18）：当日分时未落盘时如实说明，不画假曲线
   '.it-pday-empty{font-size:0.78rem;color:var(--dim);line-height:1.65}',
   '.it-pday-h{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}',
@@ -352,7 +354,70 @@ function togglePanicView(host, p, allA, br) {
 //   mousemove → 吸附到最近的交易日，竖虚线 + 三个点位（恐慌/跌停分位/全A）+ 左上浮层读数。
 //   几何与 panicChart 一致（viewBox 600×150，L40 R26 T10 B20）；内容重绘后靠 dataset 标记重绑。
 //   2026-10-30 主人收口：卡片只留三项——全A 涨幅、涨跌停家数对比、上涨下跌家数对比。
+// ---------------------------------------------------------------- 冰点卡·当日图悬停读数
+// 2026-11-19（主人）：「也像日线一样加上悬停可以查看当时的情况」。
+//   趋势图（日线）早就有光标卡；当日图按分钟点做同一件事：竖线 + 圆点 + 读数卡。
+//   命中按**交易分钟**距离算（午休压缩后 11:30 与 13:00 同 x，按钟表时间算会偏移）。
+function bindTodayCursor(host, p) {
+  const box = host && host.querySelector('.it-pday');
+  const wrap = box && box.querySelector('.it-pd-wrap');
+  const svg = wrap && wrap.querySelector('svg.it-pdchart');
+  const tip = wrap && wrap.querySelector('.it-pc-tip');
+  const g = svg && svg.querySelector('.it-pd-cur');
+  if (!svg || !tip || !g || svg.dataset.tcur === '1') return;
+  const pts = ((p && p.intraday_series) || []).filter((x) => x && x.t).slice()
+    .sort((a, b) => String(a.t).localeCompare(String(b.t)));
+  if (pts.length < 2) return;
+  svg.dataset.tcur = '1';
+  const W = 600; const H = 150; const L = 34; const R = 40; const T = 10; const B = 20;
+  const iw = W - L - R; const ih = H - T - B;
+  const hm2m = (t) => { const a = String(t).split(':'); return (+a[0]) * 60 + (+a[1]); };
+  const tmin = (t) => {
+    const m = hm2m(t);
+    if (m <= 690) return Math.max(0, m - 570);
+    if (m >= 780) return 120 + (m - 780);
+    return 120;
+  };
+  const X = (t) => L + iw * Math.max(0, Math.min(1, tmin(t) / 240));
+  const Y = (v) => T + ih * (1 - Math.max(0, Math.min(100, Number(v))) / 100);
+  const vline = g.querySelector('line');
+  const dot = g.querySelector('circle');
+  const move = (ev) => {
+    const rect = svg.getBoundingClientRect();
+    if (!rect.width) return;
+    const vbX = (ev.clientX - rect.left) * (W / rect.width);
+    if (vbX < L - 6 || vbX > W - R + 6) { g.style.display = 'none'; tip.hidden = true; return; }
+    const tm = (vbX - L) / iw * 240;
+    let best = pts[0]; let bestD = Infinity;
+    pts.forEach((x) => { const d = Math.abs(tmin(x.t) - tm); if (d < bestD) { bestD = d; best = x; } });
+    const x = X(best.t); const xf = x.toFixed(1);
+    g.style.display = '';
+    vline.setAttribute('x1', xf); vline.setAttribute('x2', xf);
+    if (dot) {
+      if (best.value == null) { dot.style.display = 'none'; } else {
+        dot.style.display = '';
+        dot.setAttribute('cx', xf); dot.setAttribute('cy', Y(best.value).toFixed(1));
+      }
+    }
+    const med = best.median_pct;
+    tip.innerHTML = '<b>' + esc(best.t) + '</b>'
+      + '<span>恐慌 <b>' + num(best.value, 1) + '</b>'
+      + (best.state ? ' · ' + esc(best.state) : '') + '</span>'
+      + '<span>跌停 <b>' + (best.limit_down == null ? '—' : num(best.limit_down, 0) + ' 家') + '</b>'
+      + ' · 占比 ' + (best.limit_down_pct == null ? '—' : num(best.limit_down_pct, 3) + '%') + '</span>'
+      + '<span>上涨 ' + (best.up_pct == null ? '—' : num(best.up_pct, 2) + '%')
+      + ' · 全A中位 <b style="color:var(' + (med == null ? '--dim' : (med >= 0 ? '--up' : '--down')) + ')">'
+      + (med == null ? '—' : (med >= 0 ? '+' : '') + num(med, 2) + '%') + '</b></span>';
+    tip.hidden = false;
+    tip.style.left = Math.max(110, Math.min(rect.width - 110, rect.width * (x / W))) + 'px';
+  };
+  svg.addEventListener('mousemove', move);
+  svg.addEventListener('mouseleave', () => { g.style.display = 'none'; tip.hidden = true; });
+}
+
 function bindPanicCursor(host, p, allA, br) {
+  // 当日图也要悬停读数（2026-11-19 主人）：两种视图都从本函数入口接，先绑这个再走趋势那套。
+  bindTodayCursor(host, p);
   // 视图切换（2026-11-18）：点图区在「近 60 日趋势」↔「当日冰点情况」之间切。
   //   绑在 .it-pchart-box 上（趋势/当日两种形态都有这个壳）；新节点用 dataset 去重，旧节点被替换后自然消失。
   const pBox = host && host.querySelector('.it-pchart-box');
@@ -588,7 +653,7 @@ function panicTodayChart(p) {
     + '<span class="it-pb-state ' + stCls + '">' + esc(p.state || '—') + '</span>'
     + '<span class="it-pday-v">' + num(p.value, 1) + '</span>'
     + '<span class="it-pday-d">当日走势 ' + dots.length + ' 点</span></div>'
-    + '<svg class="it-pchart it-pdchart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="当日恐慌广度走势与当日全A中位（面积）——每分钟一点，低值=恐慌">'
+    + '<div class="it-pd-wrap"><svg class="it-pchart it-pdchart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="当日恐慌广度走势与当日全A中位（面积）——每分钟一点，低值=恐慌">'
     + allALayer
     + gridY(0) + gridY(50) + gridY(100) + tick(0) + tick(50) + tick(100)
     + ref(ICE_THRESHOLD, 'var(--danger)') + ref(ICE_COLD_MAX, 'var(--warn)') + ref(90, 'var(--dim)')
@@ -597,7 +662,12 @@ function panicTodayChart(p) {
     + (last ? '<circle cx="' + last.px + '" cy="' + last.py + '" r="2.8" fill="var(--danger)"><title>'
       + esc(last.t) + ' 恐慌 ' + num(last.v, 1) + '</title></circle>' : '')
     + pctAxis
-    + '</svg>'
+    + '<g class="it-pd-cur" style="display:none">'
+    + '<line x1="0" y1="' + T + '" x2="0" y2="' + (H - B)
+    + '" stroke="var(--fg)" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="3 3"/>'
+    + '<circle cx="0" cy="0" r="3" fill="var(--fg)" stroke="var(--card)" stroke-width="1.2"/>'
+    + '</g>'
+    + '</svg><div class="it-pc-tip" hidden></div></div>'
     + '<div class="it-pday-foot">'
     + '开盘 ' + read(first) + ' ｜ 最高 ' + read(hi) + ' ｜ 最低 ' + read(lo)
     + ' ｜ 全A中位 ' + allATxt
