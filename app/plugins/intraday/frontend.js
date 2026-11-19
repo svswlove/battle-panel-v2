@@ -465,9 +465,18 @@ function panicTodayChart(p) {
   // 折线：值非空的点才连，遇到 null 就断开（不用 0 或前值填补）
   let path = '';
   let pen = false;
+  let prevMin = null;
+  // 2026-11-19（主人抓的 bug）：午休 11:30–13:00 没有落点（采样闸只记连续竞价），
+  //   若直接 11:30 连到 13:00，就会画出一条横跨午休的假直线（看着像恐慌值维持了 1.5 小时）。
+  //   正常节奏是 1 分钟一点，相邻点间隔 > GAP_MIN 视为「中间真没数据」→ 断线重起（M），
+  //   不插值、不拿前值补齐（与 null 同处理）。
+  const GAP_MIN = 3;
   const dots = [];
   pts.forEach((x) => {
-    if (x.value == null) { pen = false; return; }
+    if (x.value == null) { pen = false; prevMin = null; return; }
+    const curMin = hm2m(x.t);
+    if (prevMin == null || curMin - prevMin > GAP_MIN) pen = false;
+    prevMin = curMin;
     const px = X(x.t).toFixed(1); const py = Y(x.value).toFixed(1);
     path += (pen ? 'L' : 'M') + px + ' ' + py + ' ';
     pen = true;
@@ -487,16 +496,30 @@ function panicTodayChart(p) {
     const M = Math.max(0.5, Math.ceil(Math.max.apply(null, pvals.map((v) => Math.abs(v)))));
     const Y2 = (pct) => T + ih * (1 - (pct + M) / (2 * M));
     const baseY = T + ih;
-    let i0 = -1; let i1 = -1;
-    pcts.forEach((v, i) => { if (v != null) { if (i0 < 0) i0 = i; i1 = i; } });
+    // 同样按连续段画（午休断开）：跨午休连成一片会把两个时段的形态混在一起
+    const segs = [];
+    let run = [];
+    let prevM = null;
+    pcts.forEach((v, i) => {
+      const m = hm2m(pts[i].t);
+      const gap = prevM != null && m - prevM > GAP_MIN;
+      prevM = m;
+      if (v == null || gap) { if (run.length) segs.push(run); run = []; }
+      if (v != null) run.push(i);
+    });
+    if (run.length) segs.push(run);
     let area = '';
-    for (let i = i0; i <= i1; i += 1) {
-      if (pcts[i] == null) continue;
-      area += (area ? 'L' : 'M') + X(pts[i].t).toFixed(1) + ' ' + Y2(pcts[i]).toFixed(1) + ' ';
-    }
+    segs.forEach((seg) => {
+      if (seg.length < 2) return;
+      seg.forEach((i, k) => {
+        area += (k === 0 ? 'M' : 'L') + X(pts[i].t).toFixed(1) + ' ' + Y2(pcts[i]).toFixed(1) + ' ';
+      });
+      const s0 = seg[0]; const s1 = seg[seg.length - 1];
+      area += 'L ' + X(pts[s1].t).toFixed(1) + ' ' + baseY.toFixed(1)
+        + ' L ' + X(pts[s0].t).toFixed(1) + ' ' + baseY.toFixed(1) + ' Z ';
+    });
     if (area) {
-      area += 'L ' + X(pts[i1].t).toFixed(1) + ' ' + baseY.toFixed(1)
-        + ' L ' + X(pts[i0].t).toFixed(1) + ' ' + baseY.toFixed(1) + ' Z';
+      area += '';
       const lastPct = pvals[pvals.length - 1];
       const tone = lastPct >= 0 ? 'var(--up)' : 'var(--down)';
       const pmin = Math.min.apply(null, pvals); const pmax = Math.max.apply(null, pvals);
